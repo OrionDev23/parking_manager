@@ -28,6 +28,7 @@ import '../reparation/reparation/manager/reparation_table.dart';
 import '../reparation/fiche_reception/manager/fiche_reception_table.dart';
 import '../user_management/user_table.dart';
 import '../entreprise/fililales.dart';
+import '../platform/platform_companies_screen.dart';
 
 /// Chooses the search scope from the active navigation destination.
 /// Global search is intentionally available only on the main dashboard.
@@ -48,6 +49,7 @@ class ContextualSearchLauncher extends StatelessWidget {
     }
 
     final scope = switch (paneKey) {
+      'platform-companies' => _ModuleSearchScope.platformCompanies,
       'vehicle-manager' => _ModuleSearchScope.vehicles,
       'vehicle-documents' => _ModuleSearchScope.vehicleDocuments,
       'vehicle-states' => _ModuleSearchScope.vehicleStates,
@@ -80,6 +82,7 @@ class ContextualSearchLauncher extends StatelessWidget {
 }
 
 enum _ModuleSearchScope {
+  platformCompanies,
   vehicles,
   vehicleDocuments,
   vehicleStates,
@@ -124,6 +127,7 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
   String _lastDispatchedQuery = '';
 
   String get _placeholder => switch (widget.scope) {
+        _ModuleSearchScope.platformCompanies => 'Rechercher une entreprise cliente...',
         _ModuleSearchScope.vehicles => 'Rechercher un véhicule...',
         _ModuleSearchScope.vehicleDocuments => 'Rechercher un document véhicule...',
         _ModuleSearchScope.vehicleStates => 'Rechercher un état véhicule...',
@@ -174,6 +178,9 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
     }
 
     switch (widget.scope) {
+      case _ModuleSearchScope.platformCompanies:
+        PlatformCompaniesScreen.appBarSearchRequest.value = query;
+        break;
       case _ModuleSearchScope.vehicles:
         VehicleManagementState.externalSearchRequest.value = query;
         _scheduleVehiclePartSuggestion(query);
