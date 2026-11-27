@@ -463,15 +463,29 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               ),
             ),
             const SizedBox(height: 5),
-            Text(
-              model.isEmpty ? 'vehicle_details_model_missing'.tr() : model,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: compact ? 21 : 23,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -.2,
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Text(
+                    model.isEmpty ? 'vehicle_details_model_missing'.tr() : model,
+                    maxLines: compact ? 2 : 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: compact ? 21 : 23,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -.2,
+                    ),
+                  ),
+                ),
+                if (v.etatactuel != null) ...[
+                  const SizedBox(width: 10),
+                  _chip(
+                    VehiclesUtilities.getEtatName(v.etatactuel!).tr(),
+                    _vehicleStatusColor(v.etatactuel, accent),
+                  ),
+                ],
+              ],
             ),
             const SizedBox(height: 4),
             Text(
@@ -495,13 +509,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 letterSpacing: .2,
               ),
             ),
-            if (v.etatactuel != null) ...[
-              const SizedBox(height: 8),
-              _chip(
-                VehiclesUtilities.getEtatName(v.etatactuel!).tr(),
-                _vehicleStatusColor(v.etatactuel, accent),
-              ),
-            ],
             const SizedBox(height: 8),
             Wrap(
               spacing: 7,
