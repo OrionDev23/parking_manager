@@ -19,7 +19,10 @@ class UsersTable extends StatefulWidget {
   State<UsersTable> createState() => _UsersTableState();
 }
 
-class _UsersTableState extends State<UsersTable> {
+class UsersTableState extends State<UsersTable> {
+  static final ValueNotifier<String?> appBarSearchRequest =
+      ValueNotifier<String?>(null);
+
   late UsersManagementDatasource userDataSource;
 
   late final bool startedWithFiltersOn;
@@ -65,6 +68,15 @@ class _UsersTableState extends State<UsersTable> {
     }
     initColumns();
     super.initState();
+    appBarSearchRequest.addListener(_applyAppBarSearchRequest);
+    _applyAppBarSearchRequest();
+  }
+
+  void _applyAppBarSearchRequest() {
+    final query = appBarSearchRequest.value;
+    if (query == null || !mounted) return;
+    userDataSource.search(query);
+    appBarSearchRequest.value = null;
   }
 
   void initColumns() {
@@ -171,5 +183,12 @@ class _UsersTableState extends State<UsersTable> {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    appBarSearchRequest.removeListener(_applyAppBarSearchRequest);
+    userDataSource.dispose();
+    super.dispose();
   }
 }
