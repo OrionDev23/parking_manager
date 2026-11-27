@@ -1677,6 +1677,8 @@ class _VehicleFormState extends State<VehicleForm>
                 field('Longueur (mm)', lengthController, numeric: true),
                 field('Largeur (mm)', widthController, numeric: true),
                 field('Hauteur (mm)', heightController, numeric: true),
+                field('Type de motricité', driveTypeController,
+                    hint: 'Ex. 4x2, 4x4'),
                 _identitySubsectionTitle(
                   appTheme,
                   availableWidth,
@@ -1695,8 +1697,6 @@ class _VehicleFormState extends State<VehicleForm>
                     numeric: true),
                 field('Prochaine révision (km)', nextServiceMileageController,
                     numeric: true),
-                field('Type de motricité', driveTypeController,
-                    hint: 'Ex. 4x2, 4x4'),
               ],
             ),
           ],
