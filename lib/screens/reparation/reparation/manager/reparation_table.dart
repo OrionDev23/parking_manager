@@ -54,6 +54,7 @@ class ReparationTableState extends State<ReparationTable> {
       );
       filterDocument.value = null;
         filterNow = false;
+        filterNow = false;
     } else {
       startedWithFiltersOn = false;
 
