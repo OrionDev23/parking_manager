@@ -31,6 +31,7 @@ import '../../../utilities/algeria_lists.dart';
 import '../../../widgets/select_dialog/select_dialog.dart';
 import '../../../widgets/forms/parcoto_form_field.dart';
 import '../../../widgets/vehicle_image_view.dart';
+import 'widgets/vehicle_make_picker_dialog.dart';
 
 Size _responsiveVehicleCountryDialogSize(BuildContext context) {
   final screenSize = MediaQuery.sizeOf(context);
@@ -3440,7 +3441,7 @@ class _VehicleFormState extends State<VehicleForm>
       if (!mounted) return;
       final selected = await showDialog<String>(
         context: context,
-        builder: (dialogContext) => _VehicleMakePickerDialog(
+        builder: (dialogContext) => VehicleMakePickerDialog(
           selectedMakeId: marque,
         ),
       );
@@ -4192,111 +4193,4 @@ class _VehicleFormState extends State<VehicleForm>
 
   @override
   bool get wantKeepAlive => true;
-}
-
-class _VehicleMakePickerDialog extends StatefulWidget {
-  final String? selectedMakeId;
-
-  const _VehicleMakePickerDialog({this.selectedMakeId});
-
-  @override
-  State<_VehicleMakePickerDialog> createState() =>
-      _VehicleMakePickerDialogState();
-}
-
-class _VehicleMakePickerDialogState extends State<_VehicleMakePickerDialog> {
-  final TextEditingController _searchController = TextEditingController();
-  String _query = '';
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final makes = VehicleMakeService.search(_query);
-    return ContentDialog(
-      title: const Text('Choisir une marque'),
-      content: SizedBox(
-        width: 520,
-        height: 540,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextBox(
-              controller: _searchController,
-              placeholder: 'Rechercher une marque…',
-              prefix: const Padding(
-                padding: EdgeInsetsDirectional.only(start: 8),
-                child: Icon(FluentIcons.search, size: 14),
-              ),
-              onChanged: (value) => setState(() => _query = value),
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: makes.isEmpty
-                  ? const Center(child: Text('Aucune marque trouvée.'))
-                  : ListView.separated(
-                      itemCount: makes.length,
-                      separatorBuilder: (_, _) => Container(
-                        height: 1,
-                        color: Colors.grey[30],
-                      ),
-                      itemBuilder: (context, index) {
-                        final make = makes[index];
-                        final selected = make.id == widget.selectedMakeId;
-                        return Button(
-                          onPressed: () => Navigator.of(context).pop(make.id),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 7),
-                            child: Row(
-                              children: [
-                                VehicleMakeLogo(makeId: make.id, size: 34),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        make.name,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      Text(
-                                        make.category,
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: Colors.grey[100],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                if (selected)
-                                   Icon(
-                                    FluentIcons.check_mark,
-                                    color: Colors.green,
-                                    size: 16,
-                                  ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        Button(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
-        ),
-      ],
-    );
-  }
 }
