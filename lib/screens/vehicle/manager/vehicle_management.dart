@@ -144,9 +144,9 @@ class VehicleManagementState extends State<VehicleManagement>
           Padding(
             padding: EdgeInsets.fromLTRB(
               screenWidth < 720 ? 16 : 26,
+              screenWidth < 720 ? 12 : 14,
               screenWidth < 720 ? 16 : 22,
-              screenWidth < 720 ? 16 : 26,
-              12,
+              8,
             ),
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -234,7 +234,7 @@ class VehicleManagementState extends State<VehicleManagement>
             padding: EdgeInsets.symmetric(horizontal: screenWidth < 720 ? 16 : 26),
             child: _buildMetrics(theme, allVehicles),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 10),
           Expanded(
             child: loading
                 ? const Center(child: ProgressRing())
@@ -546,13 +546,13 @@ class VehicleManagementState extends State<VehicleManagement>
               child: ParcotoSurface(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
-                  vertical: 12,
+                  vertical: 9,
                 ),
                 child: Row(
                   children: [
                     Container(
-                      width: 36,
-                      height: 36,
+                      width: 32,
+                      height: 32,
                       decoration: BoxDecoration(
                         color: metric.color.withValues(alpha: .11),
                         borderRadius: BorderRadius.circular(10),
@@ -579,7 +579,7 @@ class VehicleManagementState extends State<VehicleManagement>
                             metric.value,
                             style: TextStyle(
                               color: theme.textColor,
-                              fontSize: 21,
+                              fontSize: 19,
                               height: 1.1,
                               fontWeight: FontWeight.w700,
                             ),
