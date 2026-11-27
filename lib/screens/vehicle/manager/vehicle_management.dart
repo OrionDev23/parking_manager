@@ -31,6 +31,7 @@ class VehicleManagement extends StatefulWidget {
 class VehicleManagementState extends State<VehicleManagement>
     with AutomaticKeepAliveClientMixin<VehicleManagement> {
   static ValueNotifier<int> stateChanges = ValueNotifier(0);
+  static final ValueNotifier<int> visibleResultCount = ValueNotifier<int>(0);
   static final ValueNotifier<String?> brandFilterRequest = ValueNotifier<String?>(null);
   static final ValueNotifier<String?> externalSearchRequest =
       ValueNotifier<String?>(null);
@@ -71,7 +72,7 @@ class VehicleManagementState extends State<VehicleManagement>
 
   void _handleExternalSearchRequest() {
     final request = externalSearchRequest.value;
-    if (!mounted || request == null || request.trim().isEmpty) return;
+    if (!mounted || request == null) return;
     final normalized = request.replaceAll('"', '').trim();
     setState(() {
       searchQuery = normalized;
@@ -109,6 +110,14 @@ class VehicleManagementState extends State<VehicleManagement>
     context.watch<VehicleProvider>();
     final theme = context.watch<AppTheme>();
     final vehicles = _visibleVehicles();
+    final resultCount = vehicles.length;
+    if (visibleResultCount.value != resultCount) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && visibleResultCount.value != resultCount) {
+          visibleResultCount.value = resultCount;
+        }
+      });
+    }
     final allVehicles = VehicleProvider.vehicles.values.toList();
     final loading = VehicleProvider.downloadingVehicles &&
         VehicleProvider.vehicles.isEmpty;
