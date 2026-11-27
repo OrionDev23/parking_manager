@@ -961,5 +961,6 @@
   "vehicle_make_category_agricultural": "Matériel agricole",
   "vehicle_make_category_construction": "Engin de chantier",
   "vehicle_make_category_industrial": "Matériel industriel",
-  "vehicle_make_category_other": "Autre"
+  "vehicle_make_category_other": "Autre",
+  "vehicle_doc_no_attachment": "Aucune pièce jointe"
 }
