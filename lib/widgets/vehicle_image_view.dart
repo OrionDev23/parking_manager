@@ -82,13 +82,15 @@ class _VehicleImageViewState extends State<VehicleImageView> {
   }
 
   Future<Uint8List?> _loadFileBytes(String fileId) async {
-    final cached = _imageCache.remove(fileId);
+    // Do not reuse in-memory private image bytes across company switches.
+    final cacheKey = '${DatabaseGetter.activeCompanyId ?? 'no-company'}:$fileId';
+    final cached = _imageCache.remove(cacheKey);
     if (cached != null) {
-      _imageCache[fileId] = cached;
+      _imageCache[cacheKey] = cached;
       return cached;
     }
 
-    final pending = _pendingDownloads[fileId];
+    final pending = _pendingDownloads[cacheKey];
     if (pending != null) return pending;
 
     final client = DatabaseGetter.client;
@@ -96,11 +98,11 @@ class _VehicleImageViewState extends State<VehicleImageView> {
 
     final request = Storage(client)
         .getFileView(bucketId: _bucketId, fileId: fileId);
-    _pendingDownloads[fileId] = request;
+    _pendingDownloads[cacheKey] = request;
 
     try {
       final bytes = await request;
-      _imageCache[fileId] = bytes;
+      _imageCache[cacheKey] = bytes;
       while (_imageCache.length > _maximumCachedImages) {
         _imageCache.remove(_imageCache.keys.first);
       }
@@ -109,7 +111,7 @@ class _VehicleImageViewState extends State<VehicleImageView> {
       debugPrint('[Vehicle image] authenticated Appwrite read failed: $error');
       return null;
     } finally {
-      _pendingDownloads.remove(fileId);
+      _pendingDownloads.remove(cacheKey);
     }
   }
 
