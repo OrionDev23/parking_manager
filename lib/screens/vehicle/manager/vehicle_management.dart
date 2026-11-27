@@ -133,7 +133,7 @@ class VehicleManagementState extends State<VehicleManagement>
         break;
       }
     }
-    selectedVehicle ??= vehicles.isEmpty ? null : vehicles.first;
+    // No vehicle is selected by default. The right pane starts in fleet overview mode.
     final activeVehicle = selectedVehicle;
 
     return ScaffoldPage(
@@ -255,7 +255,7 @@ class VehicleManagementState extends State<VehicleManagement>
                                 child: Padding(
                                   padding: const EdgeInsets.only(right: 18, bottom: 18),
                                   child: activeVehicle == null
-                                      ? _buildEmptyState(theme)
+                                      ? _buildFleetOverview(theme, vehicles)
                                       : VehicleDetailsPage(
                                           key: ValueKey(activeVehicle.id),
                                           vehicle: activeVehicle,
@@ -813,6 +813,279 @@ class VehicleManagementState extends State<VehicleManagement>
       );
     }).toList()
       ..sort((a, b) => a.matricule.compareTo(b.matricule));
+  }
+
+  Widget _buildFleetOverview(
+    AppTheme theme,
+    List<Vehicle> vehicles,
+  ) {
+    var available = 0;
+    var maintenance = 0;
+    var immobilized = 0;
+    var other = 0;
+
+    for (final vehicle in vehicles) {
+      switch (FleetDashboardStatusMapper.fromLegacyCode(vehicle.etatactuel)) {
+        case FleetDashboardStatus.available:
+        case FleetDashboardStatus.onMission:
+          available++;
+          break;
+        case FleetDashboardStatus.workshop:
+          maintenance++;
+          break;
+        case FleetDashboardStatus.broken:
+          immobilized++;
+          break;
+        case FleetDashboardStatus.reformed:
+        case FleetDashboardStatus.other:
+          other++;
+          break;
+      }
+    }
+
+    final total = vehicles.length;
+    final statusItems = <({
+      String label,
+      int count,
+      Color color,
+      IconData icon,
+    })>[
+      (label: 'En service', count: available, color: Colors.green, icon: FluentIcons.check_mark),
+      (label: 'En maintenance', count: maintenance, color: Colors.orange, icon: FluentIcons.repair),
+      (label: 'Immobilisés', count: immobilized, color: Colors.red, icon: FluentIcons.blocked),
+      (label: 'Autres états', count: other, color: theme.mutedTextColor, icon: FluentIcons.more),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 18, bottom: 18),
+      child: ParcotoSurface(
+        padding: const EdgeInsets.all(24),
+        elevated: true,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = constraints.maxWidth < 760;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: theme.color.withValues(alpha: .12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(FluentIcons.view_dashboard, color: theme.color, size: 21),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Vue d’ensemble du parc',
+                            style: TextStyle(color: theme.textColor, fontSize: 19, fontWeight: FontWeight.w800),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            'Suivez la situation de votre flotte en un coup d’œil.',
+                            style: TextStyle(color: theme.mutedTextColor, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: theme.fillColor,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: theme.borderColor),
+                      ),
+                      child: Text(
+                        '$total véhicule${total > 1 ? 's' : ''}',
+                        style: TextStyle(color: theme.textColor, fontSize: 11, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 28),
+                Text(
+                  'ÉTAT OPÉRATIONNEL',
+                  style: TextStyle(color: theme.mutedTextColor, fontSize: 10, letterSpacing: 1.1, fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 12),
+                if (compact)
+                  Column(
+                    children: [
+                      for (final item in statusItems)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: _fleetStatusRow(theme, item, total),
+                        ),
+                    ],
+                  )
+                else
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (var index = 0; index < statusItems.length; index++)
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(right: index == statusItems.length - 1 ? 0 : 12),
+                            child: _fleetStatusCard(theme, statusItems[index], total),
+                          ),
+                        ),
+                    ],
+                  ),
+                const Spacer(),
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 520),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 76,
+                          height: 76,
+                          decoration: BoxDecoration(color: theme.color.withValues(alpha: .10), shape: BoxShape.circle),
+                          child: Icon(FluentIcons.car, size: 34, color: theme.color),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Sélectionnez un véhicule',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: theme.textColor, fontSize: 20, fontWeight: FontWeight.w800),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Choisissez un véhicule dans la liste à gauche pour afficher sa fiche complète, ses caractéristiques, son affectation et son historique.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: theme.mutedTextColor, fontSize: 12, height: 1.6),
+                        ),
+                        const SizedBox(height: 18),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _fleetFeatureChip(theme, FluentIcons.info, 'Identification'),
+                            _fleetFeatureChip(theme, FluentIcons.settings, 'Caractéristiques'),
+                            _fleetFeatureChip(theme, FluentIcons.account_management, 'Affectation'),
+                            _fleetFeatureChip(theme, FluentIcons.document, 'Historique'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Divider(color: theme.borderColor),
+                Row(
+                  children: [
+                    Icon(FluentIcons.lightbulb, size: 15, color: theme.mutedTextColor),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'La fiche détaillée s’affichera ici dès que vous sélectionnerez un véhicule.',
+                        style: TextStyle(color: theme.mutedTextColor, fontSize: 11),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _fleetStatusCard(
+    AppTheme theme,
+    ({String label, int count, Color color, IconData icon}) item,
+    int total,
+  ) {
+    final ratio = total == 0 ? 0.0 : item.count / total;
+    return ParcotoSurface(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(item.icon, color: item.color, size: 17),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(item.label, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: theme.mutedTextColor, fontSize: 11, fontWeight: FontWeight.w600)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(item.count.toString(), style: TextStyle(color: theme.textColor, fontSize: 25, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: ratio,
+              minHeight: 5,
+              backgroundColor: theme.fillColor,
+              valueColor: AlwaysStoppedAnimation<Color>(item.color),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text('${(ratio * 100).round()} % du parc', style: TextStyle(color: theme.mutedTextColor, fontSize: 9)),
+        ],
+      ),
+    );
+  }
+
+  Widget _fleetStatusRow(
+    AppTheme theme,
+    ({String label, int count, Color color, IconData icon}) item,
+    int total,
+  ) {
+    final ratio = total == 0 ? 0.0 : item.count / total;
+    return Row(
+      children: [
+        Icon(item.icon, color: item.color, size: 17),
+        const SizedBox(width: 10),
+        Expanded(child: Text(item.label, style: TextStyle(color: theme.textColor, fontSize: 12))),
+        Text(item.count.toString(), style: TextStyle(color: theme.textColor, fontSize: 13, fontWeight: FontWeight.w800)),
+        const SizedBox(width: 12),
+        SizedBox(
+          width: 100,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: ratio,
+              minHeight: 5,
+              backgroundColor: theme.fillColor,
+              valueColor: AlwaysStoppedAnimation<Color>(item.color),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _fleetFeatureChip(AppTheme theme, IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+      decoration: BoxDecoration(
+        color: theme.fillColor,
+        border: Border.all(color: theme.borderColor),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: theme.color),
+          const SizedBox(width: 6),
+          Text(label, style: TextStyle(color: theme.textColor, fontSize: 10, fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
   }
 
   Widget _buildEmptyState(AppTheme theme) {
