@@ -503,8 +503,9 @@ class VehicleOverviewDashboard extends StatelessWidget {
     IconData icon,
     String label,
     String value,
-    Color accent,
-  ) {
+    Color accent, {
+    required bool compact,
+  }) {
     return Container(
       constraints: const BoxConstraints(minHeight: 46),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
@@ -517,31 +518,54 @@ class VehicleOverviewDashboard extends StatelessWidget {
         children: [
           Icon(icon, color: accent, size: 17),
           const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.grey[100], fontSize: 9.5),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
+          if (compact) ...[
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.grey[100], fontSize: 10),
+              ),
             ),
-          ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.end,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ] else
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: Colors.grey[100], fontSize: 9.5),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
@@ -552,12 +576,26 @@ class VehicleOverviewDashboard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
-          Icon(icon, size: 15, color: Colors.grey[100]),
-          const SizedBox(width: 9),
-          Expanded(child: Text(label, style: const TextStyle(fontSize: 11))),
+          Icon(icon, size: 14, color: Colors.grey[100]),
           const SizedBox(width: 8),
-          Flexible(child: Text(value, textAlign: TextAlign.end,
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600))),
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 10.5),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.end,
+              style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600),
+            ),
+          ),
         ],
       ),
     );
