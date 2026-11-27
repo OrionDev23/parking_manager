@@ -836,6 +836,50 @@ async function createCompanyTeam(teamId, name) {
   });
 }
 
+// Vehicle documents share the existing file-secured images bucket because
+// this Appwrite project has reached its bucket quota. Keep the bucket's
+// existing tenant ACLs and grant create permission to each newly provisioned
+// company team. File-level read/update/delete permissions remain explicit.
+async function ensureVehicleDocumentBucketCreatePermission(teamId) {
+  const normalizedTeamId = String(teamId || '').trim();
+  if (!normalizedTeamId) {
+    throw new Error('A company team ID is required to configure vehicle document storage.');
+  }
+
+  const bucketId = 'images';
+  const bucket = await appwrite(`/storage/buckets/${encodeURIComponent(bucketId)}`);
+  const existingPermissions = Array.isArray(bucket.$permissions)
+    ? bucket.$permissions.filter(value => typeof value === 'string')
+    : [];
+  const requiredPermission = `create("team:${normalizedTeamId}")`;
+
+  if (existingPermissions.includes(requiredPermission)) {
+    return { updated: false };
+  }
+
+  const permissions = [...existingPermissions, requiredPermission];
+  await appwrite(`/storage/buckets/${encodeURIComponent(bucketId)}`, {
+    method: 'PUT',
+    body: {
+      name: bucket.name || 'images',
+      permissions,
+      fileSecurity: true,
+      enabled: bucket.enabled !== false,
+      maximumFileSize: Number(bucket.maximumFileSize) || 15000000,
+      allowedFileExtensions: Array.isArray(bucket.allowedFileExtensions)
+        ? bucket.allowedFileExtensions
+        : ['jpg', 'jpeg', 'png', 'webp', 'pdf'],
+      compression: bucket.compression || 'none',
+      encryption: bucket.encryption !== false,
+      antivirus: bucket.antivirus !== false,
+      transformations: bucket.transformations === true,
+      stripMetadata: bucket.stripMetadata === true,
+    },
+  });
+
+  return { updated: true };
+}
+
 function slugify(value) {
   return value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
     .toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 64);
@@ -3310,6 +3354,8 @@ export default async (context) => requestContext.run(
           body: { data: { teamId, updatedAt: now } },
         });
       }
+      await ensureVehicleDocumentBucketCreatePermission(teamId);
+      await ensureVehicleDocumentBucketCreatePermission(teamId);
       const memberships = await listRows(MEMBERSHIPS, {
         method: 'equal', attribute: 'companyId', values: [companyId],
       });
@@ -3560,6 +3606,7 @@ export default async (context) => requestContext.run(
         companyCreated = true;
         await createCompanyTeam(teamId, `Parcoto — ${name}`);
         teamCreated = true;
+        await ensureVehicleDocumentBucketCreatePermission(teamId);
         const profile = await ensureCompanyProfile(
           companyId,
           name,
