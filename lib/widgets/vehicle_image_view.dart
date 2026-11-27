@@ -83,7 +83,7 @@ class _VehicleImageViewState extends State<VehicleImageView> {
 
   Future<Uint8List?> _loadFileBytes(String fileId) async {
     // Do not reuse in-memory private image bytes across company switches.
-    final cacheKey = '${DatabaseGetter.activeCompanyId ?? 'no-company'}:$fileId';
+    final cacheKey = '${DatabaseGetter.activeCompanyId ?? 'no-company'}:${DatabaseGetter.me.value?.id ?? 'no-user'}:$fileId';
     final cached = _imageCache.remove(cacheKey);
     if (cached != null) {
       _imageCache[cacheKey] = cached;
