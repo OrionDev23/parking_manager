@@ -53,6 +53,7 @@ class DocumentFormState extends State<DocumentForm> {
   String _documentType = 'other';
   Vehicle? _selectedVehicle;
   PlatformFile? _pendingFile;
+  List<int>? _pendingFileBytes;
   String? _documentId;
   bool _removeExistingFile = false;
   bool _loadingVehicle = false;
@@ -179,18 +180,22 @@ class DocumentFormState extends State<DocumentForm> {
     if (_pickingFile || _saving) return;
     setState(() => _pickingFile = true);
     try {
-      final result = await FilePicker.platform.pickFiles(
+      // file_picker 13.x returns the selected PlatformFile list directly.
+      // Read the bytes explicitly for web, mobile and desktop.
+      final files = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: const ['pdf', 'jpg', 'jpeg', 'png', 'webp'],
-        withData: true,
-        allowMultiple: false,
       );
-      if (!mounted || result == null || result.files.isEmpty) return;
+      if (!mounted || files.isEmpty) return;
 
-      final file = result.files.single;
-      final bytes = file.bytes;
-      if (bytes == null || bytes.isEmpty) {
-        throw StateError('Le fichier sélectionné ne peut pas être lu.');
+      final file = files.first;
+      final reportedSize = file.lengthSync() ?? await file.length();
+      if (reportedSize != null && reportedSize > _maxVehicleDocumentBytes) {
+        throw StateError('La pièce jointe ne doit pas dépasser 15 Mo.');
+      }
+      final bytes = await file.readAsBytes();
+      if (bytes.isEmpty) {
+        throw StateError('Le fichier sélectionné est vide ou illisible.');
       }
       if (bytes.length > _maxVehicleDocumentBytes) {
         throw StateError('La pièce jointe ne doit pas dépasser 15 Mo.');
@@ -198,6 +203,7 @@ class DocumentFormState extends State<DocumentForm> {
 
       setState(() {
         _pendingFile = file;
+        _pendingFileBytes = bytes;
         _removeExistingFile = false;
       });
       _refreshChanges();
@@ -215,7 +221,10 @@ class DocumentFormState extends State<DocumentForm> {
 
   void _removeAttachment() {
     if (_pendingFile != null) {
-      setState(() => _pendingFile = null);
+      setState(() {
+        _pendingFile = null;
+        _pendingFileBytes = null;
+      });
     } else if (_existingFileId != null) {
       setState(() => _removeExistingFile = true);
     }
@@ -227,7 +236,7 @@ class DocumentFormState extends State<DocumentForm> {
     if (selected == null) {
       throw StateError('Aucun fichier à téléverser.');
     }
-    final bytes = selected.bytes;
+    final bytes = _pendingFileBytes;
     if (bytes == null || bytes.isEmpty) {
       throw StateError('Le contenu de la pièce jointe est vide.');
     }
@@ -256,6 +265,7 @@ class DocumentFormState extends State<DocumentForm> {
       file: InputFile.fromBytes(
         bytes: bytes,
         filename: safeName,
+        contentType: _mimeTypeFor(selected.name),
       ),
       permissions: _filePermissions(teamId),
     );
@@ -297,6 +307,7 @@ class DocumentFormState extends State<DocumentForm> {
         dialogTitle: 'Enregistrer le document',
         fileName: fileName,
         bytes: bytes,
+        mimeType: widget.vd?.mimeType ?? _mimeTypeFor(fileName),
       );
     } catch (error) {
       if (mounted) {
@@ -446,6 +457,7 @@ class DocumentFormState extends State<DocumentForm> {
       if (!mounted) return;
       setState(() {
         _pendingFile = null;
+        _pendingFileBytes = null;
         _removeExistingFile = false;
         _changes = false;
       });
@@ -542,7 +554,7 @@ class DocumentFormState extends State<DocumentForm> {
     }
 
     final fileName = selected?.name ?? currentFileName ?? 'Document attaché';
-    final size = selected?.size ?? widget.vd?.fileSize;
+    final size = _pendingFileBytes?.length ?? widget.vd?.fileSize;
     final isPdf = fileName.toLowerCase().endsWith('.pdf');
     return Container(
       padding: const EdgeInsets.all(10),
