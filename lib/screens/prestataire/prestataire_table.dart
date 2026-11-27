@@ -66,6 +66,7 @@ class PrestataireTableState extends State<PrestataireTable> {
         );
         filterDocument.value = null;
         filterNow = false;
+        filterNow = false;
       } else {
         startedWithFiltersOn = false;
 
