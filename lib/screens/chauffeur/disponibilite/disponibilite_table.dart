@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../theme.dart';
+import '../../../ui/design_system/parcoto_surface.dart';
 import '../../../widgets/zone_box.dart';
 import '../../data_table_parcoto.dart';
 
@@ -182,7 +183,10 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
-                                                          child: ParcotoFieldSurface(child: DatePicker(
+                                                          child: ParcotoSurface(
+                                                            tone: ParcotoSurfaceTone.subtle,
+                                                            padding: EdgeInsets.zero,
+                                                            child: DatePicker(
                                                             selected: dateMin,
                                                             onChanged: (s) {
                                                               setState(() {
@@ -190,7 +194,8 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                               });
                                                               setS(() {});
                                                             },
-                                                          )),
+                                                          ),
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
@@ -206,7 +211,10 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
-                                                          child: ParcotoFieldSurface(child: DatePicker(
+                                                          child: ParcotoSurface(
+                                                            tone: ParcotoSurfaceTone.subtle,
+                                                            padding: EdgeInsets.zero,
+                                                            child: DatePicker(
                                                             selected: dateMax,
                                                             onChanged: (s) {
                                                               setState(() {
@@ -214,7 +222,8 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                               });
                                                               setS(() {});
                                                             },
-                                                          )),
+                                                          ),
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
