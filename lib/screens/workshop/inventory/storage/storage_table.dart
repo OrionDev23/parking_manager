@@ -160,6 +160,7 @@ class StorageTableState extends State<StorageTable> {
           searchKey: filterDocument.value,
         );
         filterDocument.value = null;
+        filterNow = false;
       } else {
         startedWithFiltersOn = false;
 
@@ -180,7 +181,7 @@ class StorageTableState extends State<StorageTable> {
     return ValueListenableBuilder(
       valueListenable: filterDocument,
       builder: (context, v, _) {
-        if (!startedWithFiltersOn && v != null && filterNow) {
+        if (v != null && filterNow) {
           searchController.text = v;
           storageDataSource.search(v);
           notEmpty = true;
@@ -188,61 +189,7 @@ class StorageTableState extends State<StorageTable> {
           filterNow = false;
         }
         return DataTableParc(
-          header: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: 350.px,
-                  height: 45.px,
-                  child: ParcotoTextBox(
-                    onChanged: (s) {
-                      if (s.isEmpty) {
-                        notEmpty = false;
-                        storageDataSource.search('');
-                      } else {
-                        notEmpty = true;
-                      }
-                      setState(() {});
-                    },
-                    controller: searchController,
-                    placeholder: 'search'.tr(),
-                    style: appTheme.writingStyle,
-                    cursorColor: appTheme.color.darker,
-                    placeholderStyle: placeStyle,
-                    onSubmitted: (s) {
-                      if (s.isNotEmpty) {
-                        storageDataSource.search(s);
-                        if (!notEmpty) {
-                          setState(() {
-                            notEmpty = true;
-                          });
-                        }
-                      } else {
-                        if (notEmpty) {
-                          setState(() {
-                            notEmpty = false;
-                          });
-                        }
-                      }
-                    },
-                    suffix: notEmpty
-                        ? IconButton(
-                            icon: const Icon(FluentIcons.cancel),
-                            onPressed: () {
-                              searchController.text = "";
-                              notEmpty = false;
-                              setState(() {});
-                              storageDataSource.search('');
-                            },
-                          )
-                        : null,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          header: null,
           sortAscending: assending,
           sortColumnIndex: sortColumn,
           columns: columns,
