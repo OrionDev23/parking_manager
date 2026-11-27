@@ -3,11 +3,237 @@ import 'dart:async';
 import 'package:fluent_ui/fluent_ui.dart';
 
 import '../../main.dart' show authService, driverServices, vehicleServices;
+import '../../providers/parts_provider.dart';
+import '../../serializables/pieces/part.dart';
 import '../../domain/entities/driver.dart';
 import '../../domain/entities/vehicle.dart';
 import 'pane_items.dart';
 import '../vehicle/manager/vehicles_table.dart';
 import '../chauffeur/manager/chauffeur_table.dart';
+import '../vehicle/manager/vehicle_management.dart';
+import '../workshop/parts/parts_management/parts_table.dart';
+
+/// Chooses the search scope from the active navigation destination.
+/// Global search is intentionally available only on the main dashboard.
+class ContextualSearchLauncher extends StatelessWidget {
+  final String? paneKey;
+  final bool compact;
+
+  const ContextualSearchLauncher({
+    super.key,
+    required this.paneKey,
+    this.compact = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    switch (paneKey) {
+      case 'dashboard':
+        return GlobalSearchLauncher(compact: compact);
+      case 'vehicle-manager':
+        return _ModuleSearchLauncher(
+          scope: _ModuleSearchScope.vehicles,
+          compact: compact,
+        );
+      case 'driver-manager':
+        return _ModuleSearchLauncher(
+          scope: _ModuleSearchScope.drivers,
+          compact: compact,
+        );
+      case 'workshop-parts':
+        return _ModuleSearchLauncher(
+          scope: _ModuleSearchScope.parts,
+          compact: compact,
+        );
+      default:
+        // Other screens keep their existing in-page filters until a dedicated
+        // adapter is connected. Never silently fall back to global search.
+        return const SizedBox.shrink();
+    }
+  }
+}
+
+enum _ModuleSearchScope { vehicles, drivers, parts }
+
+class _ModuleSearchLauncher extends StatefulWidget {
+  final _ModuleSearchScope scope;
+  final bool compact;
+
+  const _ModuleSearchLauncher({
+    required this.scope,
+    this.compact = false,
+  });
+
+  @override
+  State<_ModuleSearchLauncher> createState() => _ModuleSearchLauncherState();
+}
+
+class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
+  final TextEditingController _controller = TextEditingController();
+  Timer? _crossSearchTimer;
+  String? _lastCrossSuggestionQuery;
+
+  String get _placeholder => switch (widget.scope) {
+        _ModuleSearchScope.vehicles => 'Rechercher un véhicule...',
+        _ModuleSearchScope.drivers => 'Rechercher un conducteur...',
+        _ModuleSearchScope.parts => 'Rechercher une pièce...',
+      };
+
+  @override
+  void dispose() {
+    _crossSearchTimer?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _dispatchLocalSearch(String value) {
+    final query = value.trim();
+    switch (widget.scope) {
+      case _ModuleSearchScope.vehicles:
+        VehicleManagementState.externalSearchRequest.value = query;
+        _scheduleVehiclePartSuggestion(query);
+        break;
+      case _ModuleSearchScope.drivers:
+        ChauffeurTableState.filterDocument.value = query;
+        ChauffeurTableState.filterNow = true;
+        break;
+      case _ModuleSearchScope.parts:
+        PartsTableState.filterDocument.value = query;
+        PartsTableState.filterNow = true;
+        break;
+    }
+  }
+
+  void _scheduleVehiclePartSuggestion(String query) {
+    _crossSearchTimer?.cancel();
+    if (query.length < 2) return;
+    _crossSearchTimer = Timer(
+      const Duration(milliseconds: 550),
+      () => _suggestMatchingParts(query),
+    );
+  }
+
+  Future<void> _suggestMatchingParts(String query) async {
+    if (!mounted ||
+        widget.scope != _ModuleSearchScope.vehicles ||
+        _controller.text.trim() != query ||
+        VehicleManagementState.visibleResultCount.value != 0 ||
+        _lastCrossSuggestionQuery == query) {
+      return;
+    }
+
+    final matches = await _searchParts(query, limit: 3);
+    if (!mounted ||
+        _controller.text.trim() != query ||
+        VehicleManagementState.visibleResultCount.value != 0 ||
+        matches.isEmpty) {
+      return;
+    }
+
+    _lastCrossSuggestionQuery = query;
+    displayInfoBar(
+      context,
+      duration: const Duration(seconds: 9),
+      builder: (context, close) => InfoBar(
+        title: const Text('Aucun véhicule correspondant'),
+        content: Text(
+          matches.length == 1
+              ? 'Une pièce correspond à « $query ». Elle se trouve dans le module Pièces.'
+              : '${matches.length} pièces correspondent à « $query ». Elles se trouvent dans le module Pièces.',
+        ),
+        severity: InfoBarSeverity.info,
+        action: Button(
+          child: const Text('Ouvrir Pièces'),
+          onPressed: () {
+            close();
+            PartsTableState.filterDocument.value = query;
+            PartsTableState.filterNow = true;
+            PaneItemsAndFooters.selectPane('workshop-parts');
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openCompactSearch() async {
+    final dialogController = TextEditingController(text: _controller.text);
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => ContentDialog(
+        title: Text(_placeholder),
+        content: TextBox(
+          controller: dialogController,
+          autofocus: true,
+          placeholder: _placeholder,
+          onChanged: (value) {
+            _controller.text = value;
+            _dispatchLocalSearch(value);
+          },
+          onSubmitted: (value) {
+            _controller.text = value;
+            _dispatchLocalSearch(value);
+            Navigator.of(dialogContext).pop();
+          },
+          suffix: IconButton(
+            icon: const Icon(FluentIcons.cancel, size: 13),
+            onPressed: () {
+              dialogController.clear();
+              _controller.clear();
+              _dispatchLocalSearch('');
+            },
+          ),
+        ),
+        actions: [
+          Button(
+            child: const Text('Fermer'),
+            onPressed: () => Navigator.of(dialogContext).pop(),
+          ),
+        ],
+      ),
+    );
+    dialogController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.compact) {
+      return Tooltip(
+        message: _placeholder,
+        child: IconButton(
+          icon: const Icon(FluentIcons.search, size: 19),
+          onPressed: _openCompactSearch,
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: SizedBox(
+        height: 38,
+        child: TextBox(
+          controller: _controller,
+          placeholder: _placeholder,
+          onChanged: _dispatchLocalSearch,
+          onSubmitted: _dispatchLocalSearch,
+          prefix: const Padding(
+            padding: EdgeInsets.only(left: 10),
+            child: Icon(FluentIcons.search, size: 15),
+          ),
+          suffix: _controller.text.isEmpty
+              ? null
+              : IconButton(
+                  icon: const Icon(FluentIcons.cancel, size: 13),
+                  onPressed: () {
+                    _controller.clear();
+                    _dispatchLocalSearch('');
+                    setState(() {});
+                  },
+                ),
+        ),
+      ),
+    );
+  }
+}
 
 class GlobalSearchLauncher extends StatefulWidget {
   final bool compact;
@@ -70,6 +296,36 @@ class _GlobalSearchLauncherState extends State<GlobalSearchLauncher> {
   }
 }
 
+Future<List<VehiclePart>> _searchParts(
+  String query, {
+  int limit = 6,
+}) async {
+  final normalized = query.trim().toLowerCase();
+  if (normalized.length < 2) return const [];
+
+  final provider = PartsProvider();
+  try {
+    if (PartsProvider.errorParts && !PartsProvider.downloadingParts) {
+      await provider.downloadAllParts();
+    }
+    if (PartsProvider.errorParts) return const [];
+
+    return PartsProvider.parts.values.where((part) {
+      final searchable = [
+        part.search,
+        part.name,
+        part.sku,
+        part.barcode,
+      ].whereType<String>().join(' ').toLowerCase();
+      return searchable.contains(normalized);
+    }).take(limit).toList(growable: false);
+  } catch (_) {
+    return const [];
+  } finally {
+    provider.dispose();
+  }
+}
+
 class _GlobalSearchDialog extends StatefulWidget {
   final String initialQuery;
 
@@ -99,6 +355,7 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
   String? _error;
   List<Vehicle> _vehicles = [];
   List<Driver> _drivers = [];
+  List<VehiclePart> _parts = [];
 
   static const _destinations = <({String key, String title, String group})>[
     (key: 'dashboard', title: 'Tableau de bord', group: 'Général'),
@@ -141,6 +398,7 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
       _error = null;
       _vehicles = [];
       _drivers = [];
+      _parts = [];
     });
     if (query.length < 2) {
       setState(() => _searching = false);
@@ -150,6 +408,7 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
   }
 
   Future<void> _runSearch(String query) async {
+    if (!mounted || query != _query) return;
     setState(() => _searching = true);
     try {
       final session = authService.session;
@@ -159,14 +418,18 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
         setState(() => _searching = false);
         return;
       }
+
       final results = await Future.wait([
         vehicleServices.repository.getVehicles(search: query, limit: 6),
         driverServices.repository.getDrivers(search: query, limit: 6),
       ]);
+      final parts = await _searchParts(query, limit: 6);
+
       if (!mounted || query != _query) return;
       setState(() {
         _vehicles = results[0] as List<Vehicle>;
         _drivers = results[1] as List<Driver>;
+        _parts = parts;
         _searching = false;
       });
     } catch (error) {
@@ -197,6 +460,13 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
     _openDestination('driver-manager');
   }
 
+  void _openPart(String query) {
+    PartsTableState.filterDocument.value = query;
+    PartsTableState.filterNow = true;
+    _openDestination('workshop-parts');
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final q = _query.toLowerCase();
@@ -223,7 +493,7 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
             TextBox(
               controller: _controller,
               autofocus: true,
-              placeholder: 'Interface, immatriculation, véhicule, conducteur…',
+              placeholder: 'Interface, véhicule, conducteur, référence ou pièce…',
               prefix: const Padding(
                 padding: EdgeInsets.only(left: 10),
                 child: Icon(FluentIcons.search, size: 16),
@@ -233,7 +503,7 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
             const SizedBox(height: 10),
             if (_query.length < 2)
               const Text(
-                'Saisissez au moins 2 caractères. La recherche couvre les interfaces, véhicules et conducteurs.',
+                'Saisissez au moins 2 caractères. La recherche couvre les interfaces, véhicules, conducteurs et pièces.',
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
             if (destinations.isNotEmpty) ...[
@@ -271,6 +541,19 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
                     onPressed: () => _openVehicle(item),
                   )),
             ],
+            if (_parts.isNotEmpty) ...[
+              const _SectionLabel('PIÈCES DE RECHANGE'),
+              ..._parts.map((item) => _ResultTile(
+                    icon: FluentIcons.repair,
+                    title: item.name,
+                    subtitle: [
+                      if (item.sku?.isNotEmpty == true) 'SKU ${item.sku}',
+                      if (item.barcode?.isNotEmpty == true) item.barcode!,
+                      if (item.brandName?.isNotEmpty == true) item.brandName!,
+                    ].join(' • '),
+                    onPressed: () => _openPart(_query),
+                  )),
+            ],
             if (_drivers.isNotEmpty) ...[
               const _SectionLabel('CONDUCTEURS'),
               ..._drivers.map((item) => _ResultTile(
@@ -285,7 +568,10 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
                   )),
             ],
             if (_query.length >= 2 && !_searching && _error == null &&
-                destinations.isEmpty && _vehicles.isEmpty && _drivers.isEmpty)
+                destinations.isEmpty &&
+                _vehicles.isEmpty &&
+                _drivers.isEmpty &&
+                _parts.isEmpty)
               const Padding(
                 padding: EdgeInsets.all(16),
                 child: Text('Aucun résultat.'),
