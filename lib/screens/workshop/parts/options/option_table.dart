@@ -61,6 +61,7 @@ class OptionTableState extends State<OptionTable> {
         );
         filterDocument.value = null;
         filterNow = false;
+        filterNow = false;
       } else {
         startedWithFiltersOn = false;
 
