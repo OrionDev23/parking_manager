@@ -937,5 +937,6 @@
   "vehicle_make_category_agricultural": "معدات زراعية",
   "vehicle_make_category_construction": "معدات أشغال عمومية",
   "vehicle_make_category_industrial": "معدات صناعية",
-  "vehicle_make_category_other": "أخرى"
+  "vehicle_make_category_other": "أخرى",
+  "vehicle_doc_no_attachment": "لا يوجد مرفق"
 }
