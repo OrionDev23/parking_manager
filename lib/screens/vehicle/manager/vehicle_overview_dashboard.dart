@@ -3,6 +3,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import '../../../serializables/vehicle/vehicle.dart';
 import '../../../core/services/vehicle_make_service.dart';
 import '../../../ui/design_system/parcoto_tokens.dart';
+import '../../../widgets/vehicle_image_view.dart';
 
 /// Visual-first vehicle overview. It deliberately presents only information
 /// already available on the vehicle record or supplied by the parent page.
@@ -176,14 +177,14 @@ class VehicleOverviewDashboard extends StatelessWidget {
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _vehicleImage(image, accent, imageWidth, 170),
+                _vehicleImage(image, accent, imageWidth, 170, fileId: vehicle.imageFileId),
                 const SizedBox(height: 14),
                 _vehicleIdentity(accent, model),
               ],
             )
           : Row(
               children: [
-                _vehicleImage(image, accent, imageWidth, 142),
+                _vehicleImage(image, accent, imageWidth, 142, fileId: vehicle.imageFileId),
                 const SizedBox(width: 20),
                 Expanded(child: _vehicleIdentity(accent, model)),
               ],
@@ -191,21 +192,27 @@ class VehicleOverviewDashboard extends StatelessWidget {
     );
   }
 
-  Widget _vehicleImage(String image, Color accent, double width, double height) {
+  Widget _vehicleImage(
+    String image,
+    Color accent,
+    double width,
+    double height, {
+    String? fileId,
+  }) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(13),
       child: Container(
         width: width,
         height: height,
         color: accent.withValues(alpha: .08),
-        child: image.isEmpty
-            ? Icon(FluentIcons.car, color: accent, size: 42)
-            : Image.network(
-                image,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) =>
-                    Icon(FluentIcons.car, color: accent, size: 42),
-              ),
+        child: VehicleImageView(
+          fileId: fileId,
+          imageUrl: image,
+          fit: BoxFit.cover,
+          width: width,
+          height: height,
+          placeholder: Icon(FluentIcons.car, color: accent, size: 42),
+        ),
       ),
     );
   }
