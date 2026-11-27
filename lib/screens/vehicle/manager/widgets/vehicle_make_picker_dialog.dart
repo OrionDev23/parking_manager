@@ -23,6 +23,20 @@ class _VehicleMakePickerDialogState
     super.dispose();
   }
 
+  String _categoryLabel(String category) {
+    final key = switch (category) {
+      'passenger' => 'vehicle_make_category_passenger',
+      'commercial' => 'vehicle_make_category_commercial',
+      'bus' => 'vehicle_make_category_bus',
+      'motorcycle' => 'vehicle_make_category_motorcycle',
+      'agricultural' => 'vehicle_make_category_agricultural',
+      'construction' => 'vehicle_make_category_construction',
+      'industrial' => 'vehicle_make_category_industrial',
+      _ => 'vehicle_make_category_other',
+    };
+    return key.tr();
+  }
+
   @override
   Widget build(BuildContext context) {
     final makes = VehicleMakeService.search(_query);
@@ -78,9 +92,7 @@ class _VehicleMakePickerDialogState
                                         ),
                                       ),
                                       Text(
-                                        VehicleMakeService.categoryLabel(
-                                          make.category,
-                                        ),
+                                        _categoryLabel(make.category),
                                         style: TextStyle(
                                           fontSize: 10,
                                           color: Colors.grey[100],
