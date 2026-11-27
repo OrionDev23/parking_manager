@@ -253,11 +253,13 @@ class PaneItemsAndFooters {
       body: const MyEntreprise(),
       items: [
         PaneItem(
+          key: const ValueKey('company-filiales'),
           icon: Icon(FluentIcons.sections, color: appTheme.color.lightest),
           title: Text('filiales', style: paneTextStyle).tr(),
           body: const MesFilliales(),
         ),
         PaneItem(
+          key: const ValueKey('company-directions'),
           icon: Icon(
             FluentIcons.company_directory,
             color: appTheme.color.lightest,
@@ -266,6 +268,7 @@ class PaneItemsAndFooters {
           body: const MesFilliales(type: 1),
         ),
         PaneItem(
+          key: const ValueKey('company-departments'),
           icon: Icon(
             FluentIcons.company_directory_mirrored,
             color: appTheme.color.lightest,
