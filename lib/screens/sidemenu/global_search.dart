@@ -87,16 +87,6 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
       _crossSearchTimer?.cancel();
       _controller.clear();
       _lastCrossSuggestionQuery = null;
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant _ModuleSearchLauncher oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.scope != widget.scope) {
-      _crossSearchTimer?.cancel();
-      _controller.clear();
-      _lastCrossSuggestionQuery = null;
       _lastDispatchedQuery = '';
     }
   }
