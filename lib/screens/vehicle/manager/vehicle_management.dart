@@ -227,6 +227,7 @@ class VehicleManagementState extends State<VehicleManagement>
                                           key: ValueKey(activeVehicle.id),
                                           vehicle: activeVehicle,
                                           onEdit: () => _openEditor(activeVehicle),
+                                          onBack: _backToFleet,
                                         ),
                                 ),
                               ),

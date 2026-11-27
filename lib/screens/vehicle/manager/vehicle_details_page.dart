@@ -52,9 +52,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   List<Etat> _vehicleStates = [];
   List<FicheReception> _receptionSheets = [];
   int _selectedSectionIndex = 0;
-  bool _moreSectionsOpen = false;
   int _vehicleLoadGeneration = 0;
   final ScrollController _contentScrollController = ScrollController();
+  final GlobalKey _vehicleIdentityHeaderKey = GlobalKey();
   Vehicle get v => widget.vehicle;
   bool _matchesVehicleDocument(DocumentVehicle document) {
     final linkedVehicleId = document.vehicle?.trim();
@@ -81,7 +81,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.vehicle.id == widget.vehicle.id) return;
 
-    _moreSectionsOpen = false;
     _vehicleLoadGeneration++;
     _selectedSectionIndex = 0;
     _requestedDocuments = false;
@@ -222,28 +221,64 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   Widget build(BuildContext context) {
     final app = context.watch<AppTheme>();
     final accent = FluentTheme.of(context).accentColor;
-    final makeName = VehicleMakeService.nameFor(VehicleMakeService.canonicalId(v.marque));
+    final makeName = VehicleMakeService.nameFor(
+      VehicleMakeService.canonicalId(v.marque),
+    );
     final model = [
       makeName,
       v.type?.trim() ?? '',
     ].where((value) => value.isNotEmpty).join(' ');
-    final compact = MediaQuery.sizeOf(context).width < ParcotoTokens.mobileBreakpoint;
+    final compact =
+        MediaQuery.sizeOf(context).width < ParcotoTokens.tabletBreakpoint;
+    final title = model.isEmpty ? 'vehicle_details_title'.tr() : model;
+
+    if (compact) {
+      // One continuous mobile scroll surface: the identity header scrolls away,
+      // while section navigation stays pinned and remains reachable.
+      return Container(
+        color: app.backGroundColor,
+        child: CustomScrollView(
+          controller: _contentScrollController,
+          slivers: [
+            SliverToBoxAdapter(
+              child: KeyedSubtree(
+                key: _vehicleIdentityHeaderKey,
+                child: _header(accent, title),
+              ),
+            ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _VehicleSectionNavigationDelegate(
+                height: 64,
+                child: _buildSectionNavigation(compact: true),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 20),
+              sliver: SliverToBoxAdapter(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1800),
+                    child: _content(accent),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     return Container(
       color: app.backGroundColor,
       child: Column(
         children: [
-          _header(accent, model.isEmpty ? 'vehicle_details_title'.tr() : model),
-          _buildSectionNavigation(compact: compact),
+          _header(accent, title),
+          _buildSectionNavigation(compact: false),
           Expanded(
             child: SingleChildScrollView(
               controller: _contentScrollController,
-              padding: EdgeInsets.fromLTRB(
-                compact ? 12 : 16,
-                compact ? 8 : 8,
-                compact ? 12 : 16,
-                20,
-              ),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1800),
@@ -258,14 +293,23 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   }
 
   void _selectSection(int index) {
-    if (index == _selectedSectionIndex && !_moreSectionsOpen) return;
-    setState(() {
-      _selectedSectionIndex = index;
-      _moreSectionsOpen = false;
+    if (index == _selectedSectionIndex) return;
+    setState(() => _selectedSectionIndex = index);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_contentScrollController.hasClients) return;
+      final compact =
+          MediaQuery.sizeOf(context).width < ParcotoTokens.tabletBreakpoint;
+      if (!compact) {
+        _contentScrollController.jumpTo(0);
+        return;
+      }
+      final headerHeight =
+          _vehicleIdentityHeaderKey.currentContext?.size?.height ?? 0.0;
+      final target = headerHeight
+          .clamp(0.0, _contentScrollController.position.maxScrollExtent)
+          .toDouble();
+      _contentScrollController.jumpTo(target);
     });
-    if (_contentScrollController.hasClients) {
-      _contentScrollController.jumpTo(0);
-    }
     _ensureSectionDataLoaded(index);
   }
 
@@ -288,13 +332,18 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     Widget sectionItem(int index, {double minWidth = 94}) {
       final section = sections[index];
       final selected = _selectedSectionIndex == index;
-      final horizontalInset = compact ? 10.0 : minWidth == 0 ? 4.0 : 15.0;
+      final horizontalInset = compact ? 6.0 : minWidth == 0 ? 4.0 : 15.0;
       final label = compact
           ? switch (index) {
               0 => 'Vue gén.',
               1 => 'Ident.',
               2 => 'Tech.',
               3 => 'Affect.',
+              4 => 'Lieu',
+              5 => 'Docs',
+              6 => 'Maint.',
+              7 => 'Hist.',
+              8 => 'Achat',
               _ => section.label,
             }
           : switch (index) {
@@ -319,9 +368,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             constraints: BoxConstraints(minWidth: minWidth),
             padding: EdgeInsets.fromLTRB(
               horizontalInset,
-              compact ? 8 : 8,
+              8,
               horizontalInset,
-              compact ? 6 : 6,
+              6,
             ),
             decoration: BoxDecoration(
               border: Border(
@@ -358,88 +407,41 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       );
     }
 
-    Widget moreItem() {
-      final selected = _selectedSectionIndex >= 4;
-      return GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => setState(() => _moreSectionsOpen = !_moreSectionsOpen),
-        child: Container(
-          constraints: const BoxConstraints(minWidth: 76),
-          padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: selected || _moreSectionsOpen
-                    ? accent
-                    : Colors.transparent,
-                width: 2.5,
-              ),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                _moreSectionsOpen ? FluentIcons.chevron_up : FluentIcons.more,
-                size: 19,
-                color: selected || _moreSectionsOpen
-                    ? accent
-                    : Colors.grey[100],
-              ),
-              const SizedBox(height: 5),
-              Text(
-                'Plus',
-                style: TextStyle(
-                  color: selected || _moreSectionsOpen
-                      ? accent
-                      : Colors.grey[100],
-                  fontSize: 10.5,
-                  fontWeight: selected || _moreSectionsOpen
-                      ? FontWeight.w700
-                      : FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
     return LayoutBuilder(
       builder: (context, constraints) {
         final distributeDesktopTabs =
             !compact && constraints.maxWidth >= sections.length * 72;
         return Container(
-          constraints: const BoxConstraints(minHeight: 62),
+          constraints: const BoxConstraints(minHeight: 64),
           width: double.infinity,
           decoration: BoxDecoration(
             color: FluentTheme.of(context).micaBackgroundColor,
             border: Border(bottom: BorderSide(color: Colors.grey[30])),
           ),
           child: compact
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+              ? Row(
                   children: [
-                    Row(
-                      children: [
-                        for (var index = 0; index < 4; index++)
-                          Expanded(child: sectionItem(index, minWidth: 0)),
-                        moreItem(),
-                      ],
-                    ),
-                    if (_moreSectionsOpen)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-                        child: Wrap(
-                          alignment: WrapAlignment.spaceAround,
-                          spacing: 4,
-                          runSpacing: 2,
+                    if (widget.onBack != null)
+                      Tooltip(
+                        message: 'Retour à la vue d’ensemble du parc',
+                        child: IconButton(
+                          icon: const Icon(FluentIcons.back, size: 18),
+                          onPressed: widget.onBack,
+                        ),
+                      ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
                           children: [
-                            for (var index = 4; index < sections.length; index++)
-                              sectionItem(index, minWidth: 84),
+                            for (var index = 0;
+                                index < sections.length;
+                                index++)
+                              sectionItem(index, minWidth: 76),
                           ],
                         ),
                       ),
+                    ),
                   ],
                 )
               : distributeDesktopTabs
@@ -563,7 +565,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           spacing: 8,
           runSpacing: 8,
           children: [
-            if (widget.onBack != null)
+            if (widget.onBack != null && !compact)
               Button(
                 onPressed: widget.onBack,
                 child: Row(
@@ -2162,6 +2164,38 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     _contentScrollController.dispose();
     super.dispose();
   }
+}
+
+class _VehicleSectionNavigationDelegate
+    extends SliverPersistentHeaderDelegate {
+  final double height;
+  final Widget child;
+
+  const _VehicleSectionNavigationDelegate({
+    required this.height,
+    required this.child,
+  });
+
+  @override
+  double get minExtent => height;
+
+  @override
+  double get maxExtent => height;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return SizedBox.expand(child: child);
+  }
+
+  @override
+  bool shouldRebuild(
+    covariant _VehicleSectionNavigationDelegate oldDelegate,
+  ) =>
+      oldDelegate.height != height || oldDelegate.child != child;
 }
 
 class _VehicleField extends StatelessWidget {

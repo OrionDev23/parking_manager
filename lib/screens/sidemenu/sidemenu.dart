@@ -232,8 +232,7 @@ class PanesListState extends State<PanesList>
                               ? ParcotoTokens.mobileTopbarHeight
                               : ParcotoTokens.topbarHeight) -
                           1,
-                      child: DragToMoveArea(
-                        child: Padding(
+                      child: Padding(
                           padding: EdgeInsets.symmetric(
                             horizontal: compact
                                 ? ParcotoTokens.space3
@@ -244,14 +243,19 @@ class PanesListState extends State<PanesList>
                               if (compact) ...[
                                 if (isSignedIn) ...[
                                   Expanded(
-                                    child: Text(
-                                      activePageTitle ?? 'Parcoto',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: widget.appTheme.textColor,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w700,
+                                    child: DragToMoveArea(
+                                      child: Align(
+                                        alignment: AlignmentDirectional.centerStart,
+                                        child: Text(
+                                          activePageTitle ?? 'Parcoto',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: widget.appTheme.textColor,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -274,14 +278,19 @@ class PanesListState extends State<PanesList>
                               ] else if (isSignedIn) ...[
                                 SizedBox(
                                   width: 190,
-                                  child: Text(
-                                    activePageTitle ?? 'Parcoto',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: widget.appTheme.textColor,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
+                                  child: DragToMoveArea(
+                                    child: Align(
+                                      alignment: AlignmentDirectional.centerStart,
+                                      child: Text(
+                                        activePageTitle ?? 'Parcoto',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: widget.appTheme.textColor,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -361,7 +370,6 @@ class PanesListState extends State<PanesList>
                             ],
                           ),
                         ),
-                      ),
                     ),
                     if (isPlatformCompanyContext)
                       Container(
