@@ -320,8 +320,8 @@ class NotifListState extends State<NotifList>
                                       key: ValueKey(
                                         '${tiles[index].type}:${tiles[index].id}',
                                       ),
-                                      companyId: companyId!,
-                                      userId: userId!,
+                                      companyId: widget.companyId!,
+                                      userId: widget.userId!,
                                       pNotification: tiles[index],
                                     ),
                                   ),
