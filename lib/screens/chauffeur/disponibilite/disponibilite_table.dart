@@ -108,9 +108,6 @@ class DisponibliteTableState extends State<DisponibliteTable> {
 
   int rowPerPage = 12;
 
-  TextEditingController searchController = TextEditingController();
-
-  bool notEmpty = false;
   bool filtered = false;
 
   FlyoutController filterFlyout = FlyoutController();
