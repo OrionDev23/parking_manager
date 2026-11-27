@@ -1,4 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import '../../../../core/services/vehicle_make_service.dart';
 
