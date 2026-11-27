@@ -864,9 +864,11 @@ class VehicleManagementState extends State<VehicleManagement>
         child: LayoutBuilder(
           builder: (context, constraints) {
             final compact = constraints.maxWidth < 760;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                 Row(
                   children: [
                     Container(
@@ -938,7 +940,7 @@ class VehicleManagementState extends State<VehicleManagement>
                         ),
                     ],
                   ),
-                const Spacer(),
+                const SizedBox(height: 24),
                 Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 520),
@@ -978,7 +980,7 @@ class VehicleManagementState extends State<VehicleManagement>
                     ),
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(height: 24),
                 Container(height: 1, color: theme.borderColor),
                 Row(
                   children: [
@@ -992,7 +994,8 @@ class VehicleManagementState extends State<VehicleManagement>
                     ),
                   ],
                 ),
-              ],
+                ],
+              ),
             );
           },
         ),
