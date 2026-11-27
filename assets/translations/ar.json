@@ -926,5 +926,16 @@
   "vehicle_form_technical_management_section": "المواصفات التقنية وتسيير الحظيرة",
   "vehicle_form_technical_specs_subtitle": "الفئة، سنة الطراز، الطلاء، المحرك، ناقل الحركة والأبعاد",
   "vehicle_form_acquisition_section": "الاقتناء ومتابعة الحظيرة",
-  "vehicle_form_company_management_subtitle": "بيانات التسيير الخاصة بالمؤسسة"
+  "vehicle_form_company_management_subtitle": "بيانات التسيير الخاصة بالمؤسسة",
+  "vehicle_make_picker_title": "اختيار العلامة التجارية",
+  "vehicle_make_picker_search": "البحث عن علامة تجارية…",
+  "vehicle_make_picker_empty": "لم يتم العثور على علامات تجارية.",
+  "vehicle_make_category_passenger": "سيارة سياحية",
+  "vehicle_make_category_commercial": "مركبة نفعية / شاحنة",
+  "vehicle_make_category_bus": "حافلة / حافلة سياحية",
+  "vehicle_make_category_motorcycle": "دراجة نارية / سكوتر",
+  "vehicle_make_category_agricultural": "معدات زراعية",
+  "vehicle_make_category_construction": "معدات أشغال عمومية",
+  "vehicle_make_category_industrial": "معدات صناعية",
+  "vehicle_make_category_other": "أخرى"
 }
