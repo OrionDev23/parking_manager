@@ -7,6 +7,7 @@ import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
 
 import '../../../main.dart';
+import '../../../providers/client_database.dart';
 import '../../../serializables/notification.dart';
 import '../../sidemenu/pane_items.dart';
 
@@ -152,7 +153,7 @@ class _NotificationTileState extends State<NotificationTile> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Masquer cette alerte sur cet appareil ?',
+          'Masquer cette alerte sur cet appareil pour ce compte ?',
           style: TextStyle(
             color: theme.textColor,
             fontSize: 11,
@@ -178,11 +179,12 @@ class _NotificationTileState extends State<NotificationTile> {
   }
 
   Future<void> dismiss() async {
-    final recordName = widget.pNotification.type == 0
+    final basePreferenceKey = widget.pNotification.type == 0
         ? 'removedDocs'
         : widget.pNotification.type == 1
             ? 'removedCondDocs'
             : 'removedPlanning';
+    final recordName = userScopedPreferenceKey(basePreferenceKey);
 
     try {
       late List<String> storedData;
