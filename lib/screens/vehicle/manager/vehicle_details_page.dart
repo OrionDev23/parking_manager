@@ -288,6 +288,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     Widget sectionItem(int index, {double minWidth = 94}) {
       final section = sections[index];
       final selected = _selectedSectionIndex == index;
+      final horizontalInset = compact ? 10.0 : minWidth == 0 ? 4.0 : 15.0;
       final label = compact
           ? switch (index) {
               0 => 'Vue gén.',
@@ -296,7 +297,18 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               3 => 'Affect.',
               _ => section.label,
             }
-          : section.label;
+          : switch (index) {
+              0 => 'Aperçu',
+              1 => 'Ident.',
+              2 => 'Technique',
+              3 => 'Affect.',
+              4 => 'Localisation',
+              5 => 'Documents',
+              6 => 'Maintenance',
+              7 => 'Historique',
+              8 => 'Acquisition',
+              _ => section.label,
+            };
       return Tooltip(
         message: section.label,
         child: GestureDetector(
@@ -306,9 +318,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           child: Container(
             constraints: BoxConstraints(minWidth: minWidth),
             padding: EdgeInsets.fromLTRB(
-              compact ? 10 : 15,
+              horizontalInset,
               compact ? 8 : 8,
-              compact ? 10 : 15,
+              horizontalInset,
               compact ? 6 : 6,
             ),
             decoration: BoxDecoration(
@@ -654,6 +666,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   }
 
   String _vehicleOperationalLabel() {
+    if (v.etatactuel == null) return 'État non renseigné';
     switch (FleetDashboardStatusMapper.fromLegacyCode(v.etatactuel)) {
       case FleetDashboardStatus.available:
         return 'En service';
@@ -1331,7 +1344,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       ..sort((a, b) => a.dateExpiration!.compareTo(b.dateExpiration!));
     String? nearestDocumentLabel;
     if (!documentsUnavailable && documentsWithExpiry.isNotEmpty) {
-      final nextDocument = documentsWithExpiry.first;
+      final upcomingDocuments = documentsWithExpiry.where((document) {
+        final date = document.dateExpiration!;
+        return !DateTime(date.year, date.month, date.day).isBefore(today);
+      }).toList(growable: false);
+      final nextDocument = upcomingDocuments.isNotEmpty
+          ? upcomingDocuments.first
+          : documentsWithExpiry.first;
       final nextDate = nextDocument.dateExpiration!;
       final isPast = DateTime(nextDate.year, nextDate.month, nextDate.day)
           .isBefore(today);
@@ -1345,7 +1364,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     final driversForVehicle = _driversMatchingVehicleRegistration();
     final assignedDriverName = driversForVehicle.length == 1
         ? driversForVehicle.single.getName().trim()
-        : null;
+        : driversForVehicle.length > 1
+            ? '${driversForVehicle.length} conducteurs associés'
+            : null;
     final currentStatus = _vehicleOperationalLabel();
 
     return VehicleOverviewDashboard(
