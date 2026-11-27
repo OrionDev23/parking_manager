@@ -950,5 +950,16 @@
   "vehicle_form_technical_management_section": "Caractéristiques techniques et gestion du parc",
   "vehicle_form_technical_specs_subtitle": "Finition, année modèle, peinture, moteur, transmission et dimensions",
   "vehicle_form_acquisition_section": "Acquisition et suivi du parc",
-  "vehicle_form_company_management_subtitle": "Données de gestion propres à l’entreprise"
+  "vehicle_form_company_management_subtitle": "Données de gestion propres à l’entreprise",
+  "vehicle_make_picker_title": "Choisir une marque",
+  "vehicle_make_picker_search": "Rechercher une marque…",
+  "vehicle_make_picker_empty": "Aucune marque trouvée.",
+  "vehicle_make_category_passenger": "Voiture particulière",
+  "vehicle_make_category_commercial": "Utilitaire / poids lourd",
+  "vehicle_make_category_bus": "Autobus / autocar",
+  "vehicle_make_category_motorcycle": "Moto / scooter",
+  "vehicle_make_category_agricultural": "Matériel agricole",
+  "vehicle_make_category_construction": "Engin de chantier",
+  "vehicle_make_category_industrial": "Matériel industriel",
+  "vehicle_make_category_other": "Autre"
 }
