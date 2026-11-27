@@ -902,5 +902,7 @@
   "vehicle_field_transmission": "ناقل الحركة",
   "vehicle_field_usage_type": "نوع الاستخدام",
   "vehicle_details_unavailable": "غير متاح",
-  "vehicle_details_loading": "جارٍ التحميل…"
+  "vehicle_details_loading": "جارٍ التحميل…",
+  "vehicle_algerian_homologation_group": "البيانات الإدارية وبيانات المطابقة الجزائرية",
+  "vehicle_algerian_homologation_description": "معلومات البطاقة الرمادية الجزائرية، منفصلة عن مواصفات الشركة المصنعة."
 }
