@@ -733,3 +733,13 @@ class DatabaseGetter {
     return result;
   }
 }
+
+/// Device-local preference key scoped to the authenticated company and user.
+/// Used only for local notification dismissal; it is not a server read receipt.
+String userScopedPreferenceKey(String baseKey) {
+  final companyId = DatabaseGetter.activeCompanyId ?? 'no-company';
+  final userId = DatabaseGetter.me.value?.id ??
+      DatabaseGetter.user?.$id ??
+      'no-user';
+  return '${baseKey}_${companyId}_${userId}';
+}
