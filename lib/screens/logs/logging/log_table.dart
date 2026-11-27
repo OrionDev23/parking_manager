@@ -78,7 +78,6 @@ class LogTableState extends State<LogTable> {
   void _applyAppBarSearchRequest() {
     final query = appBarSearchRequest.value;
     if (query == null) return;
-    searchController.text = query;
     notEmpty = query.isNotEmpty;
     logDatasource.search(query);
     appBarSearchRequest.value = null;
