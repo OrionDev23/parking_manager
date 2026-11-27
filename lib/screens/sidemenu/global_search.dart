@@ -117,8 +117,20 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
     if (!mounted ||
         widget.scope != _ModuleSearchScope.vehicles ||
         _controller.text.trim() != query ||
-        VehicleManagementState.visibleResultCount.value != 0 ||
         _lastCrossSuggestionQuery == query) {
+      return;
+    }
+
+    // Do not report a cross-module match while the vehicle cache is still
+    // loading; wait briefly for the active screen's local result count.
+    for (var attempt = 0;
+        attempt < 40 && VehicleProvider.downloadingVehicles;
+        attempt++) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (!mounted || _controller.text.trim() != query) return;
+    }
+    if (VehicleProvider.downloadingVehicles ||
+        VehicleManagementState.visibleResultCount.value != 0) {
       return;
     }
 
@@ -126,6 +138,7 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
     if (!mounted ||
         _controller.text.trim() != query ||
         VehicleManagementState.visibleResultCount.value != 0 ||
+        VehicleProvider.downloadingVehicles ||
         matches.isEmpty) {
       return;
     }
