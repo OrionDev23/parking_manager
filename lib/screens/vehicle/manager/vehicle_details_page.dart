@@ -1271,8 +1271,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     final documentsUnavailable = _documentsLoadFailed ||
         (!VehicleProvider.downloadedDocuments &&
             !VehicleProvider.downloadingDocuments);
-    final documentsWithDeadline =
-        documents.where((document) => document.dateExpiration != null).length;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final registeredDocuments = documents.map((document) {
@@ -1338,8 +1336,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       statusLabel: currentStatus,
       driverName: assignedDriverName,
       documentsCount: documentsUnavailable ? null : documents.length,
-      documentsWithDeadline:
-          documentsUnavailable ? null : documentsWithDeadline,
       registeredDocuments:
           documentsUnavailable ? const [] : registeredDocuments,
       nearestDocumentLabel:
