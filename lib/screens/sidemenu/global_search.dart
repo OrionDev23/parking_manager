@@ -126,7 +126,7 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
   String? _lastCrossSuggestionQuery;
   String _lastDispatchedQuery = '';
 
-  String get _placeholder => switch (widget.scope) {
+  String get _placeholder => switch (scope) {
         _ModuleSearchScope.platformCompanies => 'Rechercher une entreprise cliente...',
         _ModuleSearchScope.vehicles => 'Rechercher un véhicule...',
         _ModuleSearchScope.vehicleDocuments => 'Rechercher un document véhicule...',
@@ -157,6 +157,7 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.scope != widget.scope) {
       _crossSearchTimer?.cancel();
+      _dispatchSearchForScope(oldWidget.scope, '');
       _controller.clear();
       _lastCrossSuggestionQuery = null;
       _lastDispatchedQuery = '';
@@ -166,6 +167,9 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
   @override
   void dispose() {
     _crossSearchTimer?.cancel();
+    if (_controller.text.trim().isNotEmpty) {
+      _dispatchSearchForScope(widget.scope, '');
+    }
     _controller.dispose();
     super.dispose();
   }
@@ -176,14 +180,19 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
       _lastDispatchedQuery = query;
       _lastCrossSuggestionQuery = null;
     }
+    _dispatchSearchForScope(widget.scope, query);
+    if (widget.scope == _ModuleSearchScope.vehicles) {
+      _scheduleVehiclePartSuggestion(query);
+    }
+  }
 
-    switch (widget.scope) {
+  void _dispatchSearchForScope(_ModuleSearchScope scope, String query) {
+    switch (scope) {
       case _ModuleSearchScope.platformCompanies:
         PlatformCompaniesScreen.appBarSearchRequest.value = query;
         break;
       case _ModuleSearchScope.vehicles:
         VehicleManagementState.externalSearchRequest.value = query;
-        _scheduleVehiclePartSuggestion(query);
         break;
       case _ModuleSearchScope.vehicleDocuments:
         DocumentTableState.appBarSearchRequest.value = query;
