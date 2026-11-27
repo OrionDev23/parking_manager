@@ -941,5 +941,14 @@
   "vehicle_doc_download_failed": "Téléchargement impossible",
   "vehicle_doc_issue_date_prefix": "Émis le",
   "vehicle_doc_attachment_available": "Pièce jointe disponible",
-  "vehicle_doc_saved": "Document enregistré."
+  "vehicle_doc_saved": "Document enregistré.",
+  "vehicle_form_administrative_identity_title": "Informations administratives algériennes",
+  "vehicle_form_identity_photo_title": "Identité et photo du véhicule",
+  "vehicle_form_identity_photo_description": "Immatriculation algérienne et caractéristiques constructeur",
+  "vehicle_form_registration_section": "Immatriculation algérienne",
+  "vehicle_form_manufacturer_section": "Caractéristiques constructeur",
+  "vehicle_form_technical_management_section": "Caractéristiques techniques et gestion du parc",
+  "vehicle_form_technical_specs_subtitle": "Finition, année modèle, peinture, moteur, transmission et dimensions",
+  "vehicle_form_acquisition_section": "Acquisition et suivi du parc",
+  "vehicle_form_company_management_subtitle": "Données de gestion propres à l’entreprise"
 }
