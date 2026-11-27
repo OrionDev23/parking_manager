@@ -53,6 +53,7 @@ class _UsersTableState extends State<UsersTable> {
       );
       filterDocument.value = null;
         filterNow = false;
+        filterNow = false;
     } else {
       startedWithFiltersOn = false;
 
