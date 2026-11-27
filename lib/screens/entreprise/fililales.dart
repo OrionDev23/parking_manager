@@ -30,10 +30,34 @@ class MesFilliales extends StatefulWidget {
 }
 
 class MesFillialesState extends State<MesFilliales> {
-  TextEditingController searchController = TextEditingController();
+  static final ValueNotifier<String?> appBarSearchRequest =
+      ValueNotifier<String?>(null);
+
+  String _searchQuery = '';
 
   bool notEmpty = false;
   double height = 400.px;
+
+  @override
+  void initState() {
+    super.initState();
+    appBarSearchRequest.addListener(_applyAppBarSearchRequest);
+    _applyAppBarSearchRequest();
+  }
+
+  void _applyAppBarSearchRequest() {
+    final query = appBarSearchRequest.value;
+    if (query == null || !mounted) return;
+    setState(() => _searchQuery = query);
+    appBarSearchRequest.value = null;
+  }
+
+  @override
+  void dispose() {
+    appBarSearchRequest.removeListener(_applyAppBarSearchRequest);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final appTheme = context.watch<AppTheme>();
@@ -57,45 +81,6 @@ class MesFillialesState extends State<MesFilliales> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: 300.px,
-                  height: 40.px,
-                  child: ParcotoTextBox(
-                    controller: searchController,
-                    placeholder: 'search'.tr(),
-                    style: appTheme.writingStyle,
-                    cursorColor: appTheme.color.darker,
-                    placeholderStyle: placeStyle,
-                    onChanged: (s) {
-                      if (s.isNotEmpty) {
-                        notEmpty = true;
-                      } else {
-                        if (notEmpty) {
-                          notEmpty = false;
-                        }
-                      }
-                      setState(() {});
-                    },
-                    suffix: notEmpty
-                        ? IconButton(
-                            icon: const Icon(FluentIcons.cancel),
-                            onPressed: () {
-                              searchController.text = "";
-                              notEmpty = false;
-                              setState(() {});
-                            },
-                          )
-                        : null,
-                  ),
-                ),
-              ],
-            ),
-          ),
           widget.type == 0
               ? Flexible(
                   child: ListView(
@@ -374,7 +359,7 @@ class MesFillialesState extends State<MesFilliales> {
     List<String> result = List.empty(growable: true);
     if (widget.type == 1) {
       MyEntrepriseState.p?.directions?.forEach((value) {
-        if (value.toUpperCase().contains(searchController.text.toUpperCase())) {
+        if (value.toUpperCase().contains(_searchQuery.toUpperCase())) {
           result.add(value);
         }
       });
