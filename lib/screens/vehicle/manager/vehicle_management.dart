@@ -208,15 +208,11 @@ class VehicleManagementState extends State<VehicleManagement>
                       ),
                   ],
                 );
-                final search = _buildGlobalSearch(theme);
-
                 if (constraints.maxWidth < 900) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _pageTitle(theme),
-                      const SizedBox(height: 14),
-                      search,
                       const SizedBox(height: 10),
                       Align(
                         alignment: AlignmentDirectional.centerStart,
@@ -230,9 +226,7 @@ class VehicleManagementState extends State<VehicleManagement>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(child: _pageTitle(theme)),
-                    const SizedBox(width: 18),
-                    SizedBox(width: 260, child: search),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 14),
                     actions,
                   ],
                 );
@@ -278,30 +272,6 @@ class VehicleManagementState extends State<VehicleManagement>
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildGlobalSearch(AppTheme theme) {
-    return ParcotoTextBox(
-      controller: searchController,
-      placeholder: 'Rechercher un véhicule...',
-      style: theme.writingStyle,
-      placeholderStyle: TextStyle(color: theme.mutedTextColor),
-      cursorColor: theme.color,
-      onChanged: (value) => setState(() => searchQuery = value),
-      prefix: const Padding(
-        padding: EdgeInsetsDirectional.only(start: 10, end: 6),
-        child: Icon(FluentIcons.search, size: 14),
-      ),
-      suffix: searchQuery.isEmpty
-          ? null
-          : IconButton(
-              icon: const Icon(FluentIcons.cancel, size: 13),
-              onPressed: () {
-                searchController.clear();
-                setState(() => searchQuery = '');
-              },
-            ),
     );
   }
 
