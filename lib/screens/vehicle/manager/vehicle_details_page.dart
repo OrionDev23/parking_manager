@@ -239,9 +239,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               controller: _contentScrollController,
               padding: EdgeInsets.fromLTRB(
                 compact ? 12 : 16,
-                compact ? 14 : 14,
+                compact ? 10 : 10,
                 compact ? 12 : 16,
-                24,
+                20,
               ),
               child: Center(
                 child: ConstrainedBox(
@@ -284,7 +284,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     ];
     final accent = FluentTheme.of(context).accentColor;
 
-    Widget sectionItem(int index, {double minWidth = 108}) {
+    Widget sectionItem(int index, {double minWidth = 94}) {
       final section = sections[index];
       final selected = _selectedSectionIndex == index;
       final label = compact
@@ -306,9 +306,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             constraints: BoxConstraints(minWidth: minWidth),
             padding: EdgeInsets.fromLTRB(
               compact ? 10 : 15,
-              compact ? 12 : 14,
+              compact ? 8 : 8,
               compact ? 10 : 15,
-              compact ? 10 : 12,
+              compact ? 6 : 6,
             ),
             decoration: BoxDecoration(
               border: Border(
@@ -323,17 +323,17 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               children: [
                 Icon(
                   section.icon,
-                  size: compact ? 19 : 22,
+                  size: compact ? 18 : 20,
                   color: selected ? accent : Colors.grey[100],
                 ),
-                const SizedBox(height: 7),
+                const SizedBox(height: 4),
                 Text(
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: selected ? accent : Colors.grey[100],
-                    fontSize: compact ? 10.5 : 11.5,
+                    fontSize: compact ? 10 : 10.5,
                     fontWeight:
                         selected ? FontWeight.w700 : FontWeight.w500,
                   ),
@@ -393,7 +393,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     }
 
     return Container(
-      constraints: const BoxConstraints(minHeight: 88),
+      constraints: const BoxConstraints(minHeight: 64),
       width: double.infinity,
       decoration: BoxDecoration(
         color: FluentTheme.of(context).micaBackgroundColor,
@@ -551,10 +551,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
         return Container(
           padding: EdgeInsets.fromLTRB(
-            compact ? 12 : 22,
             compact ? 12 : 18,
-            compact ? 12 : 22,
-            compact ? 14 : 18,
+            compact ? 10 : 10,
+            compact ? 12 : 18,
+            compact ? 12 : 14,
           ),
           decoration: BoxDecoration(
             color: FluentTheme.of(context).micaBackgroundColor,
@@ -589,7 +589,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     final imageUrl = v.imageUrl?.trim();
     // Match the reference layout: a clear vehicle thumbnail beside the identity.
     final width = compact ? double.infinity : 190.0;
-    final height = compact ? 160.0 : 140.0;
+    final height = compact ? 160.0 : 130.0;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
