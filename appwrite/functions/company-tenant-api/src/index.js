@@ -2433,7 +2433,7 @@ async function decodeVehicleVin({ userId, input, log }) {
   }
   await requireVehicleImageAccess(userId, companyId);
 
-  const vin = String(input.vin || '').replace(/\\s+/g, '').toUpperCase();
+  const vin = String(input.vin || '').replace(/\s+/g, '').toUpperCase();
   if (!/^[A-HJ-NPR-Z0-9]{17}$/.test(vin)) {
     const failure = new Error('Le VIN doit contenir exactement 17 caractères (sans I, O ou Q).');
     failure.status = 400;
