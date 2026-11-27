@@ -390,6 +390,10 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
 
   String deleteConfirmationMessage(T c);
 
+  /// Optional cleanup for resources stored outside the row being deleted.
+  /// Cleanup failures must not block the primary row deletion.
+  Future<void> deleteRelatedResources(T record) async {}
+
   void deleteRow(dynamic c) async {
     try {
       final entity = _cacheEntity;
@@ -443,6 +447,13 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
             entityId: c.id,
           );
         }
+      }
+      try {
+        await deleteRelatedResources(c as T);
+      } catch (cleanupError) {
+        debugPrint(
+          '[ParcOto] related resource cleanup failed after row deletion: $cleanupError',
+        );
       }
       data.removeWhere((entry) => entry.key == c.id);
       // Activity logging is secondary to the deletion. If the device is
