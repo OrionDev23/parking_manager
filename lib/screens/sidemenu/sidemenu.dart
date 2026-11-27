@@ -295,14 +295,17 @@ class PanesListState extends State<PanesList>
                               if (!loading &&
                                   signedIn.value &&
                                   !isPlatformHome &&
-                                  DatabaseGetter.trialDate != null)
-                                NotifList(
-                                  companyId: session?.company.companyId,
+                                  session?.company.companyId != null)
+                                Tooltip(
+                                  message: 'Notifications',
+                                  child: NotifList(
+                                    companyId: session!.company.companyId,
+                                  ),
                                 ),
                               if (!loading &&
                                   signedIn.value &&
                                   !isPlatformHome &&
-                                  DatabaseGetter.trialDate != null)
+                                  session?.company.companyId != null)
                                 SizedBox(
                                   width: compact
                                       ? ParcotoTokens.space2
