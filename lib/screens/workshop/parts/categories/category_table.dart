@@ -62,6 +62,7 @@ class CategoryTableState extends State<CategoryTable> {
           searchKey: filterDocument.value,
         );
         filterDocument.value = null;
+        filterNow = false;
       } else {
         startedWithFiltersOn = false;
 
@@ -156,7 +157,7 @@ class CategoryTableState extends State<CategoryTable> {
     return ValueListenableBuilder(
       valueListenable: filterDocument,
       builder: (context, v, _) {
-        if (!startedWithFiltersOn && v != null && filterNow) {
+        if (v != null && filterNow) {
           searchController.text = v;
           categoryDataSource.search(v);
           notEmpty = true;
@@ -164,61 +165,7 @@ class CategoryTableState extends State<CategoryTable> {
           filterNow = false;
         }
         return DataTableParc(
-          header: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: 350.px,
-                  height: 45.px,
-                  child: ParcotoTextBox(
-                    onChanged: (s) {
-                      if (s.isEmpty) {
-                        notEmpty = false;
-                        categoryDataSource.search('');
-                      } else {
-                        notEmpty = true;
-                      }
-                      setState(() {});
-                    },
-                    controller: searchController,
-                    placeholder: 'search'.tr(),
-                    style: appTheme.writingStyle,
-                    cursorColor: appTheme.color.darker,
-                    placeholderStyle: placeStyle,
-                    onSubmitted: (s) {
-                      if (s.isNotEmpty) {
-                        categoryDataSource.search(s);
-                        if (!notEmpty) {
-                          setState(() {
-                            notEmpty = true;
-                          });
-                        }
-                      } else {
-                        if (notEmpty) {
-                          setState(() {
-                            notEmpty = false;
-                          });
-                        }
-                      }
-                    },
-                    suffix: notEmpty
-                        ? IconButton(
-                            icon: const Icon(FluentIcons.cancel),
-                            onPressed: () {
-                              searchController.text = "";
-                              notEmpty = false;
-                              setState(() {});
-                              categoryDataSource.search('');
-                            },
-                          )
-                        : null,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          header: null,
           sortAscending: assending,
           sortColumnIndex: sortColumn,
           columns: columns,
