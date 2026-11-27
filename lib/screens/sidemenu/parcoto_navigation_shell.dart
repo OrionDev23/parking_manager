@@ -197,9 +197,11 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
     final keyboardVisible = MediaQuery.viewInsetsOf(context).bottom > 0;
     final theme = widget.appTheme;
 
-    return ValueListenableBuilder<int>(
-      valueListenable: widget.selectedIndex,
-      builder: (context, selected, _) {
+    return AnimatedBuilder(
+      animation: widget.appTheme,
+      builder: (context, _) => ValueListenableBuilder<int>(
+        valueListenable: widget.selectedIndex,
+        builder: (context, selected, _) {
         final destinations = _destinations;
         final safeIndex = selected >= 0 && selected < destinations.length
             ? selected
@@ -306,7 +308,8 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
               ),
           ],
         );
-      },
+        },
+      ),
     );
   }
 
@@ -366,7 +369,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
               child: const Icon(
                 FluentIcons.add,
                 size: 23,
-                color: Colors.white,
+                color: theme.surfaceColor,
               ),
             ),
           ),
@@ -669,7 +672,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                     padding: const EdgeInsets.fromLTRB(11, 9, 8, 5),
                     child: DefaultTextStyle(
                       style: TextStyle(
-                        color: const Color(0xFF9FB3CC),
+                        color: widget.appTheme.mutedTextColor,
                         fontSize: 9,
                         fontWeight: FontWeight.w700,
                         letterSpacing: .5,
@@ -689,7 +692,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                       horizontal: 10,
                       vertical: 6,
                     ),
-                    color: Colors.white.withValues(alpha: .14),
+                    color: widget.appTheme.borderColor.withValues(alpha: .85),
                   ),
                 ),
               );
@@ -738,7 +741,15 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
             size: childItem ? 15 : 17,
             color: active ? theme.color : muted,
           )
-        : icon ?? const SizedBox.shrink();
+        : icon is Widget
+            ? IconTheme(
+                data: IconThemeData(
+                  size: childItem ? 15 : 17,
+                  color: active ? theme.color : muted,
+                ),
+                child: icon,
+              )
+            : const SizedBox.shrink();
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: childItem ? 1 : 2),
