@@ -108,9 +108,9 @@ class VehicleOverviewDashboard extends StatelessWidget {
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(flex: 7, child: summary),
+                Expanded(flex: 8, child: summary),
                 const SizedBox(width: 14),
-                Expanded(flex: 4, child: status),
+                SizedBox(width: 310, child: status),
               ],
             );
           },
@@ -496,7 +496,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
   ) {
     return LayoutBuilder(
       builder: (context, constraints) => SizedBox(
-        width: 190,
+        width: 218,
         child: Container(
           padding: const EdgeInsets.all(11),
           decoration: BoxDecoration(
@@ -512,9 +512,10 @@ class VehicleOverviewDashboard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(label, style: TextStyle(color: Colors.grey[100], fontSize: 10)),
+                    Text(label, maxLines: 1, overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: Colors.grey[100], fontSize: 10)),
                     const SizedBox(height: 3),
-                    Text(value, maxLines: 2, overflow: TextOverflow.ellipsis,
+                    Text(value, maxLines: 1, overflow: TextOverflow.ellipsis,
                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                   ],
                 ),
