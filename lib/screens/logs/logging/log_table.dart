@@ -45,6 +45,9 @@ class LogTable extends StatefulWidget {
 }
 
 class LogTableState extends State<LogTable> {
+  static final ValueNotifier<String?> appBarSearchRequest =
+      ValueNotifier<String?>(null);
+
   late LogDatasource logDatasource;
 
   bool assending = false;
@@ -53,6 +56,7 @@ class LogTableState extends State<LogTable> {
 
   @override
   void initState() {
+    super.initState();
     sortColumn = widget.fieldsToShow.indexOf('date');
     if (widget.typelist != null) {
       filters['typelist'] = widget.typelist!.join(',');
@@ -67,7 +71,18 @@ class LogTableState extends State<LogTable> {
       filters: filters,
     );
     initColumns();
-    super.initState();
+    appBarSearchRequest.addListener(_applyAppBarSearchRequest);
+    _applyAppBarSearchRequest();
+  }
+
+  void _applyAppBarSearchRequest() {
+    final query = appBarSearchRequest.value;
+    if (query == null) return;
+    searchController.text = query;
+    notEmpty = query.isNotEmpty;
+    logDatasource.search(query);
+    appBarSearchRequest.value = null;
+    if (mounted) setState(() {});
   }
 
   double large = 250.px;
@@ -164,8 +179,6 @@ class LogTableState extends State<LogTable> {
 
   int rowPerPage = 12;
 
-  TextEditingController searchController = TextEditingController();
-
   bool notEmpty = false;
   bool filtered = false;
 
@@ -253,54 +266,7 @@ class LogTableState extends State<LogTable> {
                       ),
                     ),
                     Spacer(),
-                    Flexible(
-                      child: SizedBox(
-                        height: 45.px,
-                        child: ParcotoTextBox(
-                          onChanged: (s) {
-                            if (s.isEmpty) {
-                              notEmpty = false;
-                              logDatasource.search('');
-                            } else {
-                              notEmpty = true;
-                            }
-                            setState(() {});
-                          },
-                          controller: searchController,
-                          placeholder: 'search'.tr(),
-                          style: appTheme.writingStyle,
-                          cursorColor: appTheme.color.darker,
-                          placeholderStyle: placeStyle,
-                          onSubmitted: (s) {
-                            if (s.isNotEmpty) {
-                              logDatasource.search(s);
-                              if (!notEmpty) {
-                                setState(() {
-                                  notEmpty = true;
-                                });
-                              }
-                            } else {
-                              if (notEmpty) {
-                                setState(() {
-                                  notEmpty = false;
-                                });
-                              }
-                            }
-                          },
-                          suffix: notEmpty
-                              ? IconButton(
-                                  icon: const Icon(FluentIcons.cancel),
-                                  onPressed: () {
-                                    searchController.text = "";
-                                    notEmpty = false;
-                                    setState(() {});
-                                    logDatasource.search('');
-                                  },
-                                )
-                              : null,
-                        ),
-                      ),
-                    ),
+                    
                     ],
                     ),
                   ),
@@ -539,6 +505,7 @@ class LogTableState extends State<LogTable> {
 
   @override
   void dispose() {
+    appBarSearchRequest.removeListener(_applyAppBarSearchRequest);
     logDatasource.dispose();
     super.dispose();
   }
