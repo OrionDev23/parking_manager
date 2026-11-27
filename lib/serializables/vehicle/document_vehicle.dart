@@ -16,6 +16,14 @@ class DocumentVehicle extends ParcOtoDefault {
 
   String? vehiclemat;
   String? createdBy;
+  String? documentType;
+  String? fileId;
+  String? fileName;
+  String? mimeType;
+  int? fileSize;
+  @JsonKey(fromJson: dateFromIntJson, toJson: dateToIntJson)
+  DateTime? issueDate;
+  String? notes;
 
   DocumentVehicle({
     required super.id,
@@ -24,6 +32,13 @@ class DocumentVehicle extends ParcOtoDefault {
     this.vehicle,
     this.dateExpiration,
     this.createdBy,
+    this.documentType,
+    this.fileId,
+    this.fileName,
+    this.mimeType,
+    this.fileSize,
+    this.issueDate,
+    this.notes,
     super.createdAt,
     super.updatedAt,
   });
