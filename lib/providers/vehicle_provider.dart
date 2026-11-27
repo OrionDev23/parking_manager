@@ -232,7 +232,7 @@ class VehicleProvider extends ChangeNotifier {
   Future<List<DocumentVehicle>> getDocumentsBeforeTime(
     DateTime expiration,
   ) async {
-    removedVehiDocs = prefs.getStringList('removedDocs') ?? [];
+    removedVehiDocs = prefs.getStringList(userScopedPreferenceKey('removedDocs')) ?? [];
 
     final result = <DocumentVehicle>[];
 
