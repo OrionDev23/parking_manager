@@ -1,4 +1,6 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/serializables/conducteur/conducteur.dart';
@@ -1939,6 +1941,40 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         ),
       );
 
+  Future<void> _downloadDocumentAttachment(
+    DocumentVehicle document,
+  ) async {
+    final fileId = document.fileId?.trim() ?? '';
+    final client = DatabaseGetter.client;
+    if (fileId.isEmpty || client == null) return;
+
+    try {
+      final bytes = await Storage(client).getFileDownload(
+        bucketId: 'images',
+        fileId: fileId,
+      );
+      await FilePicker.platform.saveFile(
+        dialogTitle: 'vehicle_doc_download_title'.tr(),
+        fileName: document.fileName?.trim().isNotEmpty == true
+            ? document.fileName!.trim()
+            : 'document-' + fileId,
+        bytes: bytes,
+        mimeType: document.mimeType ?? 'application/octet-stream',
+      );
+    } catch (error) {
+      if (!mounted) return;
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: Text('vehicle_doc_download_failed'.tr()),
+          content: Text(error.toString()),
+          severity: InfoBarSeverity.error,
+        ),
+        duration: snackbarShortDuration,
+      );
+    }
+  }
+
   Widget _documentTile(DocumentVehicle document, Color accent) {
     final expiration = document.dateExpiration;
     final now = DateTime.now();
@@ -2005,6 +2041,36 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                     : '${'vehicle_document_expiry_prefix'.tr()}: ${_date(expiration)}',
                 style: TextStyle(color: Colors.grey[100], fontSize: 11),
               ),
+              if (document.documentType?.trim().isNotEmpty == true)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    ('vehicle_doc_type_' + document.documentType!).tr(),
+                    style: TextStyle(color: accent, fontSize: 11),
+                  ),
+                ),
+              if (document.issueDate != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 3),
+                  child: Text(
+                    'vehicle_doc_issue_date_prefix'.tr() +
+                        ': ' +
+                        _date(document.issueDate),
+                    style: TextStyle(color: Colors.grey[100], fontSize: 10),
+                  ),
+                ),
+              if (document.fileId?.isNotEmpty == true)
+                Padding(
+                  padding: const EdgeInsets.only(top: 3),
+                  child: Text(
+                    document.fileName?.trim().isNotEmpty == true
+                        ? document.fileName!.trim()
+                        : 'vehicle_doc_attachment_available'.tr(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: Colors.grey[100], fontSize: 10),
+                  ),
+                ),
             ],
           );
           final statusBadge = _chip(status, statusColor);
@@ -2022,9 +2088,18 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: statusBadge,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    statusBadge,
+                    if (document.fileId?.isNotEmpty == true) ...[
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(FluentIcons.download, size: 15),
+                        onPressed: () => _downloadDocumentAttachment(document),
+                      ),
+                    ],
+                  ],
                 ),
               ],
             );
@@ -2038,6 +2113,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               Expanded(child: details),
               const SizedBox(width: 10),
               statusBadge,
+              if (document.fileId?.isNotEmpty == true) ...[
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(FluentIcons.download, size: 15),
+                  onPressed: () => _downloadDocumentAttachment(document),
+                ),
+              ],
             ],
           );
         },
