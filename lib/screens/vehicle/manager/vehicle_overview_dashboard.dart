@@ -126,7 +126,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
             );
           },
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 10),
         LayoutBuilder(
           builder: (context, constraints) {
             final wide = constraints.maxWidth >= 620;
@@ -338,9 +338,9 @@ class VehicleOverviewDashboard extends StatelessWidget {
         .where((document) => document.warning)
         .length;
     final latestEvent = latestActivityLabel == null
-        ? 'Aucune activité enregistrée'
+        ? 'Aucune'
         : [
-            latestActivityLabel!,
+            latestActivityLabel!.replaceAll(' périodique', ''),
             if (latestActivityDate?.isNotEmpty == true) latestActivityDate!,
           ].join(' • ');
 
