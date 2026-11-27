@@ -1301,9 +1301,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         if (bDate == null) return -1;
         return aDate.compareTo(bDate);
       });
-    final documentsUnavailable = _documentsLoadFailed ||
-        (!VehicleProvider.downloadedDocuments &&
-            !VehicleProvider.downloadingDocuments);
+    // While the provider is still downloading, show documents as unverified.
+    // Only display an empty-state after Appwrite confirms a successful empty result.
+    final documentsUnavailable =
+        _documentsLoadFailed || !VehicleProvider.downloadedDocuments;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final registeredDocuments = documents.map((document) {
