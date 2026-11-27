@@ -1822,7 +1822,7 @@ class _VehicleFormState extends State<VehicleForm>
       fillIfEmpty(engineDisplacementController, data['engineDisplacementCc']);
       fillIfEmpty(enginePowerHpController, data['enginePowerHp']);
       fillIfEmpty(enginePowerKwController, data['enginePowerKw']);
-      fillIfEmpty(engineCodeController, data['engineCode'] ?? data['engine']);
+      fillIfEmpty(engineCodeController, data['engineCode']);
       fillIfEmpty(transmissionController, data['transmission']);
       fillIfEmpty(driveTypeController, data['drive']);
       fillIfEmpty(doorsController, data['doors']);
