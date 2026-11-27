@@ -3355,7 +3355,6 @@ export default async (context) => requestContext.run(
         });
       }
       await ensureVehicleDocumentBucketCreatePermission(teamId);
-      await ensureVehicleDocumentBucketCreatePermission(teamId);
       const memberships = await listRows(MEMBERSHIPS, {
         method: 'equal', attribute: 'companyId', values: [companyId],
       });
