@@ -289,7 +289,7 @@ class VehicleManagementState extends State<VehicleManagement>
                               const SizedBox(width: 14),
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.only(right: 18, bottom: 18),
+                                  padding: const EdgeInsets.only(right: 18, bottom: 8),
                                   child: activeVehicle == null
                                       ? _buildFleetOverview(theme, vehicles, _openDetails)
                                       : VehicleDetailsPage(
