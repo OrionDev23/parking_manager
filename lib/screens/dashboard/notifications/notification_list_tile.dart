@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/driver_provider.dart';
@@ -210,11 +212,13 @@ class _NotificationTileState extends State<NotificationTile> {
         storedData.add(widget.pNotification.id);
       }
       await prefs.setStringList(recordName, storedData);
-      await NotificationDismissalService.syncDismissal(
-        companyId: widget.companyId,
-        userId: widget.userId,
-        type: widget.pNotification.type,
-        id: widget.pNotification.id,
+      unawaited(
+        NotificationDismissalService.syncDismissal(
+          companyId: widget.companyId,
+          userId: widget.userId,
+          type: widget.pNotification.type,
+          id: widget.pNotification.id,
+        ),
       );
 
       if (!mounted) return;
