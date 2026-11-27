@@ -13,6 +13,22 @@ import '../vehicle/manager/vehicles_table.dart';
 import '../chauffeur/manager/chauffeur_table.dart';
 import '../vehicle/manager/vehicle_management.dart';
 import '../workshop/parts/parts_management/parts_table.dart';
+import '../vehicle/states/state_table.dart';
+import '../vehicle/documents/document_table.dart';
+import '../vehicle/brand/brand_list.dart';
+import '../chauffeur/document/chauf_document_table.dart';
+import '../chauffeur/disponibilite/disponibilite_table.dart';
+import '../logs/logging/log_table.dart';
+import '../workshop/inventory/storage/storage_table.dart';
+import '../workshop/inventory/fournisseurs/fournisseur_table.dart';
+import '../workshop/parts/brands/brand_table.dart';
+import '../workshop/parts/categories/category_table.dart';
+import '../workshop/parts/options/option_table.dart';
+import '../prestataire/prestataire_table.dart';
+import '../reparation/reparation/manager/reparation_table.dart';
+import '../reparation/fiche_reception/manager/fiche_reception_table.dart';
+import '../user_management/user_table.dart';
+import '../entreprise/fililales.dart';
 
 /// Chooses the search scope from the active navigation destination.
 /// Global search is intentionally available only on the main dashboard.
@@ -28,33 +44,66 @@ class ContextualSearchLauncher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    switch (paneKey) {
-      case 'dashboard':
-        return GlobalSearchLauncher(compact: compact);
-      case 'vehicle-manager':
-        return _ModuleSearchLauncher(
-          scope: _ModuleSearchScope.vehicles,
-          compact: compact,
-        );
-      case 'driver-manager':
-        return _ModuleSearchLauncher(
-          scope: _ModuleSearchScope.drivers,
-          compact: compact,
-        );
-      case 'workshop-parts':
-        return _ModuleSearchLauncher(
-          scope: _ModuleSearchScope.parts,
-          compact: compact,
-        );
-      default:
-        // Other screens keep their existing in-page filters until a dedicated
-        // adapter is connected. Never silently fall back to global search.
-        return const SizedBox.shrink();
+    if (paneKey == 'dashboard') {
+      return GlobalSearchLauncher(compact: compact);
     }
+
+    final scope = switch (paneKey) {
+      'vehicle-manager' => _ModuleSearchScope.vehicles,
+      'vehicle-documents' => _ModuleSearchScope.vehicleDocuments,
+      'vehicle-states' => _ModuleSearchScope.vehicleStates,
+      'vehicle-brands' => _ModuleSearchScope.vehicleBrands,
+      'driver-manager' => _ModuleSearchScope.drivers,
+      'driver-archive' => _ModuleSearchScope.drivers,
+      'driver-documents' => _ModuleSearchScope.driverDocuments,
+      'driver-availability' => _ModuleSearchScope.driverAvailability,
+      'workshop-parts' => _ModuleSearchScope.parts,
+      'workshop-stock' => _ModuleSearchScope.workshopStock,
+      'workshop-suppliers' => _ModuleSearchScope.workshopSuppliers,
+      'workshop-brands' => _ModuleSearchScope.workshopBrands,
+      'workshop-categories' => _ModuleSearchScope.workshopCategories,
+      'workshop-options' => _ModuleSearchScope.workshopOptions,
+      'repair-orders' => _ModuleSearchScope.repairOrders,
+      'repair-reception' => _ModuleSearchScope.repairReception,
+      'repair-providers' => _ModuleSearchScope.repairProviders,
+      'repair-clients' => _ModuleSearchScope.repairClients,
+      'events' => _ModuleSearchScope.events,
+      'usermngmt' => _ModuleSearchScope.users,
+      'company-filiales' => _ModuleSearchScope.companyFiliales,
+      'company-directions' => _ModuleSearchScope.companyDirections,
+      'company-departments' => _ModuleSearchScope.companyDepartments,
+      _ => null,
+    };
+
+    if (scope == null) return const SizedBox.shrink();
+    return _ModuleSearchLauncher(scope: scope, compact: compact);
   }
 }
 
-enum _ModuleSearchScope { vehicles, drivers, parts }
+enum _ModuleSearchScope {
+  vehicles,
+  vehicleDocuments,
+  vehicleStates,
+  vehicleBrands,
+  drivers,
+  driverDocuments,
+  driverAvailability,
+  parts,
+  workshopStock,
+  workshopSuppliers,
+  workshopBrands,
+  workshopCategories,
+  workshopOptions,
+  repairOrders,
+  repairReception,
+  repairProviders,
+  repairClients,
+  events,
+  users,
+  companyFiliales,
+  companyDirections,
+  companyDepartments,
+}
 
 class _ModuleSearchLauncher extends StatefulWidget {
   final _ModuleSearchScope scope;
@@ -77,8 +126,27 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
 
   String get _placeholder => switch (widget.scope) {
         _ModuleSearchScope.vehicles => 'Rechercher un véhicule...',
+        _ModuleSearchScope.vehicleDocuments => 'Rechercher un document véhicule...',
+        _ModuleSearchScope.vehicleStates => 'Rechercher un état véhicule...',
+        _ModuleSearchScope.vehicleBrands => 'Rechercher une marque de véhicule...',
         _ModuleSearchScope.drivers => 'Rechercher un conducteur...',
+        _ModuleSearchScope.driverDocuments => 'Rechercher un document conducteur...',
+        _ModuleSearchScope.driverAvailability => 'Rechercher une disponibilité...',
         _ModuleSearchScope.parts => 'Rechercher une pièce...',
+        _ModuleSearchScope.workshopStock => 'Rechercher un article en stock...',
+        _ModuleSearchScope.workshopSuppliers => 'Rechercher un fournisseur...',
+        _ModuleSearchScope.workshopBrands => 'Rechercher une marque de pièce...',
+        _ModuleSearchScope.workshopCategories => 'Rechercher une catégorie...',
+        _ModuleSearchScope.workshopOptions => 'Rechercher une option...',
+        _ModuleSearchScope.repairOrders => 'Rechercher une réparation...',
+        _ModuleSearchScope.repairReception => 'Rechercher une fiche de réception...',
+        _ModuleSearchScope.repairProviders => 'Rechercher un prestataire...',
+        _ModuleSearchScope.repairClients => 'Rechercher un client...',
+        _ModuleSearchScope.events => 'Rechercher dans le journal...',
+        _ModuleSearchScope.users => 'Rechercher un utilisateur...',
+        _ModuleSearchScope.companyFiliales => 'Rechercher une filiale...',
+        _ModuleSearchScope.companyDirections => 'Rechercher une direction...',
+        _ModuleSearchScope.companyDepartments => 'Rechercher un département...',
       };
 
   @override
@@ -105,18 +173,78 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
       _lastDispatchedQuery = query;
       _lastCrossSuggestionQuery = null;
     }
+
     switch (widget.scope) {
       case _ModuleSearchScope.vehicles:
         VehicleManagementState.externalSearchRequest.value = query;
         _scheduleVehiclePartSuggestion(query);
         break;
+      case _ModuleSearchScope.vehicleDocuments:
+        DocumentTableState.appBarSearchRequest.value = query;
+        break;
+      case _ModuleSearchScope.vehicleStates:
+        StateTableState.appBarSearchRequest.value = query;
+        break;
+      case _ModuleSearchScope.vehicleBrands:
+        BrandList.appBarSearchRequest.value = query;
+        break;
       case _ModuleSearchScope.drivers:
         ChauffeurTableState.filterDocument.value = query;
         ChauffeurTableState.filterNow = true;
         break;
+      case _ModuleSearchScope.driverDocuments:
+        CDocumentTableState.appBarSearchRequest.value = query;
+        break;
+      case _ModuleSearchScope.driverAvailability:
+        DisponibliteTableState.appBarSearchRequest.value = query;
+        break;
       case _ModuleSearchScope.parts:
         PartsTableState.filterDocument.value = query;
         PartsTableState.filterNow = true;
+        break;
+      case _ModuleSearchScope.workshopStock:
+        StorageTableState.filterDocument.value = query;
+        StorageTableState.filterNow = true;
+        break;
+      case _ModuleSearchScope.workshopSuppliers:
+        PrestataireTableState.filterDocument.value = query;
+        PrestataireTableState.filterNow = true;
+        break;
+      case _ModuleSearchScope.workshopBrands:
+        BrandTableState.filterDocument.value = query;
+        BrandTableState.filterNow = true;
+        break;
+      case _ModuleSearchScope.workshopCategories:
+        CategoryTableState.filterDocument.value = query;
+        CategoryTableState.filterNow = true;
+        break;
+      case _ModuleSearchScope.workshopOptions:
+        OptionTableState.filterDocument.value = query;
+        OptionTableState.filterNow = true;
+        break;
+      case _ModuleSearchScope.repairOrders:
+        ReparationTableState.filterDocument.value = query;
+        ReparationTableState.filterNow = true;
+        break;
+      case _ModuleSearchScope.repairReception:
+        FicheReceptionTableState.filterDocument.value = query;
+        FicheReceptionTableState.filterNow = true;
+        break;
+      case _ModuleSearchScope.repairProviders:
+      case _ModuleSearchScope.repairClients:
+        PrestataireTableState.filterDocument.value = query;
+        PrestataireTableState.filterNow = true;
+        break;
+      case _ModuleSearchScope.events:
+        LogTableState.appBarSearchRequest.value = query;
+        break;
+      case _ModuleSearchScope.users:
+        UsersTableState.appBarSearchRequest.value = query;
+        break;
+      case _ModuleSearchScope.companyFiliales:
+      case _ModuleSearchScope.companyDirections:
+      case _ModuleSearchScope.companyDepartments:
+        MesFillialesState.appBarSearchRequest.value = query;
         break;
     }
   }
