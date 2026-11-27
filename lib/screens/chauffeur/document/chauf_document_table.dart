@@ -31,6 +31,9 @@ class CDocumentTable extends StatefulWidget {
 }
 
 class CDocumentTableState extends State<CDocumentTable> {
+  static final ValueNotifier<String?> appBarSearchRequest =
+      ValueNotifier<String?>(null);
+
   late ChaufDocumentsDataSource documentsDataSource;
 
   bool assending = false;
@@ -39,13 +42,25 @@ class CDocumentTableState extends State<CDocumentTable> {
 
   @override
   void initState() {
+    super.initState();
     documentsDataSource = ChaufDocumentsDataSource(
       current: context,
       collectionID: chaufDoc,
       selectC: widget.selectD,
     );
     initColumns();
-    super.initState();
+    appBarSearchRequest.addListener(_applyAppBarSearchRequest);
+    _applyAppBarSearchRequest();
+  }
+
+  void _applyAppBarSearchRequest() {
+    final query = appBarSearchRequest.value;
+    if (query == null) return;
+    searchController.text = query;
+    notEmpty = query.isNotEmpty;
+    documentsDataSource.search(query);
+    appBarSearchRequest.value = null;
+    if (mounted) setState(() {});
   }
 
   int sortColumn = 3;
@@ -118,8 +133,6 @@ class CDocumentTableState extends State<CDocumentTable> {
 
   int rowPerPage = 12;
 
-  TextEditingController searchController = TextEditingController();
-
   bool notEmpty = false;
   bool filtered = false;
 
@@ -136,9 +149,6 @@ class CDocumentTableState extends State<CDocumentTable> {
     return DataTableParc(
       header: LayoutBuilder(
         builder: (context, constraints) {
-          final searchWidth = (constraints.maxWidth - 105)
-              .clamp(140.0, 350.0)
-              .toDouble();
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
             child: Wrap(
@@ -434,53 +444,7 @@ class CDocumentTableState extends State<CDocumentTable> {
                 ],
               ),
             ),
-            SizedBox(
-              width: searchWidth,
-              height: 45.px,
-              child: ParcotoTextBox(
-                onChanged: (s) {
-                  if (s.isEmpty) {
-                    notEmpty = false;
-                    documentsDataSource.search('');
-                  } else {
-                    notEmpty = true;
-                  }
-                  setState(() {});
-                },
-                controller: searchController,
-                placeholder: 'search'.tr(),
-                style: appTheme.writingStyle,
-                cursorColor: appTheme.color.darker,
-                placeholderStyle: placeStyle,
-                onSubmitted: (s) {
-                  if (s.isNotEmpty) {
-                    documentsDataSource.search(s);
-                    if (!notEmpty) {
-                      setState(() {
-                        notEmpty = true;
-                      });
-                    }
-                  } else {
-                    if (notEmpty) {
-                      setState(() {
-                        notEmpty = false;
-                      });
-                    }
-                  }
-                },
-                suffix: notEmpty
-                    ? IconButton(
-                        icon: const Icon(FluentIcons.cancel),
-                        onPressed: () {
-                          searchController.text = "";
-                          notEmpty = false;
-                          setState(() {});
-                          documentsDataSource.search('');
-                        },
-                      )
-                    : null,
-              ),
-            ),
+            
               ],
             ),
           );
@@ -495,6 +459,7 @@ class CDocumentTableState extends State<CDocumentTable> {
 
   @override
   void dispose() {
+    appBarSearchRequest.removeListener(_applyAppBarSearchRequest);
     documentsDataSource.dispose();
     super.dispose();
   }
