@@ -108,9 +108,12 @@ class VehicleOverviewDashboard extends StatelessWidget {
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(flex: 8, child: summary),
-                const SizedBox(width: 14),
-                SizedBox(width: 280, child: status),
+                Expanded(child: summary),
+                const SizedBox(width: 12),
+                SizedBox(
+                  width: (constraints.maxWidth * .34).clamp(230.0, 280.0),
+                  child: status,
+                ),
               ],
             );
           },
@@ -257,39 +260,55 @@ class VehicleOverviewDashboard extends StatelessWidget {
     String assignment,
     String? location,
   ) {
+    final metrics = <({IconData icon, String label, String value})>[
+      (icon: FluentIcons.car, label: 'Kilométrage', value: mileage),
+      (icon: FluentIcons.repair, label: 'Prochaine révision', value: nextService),
+      (
+        icon: FluentIcons.people,
+        label: 'Conducteur',
+        value: driver?.isNotEmpty == true ? driver! : 'Non affecté',
+      ),
+      (
+        icon: FluentIcons.account_management,
+        label: 'Affectation',
+        value: assignment.isNotEmpty ? assignment : 'Non renseignée',
+      ),
+      (
+        icon: FluentIcons.car,
+        label: 'Emplacement',
+        value: location?.trim().isNotEmpty == true ? location! : 'Non renseigné',
+      ),
+      (
+        icon: FluentIcons.calendar,
+        label: 'Prochaine échéance',
+        value: documentsCount == null
+            ? 'Non vérifiée'
+            : nearestDocumentLabel ?? 'Aucune échéance enregistrée',
+      ),
+    ];
+
     return _panel(
       context,
       'Synthèse',
       FluentIcons.view_dashboard,
       accent,
-      Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        children: [
-          _metric(context, FluentIcons.car, 'Kilométrage', mileage, accent),
-          _metric(context, FluentIcons.repair, 'Prochaine révision', nextService, accent),
-          _metric(context, FluentIcons.people, 'Conducteur',
-              driver?.isNotEmpty == true ? driver! : 'Non affecté', accent),
-          _metric(context, FluentIcons.account_management, 'Affectation',
-              assignment.isNotEmpty ? assignment : 'Non renseignée', accent),
-          _metric(context, FluentIcons.car, 'Emplacement',
-              location?.trim().isNotEmpty == true ? location! : 'Non renseigné', accent),
-          _metric(context, FluentIcons.calendar, 'Prochaine échéance',
-              documentsWithDeadline == null
-                  ? 'Non vérifiée'
-                  : documentsWithDeadline == 0
-                      ? 'Aucune échéance enregistrée'
-                      : '$documentsWithDeadline document(s)', accent),
-        ],
-      ),
-    );
-  }
-
-  Widget _statusPanel(
+      LayoutBuilder(
+        builder: (context, constraints) {
+          final columns = constraints.maxWidth >  Widget _statusPanel(
     BuildContext context,
     Color accent,
     Color statusColor,
   ) {
+    final documentsToWatch = registeredDocuments
+        .where((document) => document.warning)
+        .length;
+    final latestEvent = latestActivityLabel == null
+        ? 'Aucune activité enregistrée'
+        : [
+            latestActivityLabel!,
+            if (latestActivityDate?.isNotEmpty == true) latestActivityDate!,
+          ].join(' • ');
+
     return _panel(
       context,
       'État du véhicule',
@@ -299,21 +318,25 @@ class VehicleOverviewDashboard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _pill(statusLabel, statusColor, expanded: true),
-          const SizedBox(height: 12),
-          _infoLine(FluentIcons.repair, 'Kilométrage actuel',
-              vehicle.currentMileage == null
-                  ? 'Non renseigné'
-                  : '${_number(vehicle.currentMileage!)} km'),
-          _infoLine(FluentIcons.document, 'Documents enregistrés',
-              documentsCount == null ? 'Non vérifiés' : documentsCount.toString()),
-          _infoLine(FluentIcons.info, 'Garantie',
-              vehicle.warrantyEndDate?.isNotEmpty == true
-                  ? vehicle.warrantyEndDate!
-                  : 'Non renseignée'),
-          const SizedBox(height: 8),
-          Text(
-            'La position GPS en temps réel n’est pas configurée.',
-            style: TextStyle(color: Colors.grey[100], fontSize: 11, height: 1.4),
+          const SizedBox(height: 7),
+          _infoLine(
+            FluentIcons.history,
+            'Dernière activité',
+            latestEvent,
+          ),
+          _infoLine(
+            FluentIcons.document,
+            'Documents à surveiller',
+            documentsCount == null
+                ? 'Non vérifié'
+                : documentsToWatch.toString(),
+          ),
+          _infoLine(
+            FluentIcons.info,
+            'Garantie',
+            vehicle.warrantyEndDate?.isNotEmpty == true
+                ? vehicle.warrantyEndDate!
+                : 'Non renseignée',
           ),
         ],
       ),
@@ -386,21 +409,40 @@ class VehicleOverviewDashboard extends StatelessWidget {
       FluentIcons.document_set,
       accent,
       Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _documentLine('Carte grise', documentsCount == null
-              ? 'Statut non vérifié'
-              : documentsCount! > 0 ? 'Document(s) enregistré(s)' : 'À ajouter',
-              documentsCount == null ? FluentIcons.help : FluentIcons.check_mark),
-          _documentLine('Assurance', 'Échéance à vérifier', FluentIcons.warning),
-          _documentLine('Contrôle technique', 'Échéance à vérifier', FluentIcons.warning),
-          const SizedBox(height: 8),
+          if (documentsCount == null)
+            _emptyState('Les documents du véhicule n’ont pas pu être vérifiés.')
+          else if (registeredDocuments.isEmpty)
+            _emptyState('Aucun document enregistré pour ce véhicule.')
+          else ...[
+            for (final document in registeredDocuments.take(3))
+              _documentLine(
+                document.title,
+                document.expiryLabel,
+                document.statusLabel,
+                document.warning
+                    ? (document.expired ? Colors.red : Colors.orange)
+                    : Colors.green,
+                document.expired
+                    ? FluentIcons.error
+                    : document.warning
+                        ? FluentIcons.warning
+                        : FluentIcons.check_mark,
+              ),
+            if (registeredDocuments.length > 3)
+              Padding(
+                padding: const EdgeInsets.only(top: 3),
+                child: Text(
+                  '+ ${registeredDocuments.length - 3} autres documents',
+                  style: TextStyle(color: Colors.grey[100], fontSize: 10),
+                ),
+              ),
+          ],
+          const SizedBox(height: 5),
           Align(
             alignment: AlignmentDirectional.centerEnd,
-            child: _textAction('Voir les documents', onOpenDocuments),
-          ),
-          Text(
-            'Les lignes ci-dessus sont des catégories de suivi, pas une validation de conformité.',
-            style: TextStyle(color: Colors.grey[100], fontSize: 10, height: 1.35),
+            child: _textAction('Voir tout', onOpenDocuments),
           ),
         ],
       ),
@@ -464,7 +506,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
   ) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
         color: FluentTheme.of(context).micaBackgroundColor,
         borderRadius: BorderRadius.circular(16),
@@ -480,7 +522,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
               Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 10),
           child,
         ],
       ),
@@ -488,61 +530,56 @@ class VehicleOverviewDashboard extends StatelessWidget {
   }
 
   Widget _metric(
-    BuildContext context,
     IconData icon,
     String label,
     String value,
     Color accent,
   ) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Use three columns on wide summary panels, two on medium panels,
-        // and one on narrow layouts instead of leaving a blank third column.
-        final availableWidth = constraints.maxWidth;
-        final columns = availableWidth >= 650
-            ? 3
-            : availableWidth >= 430
-                ? 2
-                : 1;
-        final metricWidth =
-            (availableWidth - ((columns - 1) * 10)) / columns;
-
-        return SizedBox(
-          width: metricWidth,
-          child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-          decoration: BoxDecoration(
-            color: accent.withValues(alpha: .045),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[30]),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, color: accent, size: 16),
-              const SizedBox(width: 7),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(label, maxLines: 1, overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.grey[100], fontSize: 9)),
-                    const SizedBox(height: 2),
-                    Text(value, maxLines: 1, overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-                  ],
+    return Container(
+      constraints: const BoxConstraints(minHeight: 46),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: .045),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey[30]),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: accent, size: 17),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.grey[100], fontSize: 9.5),
                 ),
-              ),
-            ],
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
           ),
-          ),
-        );
-      },
+        ],
+      ),
     );
   }
 
   Widget _infoLine(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
           Icon(icon, size: 15, color: Colors.grey[100]),
@@ -556,9 +593,15 @@ class VehicleOverviewDashboard extends StatelessWidget {
     );
   }
 
-  Widget _documentLine(String title, String subtitle, IconData icon) {
+  Widget _documentLine(
+    String title,
+    String subtitle,
+    String status,
+    Color statusColor,
+    IconData statusIcon,
+  ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
           Icon(FluentIcons.document, size: 16, color: Colors.grey[100]),
@@ -567,12 +610,26 @@ class VehicleOverviewDashboard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                Text(subtitle, style: TextStyle(fontSize: 10, color: Colors.grey[100])),
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
+                ),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 9.5, color: Colors.grey[100]),
+                ),
               ],
             ),
           ),
-          Icon(icon, size: 15, color: icon == FluentIcons.warning ? Colors.orange : Colors.green),
+          const SizedBox(width: 8),
+          Tooltip(
+            message: status,
+            child: Icon(statusIcon, size: 15, color: statusColor),
+          ),
         ],
       ),
     );
@@ -599,8 +656,8 @@ class VehicleOverviewDashboard extends StatelessWidget {
               if (note?.trim().isNotEmpty == true)
                 Padding(
                   padding: const EdgeInsets.only(top: 5),
-                  child: Text(note!, maxLines: 2, overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 11, color: Colors.grey[100])),
+                  child: Text(note!, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 10, color: Colors.grey[100])),
                 ),
             ],
           ),
