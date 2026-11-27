@@ -587,9 +587,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
   Widget _vehicleAvatar(Color accent, {required bool compact}) {
     final imageUrl = v.imageUrl?.trim();
-    // Desktop identity data deserves more space than the vehicle thumbnail.
-    final width = compact ? double.infinity : 132.0;
-    final height = compact ? 150.0 : 96.0;
+    // Match the reference layout: a clear vehicle thumbnail beside the identity.
+    final width = compact ? double.infinity : 190.0;
+    final height = compact ? 160.0 : 140.0;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
