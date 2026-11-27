@@ -924,22 +924,18 @@ class _VehicleFormState extends State<VehicleForm>
                           borderRadius: BorderRadius.circular(9),
                         ),
                         clipBehavior: Clip.antiAlias,
-                        child: _resolvedImageUrl != null &&
-                                _resolvedImageUrl!.isNotEmpty
-                            ? Image.network(
-                                _resolvedImageUrl!,
-                                fit: BoxFit.contain,
-                                errorBuilder: (_, _, _) => Icon(
-                                  FluentIcons.car,
-                                  size: 38,
-                                  color: appTheme.color,
-                                ),
-                              )
-                            : Icon(
-                                FluentIcons.car,
-                                size: 38,
-                                color: appTheme.color,
-                              ),
+                        child: VehicleImageView(
+                          fileId: _resolvedImageFileId,
+                          imageUrl: _resolvedImageUrl,
+                          fit: BoxFit.contain,
+                          width: compactImage ? double.infinity : 176,
+                          height: 112,
+                          placeholder: Icon(
+                            FluentIcons.car,
+                            size: 38,
+                            color: appTheme.color,
+                          ),
+                        ),
                       );
                       final controls = Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
