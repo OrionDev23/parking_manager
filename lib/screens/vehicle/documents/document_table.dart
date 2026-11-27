@@ -62,7 +62,7 @@ class DocumentTableState extends State<DocumentTable> {
     if (mounted) setState(() {});
   }
 
-  int sortColumn = 3;
+  int sortColumn = 4;
 
   void initColumns() {
     columns = [
@@ -97,11 +97,27 @@ class DocumentTableState extends State<DocumentTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text('vehicle_doc_field_type', style: tstyle).tr(),
+        ),
+        size: ColumnSize.M,
+        onSort: null,
+      ),
+      DataColumn2(
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text('vehicle_doc_field_attachment', style: tstyle).tr(),
+        ),
+        size: ColumnSize.L,
+        onSort: null,
+      ),
+      DataColumn2(
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text('dateexp', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
-          sortColumn = 2;
+          sortColumn = 4;
           assending = !assending;
 
           documentsDataSource.sort(sortColumn, assending);
@@ -115,7 +131,7 @@ class DocumentTableState extends State<DocumentTable> {
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
-          sortColumn = 3;
+          sortColumn = 5;
           assending = !assending;
           documentsDataSource.sort(sortColumn, assending);
           setState(() {});
