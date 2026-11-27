@@ -927,5 +927,16 @@
   "vehicle_form_technical_management_section": "Technical specifications and fleet management",
   "vehicle_form_technical_specs_subtitle": "Trim, model year, paint, engine, transmission and dimensions",
   "vehicle_form_acquisition_section": "Acquisition and fleet follow-up",
-  "vehicle_form_company_management_subtitle": "Company-specific management data"
+  "vehicle_form_company_management_subtitle": "Company-specific management data",
+  "vehicle_make_picker_title": "Choose a make",
+  "vehicle_make_picker_search": "Search makes…",
+  "vehicle_make_picker_empty": "No makes found.",
+  "vehicle_make_category_passenger": "Passenger car",
+  "vehicle_make_category_commercial": "Commercial vehicle / truck",
+  "vehicle_make_category_bus": "Bus / coach",
+  "vehicle_make_category_motorcycle": "Motorcycle / scooter",
+  "vehicle_make_category_agricultural": "Agricultural equipment",
+  "vehicle_make_category_construction": "Construction equipment",
+  "vehicle_make_category_industrial": "Industrial equipment",
+  "vehicle_make_category_other": "Other"
 }
