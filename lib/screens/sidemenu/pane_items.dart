@@ -439,6 +439,11 @@ class PaneItemsAndFooters {
     final key = rawKey is ValueKey ? rawKey.value.toString() : null;
     if (key == null || key.isEmpty) return null;
 
+    if (key == 'user-access-management' &&
+        authService.session?.hasPermission('users.manage') == true) {
+      return 'usermngmt';
+    }
+
     // The vehicle dashboard is a nested workspace. Its selected legacy
     // section is more specific than the parent NavigationPane destination.
     if (key == 'vehicles') {
