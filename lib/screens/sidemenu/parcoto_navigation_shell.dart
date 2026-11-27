@@ -366,7 +366,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                 color: theme.color,
                 borderRadius: BorderRadius.circular(15),
               ),
-              child: const Icon(
+              child: Icon(
                 FluentIcons.add,
                 size: 23,
                 color: theme.surfaceColor,
