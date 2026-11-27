@@ -1065,7 +1065,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 'vehicle_field_previous_registrations'.tr(),
                 v.matriculePrec?.join(', '),
               ),
-              _field('vehicle_field_vin'.tr(), v.numeroSerie),
             ]),
             _group('vehicle_registration_document_group'.tr(), [
               _field('vehicle_field_recorded_date'.tr(), _date(v.date)),
@@ -1075,6 +1074,16 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 v.quittance == null
                     ? null
                     : VehicleDetailFormatters.formatNumber(v.quittance!),
+              ),
+            ]),
+            _group('vehicle_algerian_homologation_group'.tr(), [
+              _field(
+                'vehicle_field_legacy_usage_year'.tr(),
+                v.anneeUtil?.toString(),
+              ),
+              _field(
+                'vehicle_field_administrative_genre'.tr(),
+                VehicleDetailFormatters.genreLabel(v.genre)?.tr(),
               ),
             ]),
             _group('vehicle_administrative_address_group'.tr(), [
@@ -1105,14 +1114,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               _field('vehicle_field_model_type'.tr(), v.type),
               _field('vehicle_field_trim'.tr(), v.trim),
               _field('vehicle_field_model_year'.tr(), v.modelYear?.toString()),
-              _field(
-                'vehicle_field_legacy_usage_year'.tr(),
-                v.anneeUtil?.toString(),
-              ),
-              _field(
-                'vehicle_field_administrative_genre'.tr(),
-                VehicleDetailFormatters.genreLabel(v.genre)?.tr(),
-              ),
+              _field('vehicle_field_vin'.tr(), v.numeroSerie),
               _field('vehicle_field_body_type'.tr(), v.carrosserie),
               _field(
                 'vehicle_field_paint_color'.tr(),
