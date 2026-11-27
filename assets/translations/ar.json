@@ -917,5 +917,14 @@
   "vehicle_doc_download_failed": "تعذر تنزيل الملف",
   "vehicle_doc_issue_date_prefix": "تاريخ الإصدار",
   "vehicle_doc_attachment_available": "المرفق متاح",
-  "vehicle_doc_saved": "تم حفظ الوثيقة."
+  "vehicle_doc_saved": "تم حفظ الوثيقة.",
+  "vehicle_form_administrative_identity_title": "المعلومات الإدارية الجزائرية",
+  "vehicle_form_identity_photo_title": "هوية المركبة وصورتها",
+  "vehicle_form_identity_photo_description": "الترقيم الجزائري ومواصفات الشركة المصنعة",
+  "vehicle_form_registration_section": "الترقيم الجزائري",
+  "vehicle_form_manufacturer_section": "مواصفات الشركة المصنعة",
+  "vehicle_form_technical_management_section": "المواصفات التقنية وتسيير الحظيرة",
+  "vehicle_form_technical_specs_subtitle": "الفئة، سنة الطراز، الطلاء، المحرك، ناقل الحركة والأبعاد",
+  "vehicle_form_acquisition_section": "الاقتناء ومتابعة الحظيرة",
+  "vehicle_form_company_management_subtitle": "بيانات التسيير الخاصة بالمؤسسة"
 }
