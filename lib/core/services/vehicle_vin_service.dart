@@ -56,7 +56,7 @@ class VehicleVinService {
       throw StateError('Le client Appwrite n’est pas initialisé.');
     }
 
-    final normalizedVin = vin.replaceAll(RegExp(r'\\s+'), '').toUpperCase();
+    final normalizedVin = vin.replaceAll(RegExp(r'\s+'), '').toUpperCase();
     final execution = await Functions(client).createExecution(
       functionId: functionId,
       body: jsonEncode({
