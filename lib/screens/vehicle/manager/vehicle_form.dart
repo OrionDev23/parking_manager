@@ -23,6 +23,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../serializables/vehicle/vehicle.dart';
 import '../../../core/services/vehicle_image_service.dart';
 import '../../../core/services/vehicle_make_service.dart';
+import '../../../core/services/vehicle_vin_service.dart';
 import '../../../data/mappers/vehicle_mapper.dart';
 import '../../../main.dart';
 import '../../../theme.dart';
@@ -213,6 +214,9 @@ class _VehicleFormState extends State<VehicleForm>
   List<VehicleImageCandidate> _vehicleImageCandidates = [];
   bool _canUploadVehicleImage = false;
   bool _canForceRefreshVehicleImage = false;
+  bool _decodingVin = false;
+  String? _vinDecodeMessage;
+  Map<String, dynamic>? _vinDecodeMetadata;
   final ImagePicker _vehicleImagePicker = ImagePicker();
   bool autreMat = false;
   String? marque;
@@ -797,8 +801,8 @@ class _VehicleFormState extends State<VehicleForm>
       _buildVehicleIdentitySection(appTheme),
       _sectionHeader(
         appTheme,
-        'Carte grise et localisation',
-        'Informations administratives, date de carte grise et adresse du véhicule',
+        'Informations administratives algériennes',
+        'Immatriculation, carte grise, titulaire et localisation administrative',
       ),
       ...getWilayaCommuneWidget(appTheme),
       ...secondLine(appTheme),
@@ -876,7 +880,7 @@ class _VehicleFormState extends State<VehicleForm>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Identification du véhicule',
+                            'Identité et photo du véhicule',
                             style: appTheme.writingStyle.copyWith(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
@@ -884,7 +888,7 @@ class _VehicleFormState extends State<VehicleForm>
                           ),
                           const SizedBox(height: 3),
                           Text(
-                            'Identité administrative et commerciale du véhicule',
+                            'Immatriculation algérienne et caractéristiques constructeur',
                             style: appTheme.writingStyle.copyWith(
                               fontSize: 12,
                               color: appTheme.writingStyle.color
@@ -1212,6 +1216,12 @@ class _VehicleFormState extends State<VehicleForm>
                   spacing: spacing,
                   runSpacing: 14,
                   children: [
+                    _identitySubsectionTitle(
+                      appTheme,
+                      availableWidth,
+                      'Immatriculation algérienne',
+                      'Numéro d’immatriculation et informations de la carte grise',
+                    ),
                     _identityField(
                       appTheme,
                       width: fieldWidth,
@@ -1294,43 +1304,6 @@ class _VehicleFormState extends State<VehicleForm>
                     _identityField(
                       appTheme,
                       width: fieldWidth,
-                      label: 'Marque',
-                      child: Button(
-                        onPressed: widget.readOnly ? null : _selectVehicleMake,
-                        child: Row(
-                          children: [
-                            VehicleMakeLogo(makeId: marque, size: 28),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                VehicleMakeService.nameFor(marque).isEmpty
-                                    ? 'Choisir une marque'
-                                    : VehicleMakeService.nameFor(marque),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            const Icon(FluentIcons.chevron_down, size: 12),
-                          ],
-                        ),
-                      ),
-                    ),
-                    _identityField(
-                      appTheme,
-                      width: fieldWidth,
-                      label: 'Modèle',
-                      child: ParcotoTextBox(
-                        enabled: !widget.readOnly,
-                        controller: type,
-                        maxLength: 60,
-                        placeholder: 'Ex. : Clio, Corolla, Hilux',
-                        style: appTheme.writingStyle,
-                        placeholderStyle: placeStyle,
-                        cursorColor: appTheme.color,
-                      ),
-                    ),
-                    _identityField(
-                      appTheme,
-                      width: fieldWidth,
                       label: 'Genre',
                       child: Button(
                         onPressed: widget.readOnly
@@ -1384,20 +1357,117 @@ class _VehicleFormState extends State<VehicleForm>
                         ),
                       ),
                     ),
+                    _identitySubsectionTitle(
+                      appTheme,
+                      availableWidth,
+                      'Caractéristiques constructeur',
+                      'Marque, modèle, finition, année modèle et numéro VIN',
+                    ),
+                    _identityField(
+                      appTheme,
+                      width: fieldWidth,
+                      label: 'Marque',
+                      child: Button(
+                        onPressed: widget.readOnly ? null : _selectVehicleMake,
+                        child: Row(
+                          children: [
+                            VehicleMakeLogo(makeId: marque, size: 28),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                VehicleMakeService.nameFor(marque).isEmpty
+                                    ? 'Choisir une marque'
+                                    : VehicleMakeService.nameFor(marque),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const Icon(FluentIcons.chevron_down, size: 12),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _identityField(
+                      appTheme,
+                      width: fieldWidth,
+                      label: 'Modèle',
+                      child: ParcotoTextBox(
+                        enabled: !widget.readOnly,
+                        controller: type,
+                        maxLength: 60,
+                        placeholder: 'Ex. : Clio, Corolla, Hilux',
+                        style: appTheme.writingStyle,
+                        placeholderStyle: placeStyle,
+                        cursorColor: appTheme.color,
+                      ),
+                    ),
                     if (chassisKey)
                       _identityField(
                         appTheme,
                         width: fieldWidth,
                         label: 'Numéro de châssis (VIN)',
                         requiredField: true,
-                        child: ParcotoTextBox(
-                          enabled: !widget.readOnly,
-                          controller: numSer,
-                          maxLength: 30,
-                          placeholder: '17 caractères généralement',
-                          style: appTheme.writingStyle,
-                          placeholderStyle: placeStyle,
-                          cursorColor: appTheme.color,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ParcotoTextBox(
+                              enabled: !widget.readOnly,
+                              controller: numSer,
+                              maxLength: 30,
+                              placeholder: '17 caractères généralement',
+                              style: appTheme.writingStyle,
+                              placeholderStyle: placeStyle,
+                              cursorColor: appTheme.color,
+                              onChanged: (_) {
+                                if (_vinDecodeMetadata != null) {
+                                  setState(() {
+                                    _vinDecodeMetadata = null;
+                                    _vinDecodeMessage =
+                                        'VIN modifié : relancez le décodage pour actualiser les données proposées.';
+                                  });
+                                }
+                              },
+                            ),
+                            if (!widget.readOnly) ...[
+                              const SizedBox(height: 7),
+                              Align(
+                                alignment: AlignmentDirectional.centerStart,
+                                child: Button(
+                                  onPressed: _decodingVin ? null : _decodeVehicleVin,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (_decodingVin)
+                                        const ProgressRing(strokeWidth: 2)
+                                      else
+                                        const Icon(FluentIcons.search, size: 13),
+                                      const SizedBox(width: 7),
+                                      Text(
+                                        _decodingVin
+                                            ? 'Décodage en cours…'
+                                            : 'Décoder le VIN',
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                            if (_vinDecodeMessage?.isNotEmpty == true)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  _vinDecodeMessage!,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    height: 1.3,
+                                    color: _vinDecodeMessage!.startsWith('Échec')
+                                        ? Colors.red
+                                        : appTheme.writingStyle.color
+                                            ?.withValues(alpha: .75),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                   ],
@@ -1631,6 +1701,2601 @@ class _VehicleFormState extends State<VehicleForm>
   String? _nullableText(String value) {
     final trimmed = value.trim();
     return trimmed.isEmpty ? null : trimmed;
+  }
+
+  Widget _identitySubsectionTitle(
+    AppTheme appTheme,
+    double width,
+    String title,
+    String subtitle,
+  ) {
+    return SizedBox(
+      width: width,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 4, bottom: 2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: appTheme.writingStyle.copyWith(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: appTheme.color,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: appTheme.writingStyle.copyWith(
+                fontSize: 10,
+                color: appTheme.writingStyle.color?.withValues(alpha: .65),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _decodeVehicleVin() async {
+    if (widget.readOnly || _decodingVin) return;
+    final vin = numSer.text.replaceAll(RegExp(r'\s+'), '').toUpperCase();
+    if (!RegExp(r'^[A-HJ-NPR-Z0-9]{17}    AppTheme appTheme, {
+    required double width,
+    required String label,
+    required Widget child,
+    bool requiredField = false,
+  }) {
+    return ParcotoFormField(
+      width: width,
+      label: label,
+      requiredField: requiredField,
+      child: child,
+    );
+  }
+
+
+  Widget _sectionHeader(
+    AppTheme appTheme,
+    String title,
+    String description,
+  ) {
+    return StaggeredGridTile.fit(
+      crossAxisCellCount: _isCompactViewport ? 12 : 12,
+      child: Container(
+        margin: const EdgeInsets.only(top: 14, bottom: 6),
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+        decoration: BoxDecoration(
+          color: appTheme.color.withValues(alpha: 0.08),
+          border: Border(
+            left: BorderSide(color: appTheme.color, width: 3),
+          ),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: appTheme.writingStyle.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              description,
+              style: appTheme.writingStyle.copyWith(
+                fontSize: 11,
+                color: appTheme.writingStyle.color?.withValues(alpha: 0.7),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Widget> firstLine(AppTheme appTheme) {
+    return [
+      if (chassisKey) getChassisWidget(appTheme),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 6,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              top: _isCompactViewport
+                  ? BorderSide.none
+                  : BorderSide(color: appTheme.color),
+              right: _isCompactViewport
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
+              left: _isCompactViewport
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
+            ),
+          ),
+          height: heightFirst,
+          padding: const EdgeInsets.symmetric(horizontal: chassisKey ? 0 : 10),
+          child: Container(
+            padding: EdgeInsets.zero,
+            decoration: BoxDecoration(
+              border: Border.all(color: appTheme.color),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    'nummat',
+                    style: formHintStyle.copyWith(
+                      fontSize: 12,
+                      color: Colors.red,
+                    ),
+                  ).tr(),
+                ),
+                const Spacer(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  child: autreMat
+                      ? ParcotoTextBox(
+                          enabled: !widget.readOnly,
+                          controller: matriculeEtr,
+                          maxLength: 30,
+                          cursorColor: appTheme.color.darker,
+                          style: appTheme.writingStyle,
+                          placeholder: 'XXXXXXXXXXXXXX',
+                          textAlign: TextAlign.center,
+                          placeholderStyle: placeStyle,
+
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.allow(
+                              RegExp("[0-9a-zA-Z.-]"),
+                            ),
+                          ],
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              flex: 6,
+                              child: ParcotoTextBox(
+                                enabled: !widget.readOnly,
+                                controller: matr1,
+                                cursorColor: appTheme.color.darker,
+                                style: appTheme.writingStyle,
+                                placeholder: '123456',
+                                placeholderStyle: placeStyle,
+
+                                maxLength: 6,
+                                textAlign: TextAlign.center,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                              ),
+                            ),
+                            smallSpace,
+                            Text('-', style: formHintStyle),
+                            smallSpace,
+                            Flexible(
+                              flex: 3,
+                              child: ParcotoTextBox(
+                                enabled: !widget.readOnly,
+                                controller: matr2,
+                                cursorColor: appTheme.color.darker,
+                                style: appTheme.writingStyle,
+                                placeholder: '123',
+                                maxLength: 3,
+                                placeholderStyle: placeStyle,
+
+                                textAlign: TextAlign.center,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                onChanged: (s) {
+                                  updateOverMatricule(appTheme);
+                                },
+                              ),
+                            ),
+                            smallSpace,
+                            Text('-', style: formHintStyle),
+                            smallSpace,
+                            Flexible(
+                              flex: 2,
+                              child: ParcotoTextBox(
+                                enabled: !widget.readOnly,
+                                controller: matr3,
+                                cursorColor: appTheme.color.darker,
+                                style: appTheme.writingStyle,
+                                placeholder: '12',
+                                maxLength: 2,
+                                placeholderStyle: placeStyle,
+
+                                textAlign: TextAlign.center,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                onChanged: (s) {
+                                  updateOverMatricule(appTheme);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+                const Spacer(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (erreurMatricule)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        child: Text(
+                          'erreurmat',
+                          style: TextStyle(color: Colors.red),
+                        ).tr(),
+                      ),
+                    if (erreurMatricule) Spacer(),
+                    Checkbox(
+                      checked: autreMat,
+                      content: Text(
+                        'autremat',
+                        style: appTheme.writingStyle,
+                      ).tr(),
+                      onChanged: widget.readOnly
+                          ? null
+                          : (s) {
+                              if (s != null) {
+                                setState(() {
+                                  autreMat = s;
+                                });
+                              }
+                            },
+                    ),
+                    smallSpace,
+                  ],
+                ),
+                smallSpace,
+              ],
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> getWilayaCommuneWidget(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 6,
+        child: Container(
+          height: heightFirst,
+
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(color: appTheme.color),
+              left: BorderSide(color: appTheme.color),
+              right: _isCompactViewport
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('pays', style: formHintStyle).tr(),
+              CountryCodePicker(
+                enabled: !widget.readOnly,
+                boxDecoration: BoxDecoration(
+                  color: appTheme.backGroundColor,
+                  boxShadow: kElevationToShadow[2],
+                ),
+                padding: const EdgeInsets.all(3),
+                searchDecoration: appTheme.inputDecoration,
+                dialogSize: _responsiveVehicleCountryDialogSize(context),
+                initialSelection: pays,
+                showCountryOnly: true,
+                showDropDownButton: true,
+                showFlagDialog: true,
+                showOnlyCountryWhenClosed: true,
+                onChanged: (c) {
+                  setState(() {
+                    pays = c.code ?? 'DZ';
+                  });
+                },
+              ),
+              Text('wilaya', style: formHintStyle).tr(),
+              SizedBox(
+                height: 44,
+                child: ParcotoFieldSurface(child: AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
+                  controller: wilayaCont,
+                  placeholder: 'wilaya'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+
+                  items: AlgeriaList.dzair!.getWilayat()!.map((wilaya) {
+                    return AutoSuggestBoxItem<String>(
+                      value: wilaya!.getWilayaCode()!,
+                      label: wilaya.getWilayaName(
+                        appTheme.locale!.languageCode.toUpperCase() == "AR"
+                            ? Language.AR
+                            : Language.FR,
+                      )!,
+                    );
+                  }).toList(),
+                  onSelected: (item) {
+                    setState(() {
+                      wilaya = item.value!;
+                      wilayaCont.text =
+                          AlgeriaList.dzair!
+                              .searchWilayatByName(
+                                item.label,
+                                appTheme.locale!.languageCode.toUpperCase() ==
+                                        "AR"
+                                    ? Language.AR
+                                    : Language.FR,
+                              )
+                              ?.first
+                              ?.getWilayaName(Language.FR) ??
+                          '';
+                    });
+                  },
+                )),
+              ),
+            ],
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 6,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              top: _isCompactViewport
+                  ? BorderSide.none
+                  : BorderSide(color: appTheme.color),
+              right: BorderSide(color: appTheme.color),
+              left: _isCompactViewport
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
+            ),
+          ),
+          height: heightFirst,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('daira', style: formHintStyle).tr(),
+              SizedBox(
+                height: 44,
+                child: ParcotoFieldSurface(child: AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
+                  controller: dairaCont,
+                  placeholder: 'daira'.tr(),
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  placeholderStyle: placeStyle,
+
+                  items: AlgeriaList().getDairas(wilayaCont.text).map((daira) {
+                    return AutoSuggestBoxItem<String>(
+                      value: daira?.getDairaName(Language.FR) ?? '',
+                      label:
+                          daira?.getDairaName(
+                            appTheme.locale?.languageCode.toUpperCase() == "AR"
+                                ? Language.AR
+                                : Language.FR,                          ) ??
+                          '',
+                    );
+                  }).toList(),
+                  onSelected: (item) {
+                    setState(() => dairaCont.text = item.value ?? "");
+                  },
+                )),
+              ),
+              Text('commune', style: formHintStyle).tr(),
+              SizedBox(
+                height: 44,
+                child: ParcotoFieldSurface(child: AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
+                  controller: communeCont,
+                  placeholder: 'commune'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+
+                  items: AlgeriaList().getCommune(wilayaCont.text).map((
+                    commune,
+                  ) {
+                    return AutoSuggestBoxItem<String>(
+                      value: commune == null
+                          ? ''
+                          : commune.getCommuneName(Language.FR) ?? '',
+                      label: commune == null
+                          ? ''
+                          : commune.getCommuneName(
+                                  appTheme.locale?.languageCode.toUpperCase() ==
+                                          "AR"
+                                      ? Language.AR
+                                      : Language.FR,
+                                ) ??
+                                '',
+                    );
+                  }).toList(),
+                  onSelected: (item) {
+                    setState(() => communeCont.text = item.value ?? "");
+                  },
+                )),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> secondLine(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 4,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(color: appTheme.color),
+              right: _isCompactViewport
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
+            ),
+          ),
+          height: height,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('datecartegrise', style: formHintStyle).tr(),
+              ParcotoFieldSurface(child: DatePicker(
+                selected: selectedDate,
+                onChanged: widget.readOnly
+                    ? null
+                    : (s) {
+                        setState(() {
+                          selectedDate = s;
+                        });
+                      },
+              )),
+            ],
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 4,
+        child: Container(
+          decoration: BoxDecoration(
+            border: _isCompactViewport
+                ? Border(
+                    left: BorderSide(color: appTheme.color),
+                    right: BorderSide(color: appTheme.color),
+                  )
+                : const Border(),
+          ),
+
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('numcartegrise', style: formHintStyle).tr(),
+              ParcotoTextBox(
+                enabled: !widget.readOnly,
+                controller: numero,
+                placeholder: 'numcartegrise'.tr(),
+                maxLength: 30,
+                placeholderStyle: placeStyle,
+                cursorColor: appTheme.color.darker,
+                style: appTheme.writingStyle,
+              ),
+            ],
+          ),
+        ),
+      ),
+      if (!_isCompactViewport)
+        StaggeredGridTile.fit(
+          crossAxisCellCount: _isCompactViewport ? 12 : 2,
+          child: SizedBox(height: height),
+        ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          height: height,
+          decoration: BoxDecoration(
+            border: Border(
+              right: BorderSide(color: appTheme.color),
+              left: _isCompactViewport
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('quittance', style: formHintStyle).tr(),
+              ParcotoTextBox(
+                enabled: !widget.readOnly,
+                controller: quittance,
+                placeholder: 'quittance'.tr(),
+                cursorColor: appTheme.color.darker,
+                style: appTheme.writingStyle,
+                placeholderStyle: placeStyle,
+
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                    RegExp(r'^(\d+)?\.?\d{0,2}'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> thirdLine(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(color: appTheme.color),
+              left: BorderSide(color: appTheme.color),
+              right: _isCompactViewport
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
+            ),
+          ),
+
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('existingdriver', style: formHintStyle).tr(),
+              SizedBox(
+                width: double.infinity,
+                child: Button(
+                  onPressed: () => selectConducteur(appTheme),
+                  child: const Text('select').tr(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          decoration: BoxDecoration(
+            border: _isCompactViewport
+                ? Border(
+                    left: BorderSide(color: appTheme.color),
+                    right: BorderSide(color: appTheme.color),
+                  )
+                : Border(top: BorderSide(color: appTheme.color)),
+          ),
+
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('matriculeemploye', style: formHintStyle).tr(),
+              SizedBox(
+                height: 44,
+                child: ParcotoTextBox(
+                  enabled: !widget.readOnly,
+                  controller: matempl,
+                  maxLength: 30,
+                  placeholder: 'matriculeemploye'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          decoration: BoxDecoration(
+            border: _isCompactViewport
+                ? Border(
+                    left: BorderSide(color: appTheme.color),
+                    right: BorderSide(color: appTheme.color),
+                  )
+                : Border(top: BorderSide(color: appTheme.color)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('nomf', style: formHintStyle).tr(),
+              SizedBox(
+                height: 44,
+                child: ParcotoTextBox(
+                  enabled: !widget.readOnly,
+                  controller: lname,
+                  maxLength: 30,
+                  placeholder: 'nomf'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+            border: _isCompactViewport
+                ? Border(
+                    left: BorderSide(color: appTheme.color),
+                    right: BorderSide(color: appTheme.color),
+                  )
+                : Border(top: BorderSide(color: appTheme.color)),
+          ),
+          height: height,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('prenom', style: formHintStyle).tr(),
+              SizedBox(
+                height: 44,
+                child: ParcotoTextBox(
+                  enabled: !widget.readOnly,
+                  controller: fname,
+                  maxLength: 30,
+                  placeholder: 'prenom'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 4,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              top: _isCompactViewport
+                  ? BorderSide.none
+                  : BorderSide(color: appTheme.color),
+              right: BorderSide(color: appTheme.color),
+              left: _isCompactViewport
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
+            ),
+          ),
+
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: height,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('poste', style: formHintStyle).tr(),
+              SizedBox(
+                height: 44,
+                child: ParcotoTextBox(
+                  enabled: !widget.readOnly,
+                  controller: profession,
+                  maxLength: 40,
+                  placeholder: 'poste'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> forthLine(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 3,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: _isCompactViewport
+                  ? BorderSide.none
+                  : BorderSide(color: appTheme.color),
+              left: BorderSide(color: appTheme.color),
+              right: _isCompactViewport
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
+            ),
+          ),
+
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('servicefonction', style: formHintStyle).tr(),
+              SizedBox(
+                height: 44,
+                child: Row(
+                  children: [
+                    const Text('fonction').tr(),
+                    smallSpace,
+                    ToggleSwitch(
+                      checked: service,
+                      onChanged: (s) {
+                        setState(() {
+                          service = s;
+                        });
+                      },
+                    ),
+                    smallSpace,
+                    const Text('service').tr(),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 6,
+        child: Container(
+          decoration: BoxDecoration(
+            border: _isCompactViewport
+                ? Border(
+                    bottom: _isCompactViewport
+                        ? BorderSide.none
+                        : BorderSide(color: appTheme.color),
+                    left: BorderSide(color: appTheme.color),
+                    right: BorderSide(color: appTheme.color),
+                  )
+                : Border(bottom: BorderSide(color: appTheme.color)),
+          ),
+
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('adresse', style: formHintStyle).tr(),
+              SizedBox(
+                height: 44,
+                child: ParcotoTextBox(
+                  enabled: !widget.readOnly,
+                  controller: adresse,
+                  placeholder: 'adresse'.tr(),
+                  maxLength: 100,
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 3,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: appTheme.color),
+              right: BorderSide(color: appTheme.color),
+              left: _isCompactViewport
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('appartenanceconducteursingle', style: formHintStyle).tr(),
+                ParcotoFieldSurface(child: AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
+                  placeholder: 'appartenanceconducteursingle'.tr(),
+                  placeholderStyle: placeStyle,
+                  controller: selectedAppartenanceEmploye,
+                  items: List.generate(
+                    MyEntrepriseState.p!.filiales!.length,
+                    (index) => AutoSuggestBoxItem(
+                      value: MyEntrepriseState.p!.filiales![index],
+                      label: MyEntrepriseState.p!.filiales![index]
+                          .toUpperCase(),
+                    ),
+                  ),
+                )),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> fifthLine(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 3,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(color: appTheme.color),
+              right: _isCompactViewport
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('appartenancevehiculesingle', style: formHintStyle).tr(),
+                ParcotoFieldSurface(child: AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
+                  placeholder: 'appartenancevehiculesingle'.tr(),
+                  placeholderStyle: placeStyle,
+                  controller: selectedAppartenance,
+                  items: List.generate(
+                    MyEntrepriseState.p!.filiales!.length,
+                    (index) => AutoSuggestBoxItem(
+                      value: MyEntrepriseState.p!.filiales![index],
+                      label: MyEntrepriseState.p!.filiales![index]
+                          .toUpperCase(),
+                    ),
+                  ),
+                )),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 3,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: _isCompactViewport
+                ? Border(
+                    left: BorderSide(color: appTheme.color),
+                    right: BorderSide(color: appTheme.color),
+                  )
+                : const Border(),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('filialeexploit', style: formHintStyle).tr(),
+                ParcotoFieldSurface(child: AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
+                  placeholder: 'filialeexploit'.tr(),
+                  placeholderStyle: placeStyle,
+                  controller: selectedFiliale,
+                  items: List.generate(
+                    MyEntrepriseState.p!.filiales!.length,
+                    (index) => AutoSuggestBoxItem(
+                      value: MyEntrepriseState.p!.filiales![index],
+                      label: MyEntrepriseState.p!.filiales![index]
+                          .toUpperCase(),
+                    ),
+                  ),
+                )),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 3,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: _isCompactViewport
+                ? Border(
+                    left: BorderSide(color: appTheme.color),
+                    right: BorderSide(color: appTheme.color),
+                  )
+                : const Border(),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('direction', style: formHintStyle).tr(),
+                ParcotoFieldSurface(child: AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
+                  placeholder: 'direction'.tr(),
+                  placeholderStyle: placeStyle,
+                  controller: selectedDirection,
+                  items: List.generate(
+                    MyEntrepriseState.p!.directions!.length,
+                    (index) => AutoSuggestBoxItem(
+                      value: MyEntrepriseState.p!.directions![index],
+                      label: MyEntrepriseState.p!.directions![index]
+                          .toUpperCase(),
+                    ),
+                  ),
+                )),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 3,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border(
+              right: BorderSide(color: appTheme.color),
+              left: _isCompactViewport
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('departement', style: formHintStyle).tr(),
+                ParcotoFieldSurface(child: AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
+                  placeholder: 'departement'.tr(),
+                  placeholderStyle: placeStyle,
+                  controller: selectedDepartment,
+                  items: List.generate(
+                    MyEntrepriseState.p!.departments!.length,
+                    (index) => AutoSuggestBoxItem(
+                      value: MyEntrepriseState.p!.departments![index],
+                      label: MyEntrepriseState.p!.departments![index]
+                          .toUpperCase(),
+                    ),
+                  ),
+                )),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> sixthLine(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                Text('genre', style: formHintStyle).tr(),
+                Flexible(
+                  child: ListTile(
+                    title: AutoSizeText(
+                      (VehiclesUtilities.genres![genre ?? -1] ?? 'nonind').tr(),
+                      minFontSize: 5,
+                      softWrap: true,
+                      maxLines: 1,
+                    ),
+                    onPressed: widget.readOnly
+                        ? null
+                        : () {
+                            SelectDialog.showModal<int>(
+                              context,
+                              selectedValue: genre,
+                              backgroundColor: appTheme.backGroundColor,
+                              items: VehiclesUtilities.genres!.keys.toList(),
+                              itemBuilder: (c, v, e) {
+                                return Container(
+                                  padding: const EdgeInsets.all(5.0),
+                                  color: v % 2 == 0
+                                      ? Colors.transparent
+                                      : appTheme.color.lightest,
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(v.toString()),
+                                      smallSpace,
+                                      smallSpace,
+                                      smallSpace,
+                                      Text(VehiclesUtilities.genres?[v] ?? '')
+                                          .tr(),
+                                    ],
+                                  ),
+                                );
+                              },
+                              onChange: (s) {
+                                setState(() {
+                                  genre = s;
+                                });
+                              },
+                              onFind: VehiclesUtilities.findGenres,
+                              emptyBuilder: (s) {
+                                return Center(
+                                  child: Text(
+                                    'lvide',
+                                    style: TextStyle(color: Colors.grey[100]),
+                                  ).tr(),
+                                );
+                              },
+                              loadingBuilder: (s) {
+                                return Center(
+                                  child: Text(
+                                    'telechargement',
+                                    style: TextStyle(color: Colors.grey[100]),
+                                  ).tr(),
+                                );
+                              },
+                              searchBoxDecoration: appTheme.materialUiInputDecoration
+                                  .copyWith(
+                                    labelText: 'search'.tr(),
+                                    labelStyle: placeStyle,
+                                  ),
+                              searchTextStyle: appTheme.writingStyle,
+                              searchCursorColor: appTheme.color,
+                              constraints: _responsiveVehiclePickerConstraints(
+                                context,
+                                maxWidth: 400,
+                                maxHeight: 400,
+                              ),
+                            );
+                          },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                Text('marque', style: formHintStyle).tr(),
+                Flexible(
+                  child: Button(
+                    onPressed: widget.readOnly ? null : _selectVehicleMake,
+                    child: Row(
+                      children: [
+                        VehicleMakeLogo(makeId: marque, size: 30),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: AutoSizeText(
+                            VehicleMakeService.nameFor(marque).isEmpty
+                                ? 'nonind'.tr()
+                                : VehicleMakeService.nameFor(marque),
+                            minFontSize: 5,
+                            maxLines: 1,
+                          ),
+                        ),
+                        const Icon(FluentIcons.chevron_down, size: 12),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                Text('type', style: formHintStyle).tr(),
+                ParcotoTextBox(
+                  enabled: !widget.readOnly,
+                  controller: type,
+                  placeholder: 'type'.tr(),
+                  maxLength: 30,
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      if (!chassisKey) getChassisWidget(appTheme),
+    ];
+  }
+
+  Widget getChassisWidget(AppTheme appTheme) {
+    return StaggeredGridTile.fit(
+      crossAxisCellCount: _isCompactViewport ? 12 : 6,
+      child: Container(
+        height: chassisKey ? heightFirst : height,
+        padding: EdgeInsets.zero,
+        decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Column(
+            crossAxisAlignment: chassisKey
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.center,
+            children: [
+              Text(
+                'nchassi',
+                style: formHintStyle.copyWith(
+                  fontSize: chassisKey ? 12 : 10,
+                  color: Colors.red,
+                ),
+              ).tr(),
+              if (chassisKey) const Spacer(),
+              ParcotoTextBox(
+                enabled: !widget.readOnly,
+                controller: numSer,
+                maxLength: 30,
+                placeholder: 'nchassi'.tr(),
+                placeholderStyle: placeStyle,
+                cursorColor: appTheme.color.darker,
+                style: appTheme.writingStyle,
+              ),
+              if (chassisKey) const Spacer(),
+              if (chassisKey)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  child: SizedBox(
+                    height: 22.px,
+                    child: errorChassis
+                        ? Text(
+                            'chassReq',
+                            style: TextStyle(color: Colors.red),
+                          ).tr()
+                        : null,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> seventhLine(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                Text('caross', style: formHintStyle).tr(),
+                ParcotoTextBox(
+                  enabled: !widget.readOnly,
+                  controller: caross,
+                  maxLength: 30,
+                  placeholder: 'caross'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                Text('energie', style: formHintStyle).tr(),
+                ParcotoTextBox(
+                  enabled: !widget.readOnly,
+                  controller: energie,
+                  maxLength: 20,
+                  placeholder: 'energie'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text('Puissance fiscale (CV)', style: TextStyle(fontSize: 12)),
+                ParcotoTextBox(
+                  enabled: !widget.readOnly,
+                  placeholder: '0000',
+                  controller: puissance,
+                  maxLength: 4,
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(children: [
+              const Text('Puissance moteur (ch)', style: TextStyle(fontSize: 12)),
+              ParcotoTextBox(
+                enabled: !widget.readOnly, placeholder: 'Ex. 110',
+                controller: enginePowerHpController, maxLength: 7,
+                placeholderStyle: placeStyle, cursorColor: appTheme.color.darker,
+                style: appTheme.writingStyle,
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}'))],
+              ),
+            ]),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(children: [
+              const Text('Puissance moteur (kW)', style: TextStyle(fontSize: 12)),
+              ParcotoTextBox(
+                enabled: !widget.readOnly, placeholder: 'Ex. 81',
+                controller: enginePowerKwController, maxLength: 7,
+                placeholderStyle: placeStyle, cursorColor: appTheme.color.darker,
+                style: appTheme.writingStyle,
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}'))],
+              ),
+            ]),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                Text('placeassise', style: formHintStyle).tr(),
+                ParcotoTextBox(
+                  enabled: !widget.readOnly,
+                  placeholder: '000',
+                  controller: places,
+                  maxLength: 3,
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                Text('poidstotal', style: formHintStyle).tr(),
+                ParcotoTextBox(
+                  enabled: !widget.readOnly,
+                  placeholder: '000000',
+                  controller: poidsT,
+                  maxLength: 15,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Row(
+              children: [
+                Text('lourd?', style: formHintStyle).tr(),
+                const Spacer(),
+                Checkbox(
+                  checked: lourd,
+                  onChanged: widget.readOnly
+                      ? null
+                      : (s) {
+                          setState(() {
+                            lourd = s ?? false;
+                          });
+                        },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> eightLine(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                Text('chargeutil', style: formHintStyle).tr(),
+                ParcotoTextBox(
+                  enabled: !widget.readOnly,
+                  placeholder: '000000',
+                  controller: charg,
+                  maxLength: 15,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 4,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                Text('anneeutil', style: formHintStyle).tr(),
+                Flexible(
+                  child: ParcotoFieldSurface(child: DatePicker(
+                    showDay: false,
+                    showMonth: false,
+                    selected: selectedAnnee,
+                    onChanged: widget.readOnly
+                        ? null
+                        : (s) {
+                            setState(() {
+                              selectedAnnee = s;
+                            });
+                          },
+                  )),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 12,
+        child: Container(
+          height: heightFirst,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                Text('precmat', style: formHintStyle).tr(),
+                Flexible(
+                  child: ListView(
+                    children: [
+                      m.Material(
+                        color: appTheme.backGroundColor,
+                        child: ChipTags(
+                          list: matriculesPrec,
+                          iconColor: appTheme.color.darkest,
+                          chipColor: appTheme.color.lightest,
+                          textColor: appTheme.writingStyle.color!,
+                          decoration: m.InputDecoration(
+                            hintText: 'entervalues'.tr(),
+                            hintStyle: placeStyle,
+                            fillColor: appTheme.backGroundColor,
+                          ),
+                          createTagOnSubmit: true,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
+  void selectConducteur(AppTheme appTheme) async {
+    Conducteur? conducteur = await showDialog<Conducteur>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return ContentDialog(
+          constraints: BoxConstraints.tight(
+            _responsiveVehiclePickerConstraints(
+              context,
+              maxWidth: 700,
+              maxHeight: 550,
+            ).biggest,
+          ),
+          title: const Text('selectchauffeur').tr(),
+          style: ContentDialogThemeData(
+            titleStyle: appTheme.writingStyle.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: const ChauffeurTable(selectD: true),
+          actions: [
+            Button(
+              child: const Text('fermer').tr(),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+    if (conducteur != null) {
+      selectedAppartenanceEmploye.text = VehiclesUtilities.getAppartenance(
+        conducteur.filliale,
+      );
+      adresse.text = conducteur.adresse ?? '';
+      fname.text = conducteur.prenom;
+      matempl.text = conducteur.matricule;
+      lname.text = conducteur.name;
+      service = conducteur.service;
+      profession.text = conducteur.profession ?? '';
+      setState(() {});
+    }
+  }
+
+  void updateOverMatricule(AppTheme appTheme) {
+    if (autreMat) return;
+
+    var derivedValuesChanged = false;
+    if (matr3.text.isNotEmpty) {
+      wilaya = matr3.text;
+      wilayaCont.text = AlgeriaList().getWilayaByNum(matr3.text) ?? '';
+      dairaCont.text =
+          AlgeriaList()
+              .getDairas(wilayaCont.text)
+              .firstOrNull
+              ?.getDairaName(
+                appTheme.locale?.languageCode.toUpperCase() == "AR"
+                    ? Language.AR
+                    : Language.FR,
+              ) ??
+          '';
+      communeCont.text =
+          AlgeriaList()
+              .getCommune(wilayaCont.text)
+              .firstOrNull
+              ?.getDairaName(
+                appTheme.locale?.languageCode.toUpperCase() == "AR"
+                    ? Language.AR
+                    : Language.FR,
+              ) ??
+          '';
+      derivedValuesChanged = true;
+    }
+
+    if (matr2.text.isNotEmpty) {
+      genre = (int.tryParse(matr2.text) ?? 100) ~/ 100;
+      selectedAnnee = DateTime(
+        VehiclesUtilities.getAnneeFromMatricule('0000-${matr2.text}-00'),
+      );
+      derivedValuesChanged = true;
+    }
+
+    // Both parts are typed independently, but their derived state only needs
+    // one parent rebuild per key event.
+    if (derivedValuesChanged && mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _selectVehicleMake() async {
+    try {
+      await VehicleMakeService.load();
+      if (!mounted) return;
+      final selected = await showDialog<String>(
+        context: context,
+        builder: (dialogContext) => _VehicleMakePickerDialog(
+          selectedMakeId: marque,
+        ),
+      );
+      if (selected != null && mounted) {
+        setState(() => marque = selected);
+      }
+    } catch (error) {
+      if (!mounted) return;
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Impossible de charger le catalogue des marques.'),
+          content: Text(error.toString()),
+          severity: InfoBarSeverity.error,
+        ),
+        duration: snackbarShortDuration,
+      );
+    }
+  }
+
+  Future<void> _loadVehicleImageCapabilities() async {
+    try {
+      final capabilities = await VehicleImageService.capabilities(
+        companyId: vehicleServices.companyId,
+      );
+      if (!mounted) return;
+      setState(() {
+        _canUploadVehicleImage = capabilities.canUpload;
+        _canForceRefreshVehicleImage = capabilities.canForceRefresh;
+      });
+    } catch (_) {
+      // Fail closed: if the server cannot validate the caller's role, hide
+      // privileged actions rather than guessing from client-side state.
+      if (!mounted) return;
+      setState(() {
+        _canUploadVehicleImage = false;
+        _canForceRefreshVehicleImage = false;
+      });
+    }
+  }
+
+  String _vehicleImageSourceLabel(String source) {
+    switch (source) {
+      case 'wikimedia_commons':
+        return 'Wikimedia Commons';
+      case 'trustcar':
+        return 'CarAPI TrustCar';
+      case 'openverse':
+        return 'Openverse';
+      case 'carimages':
+        return 'CarImagesAPI';
+      case 'manual_upload':
+        return 'Photo ajoutée par un administrateur';
+      case 'shared_cache':
+        return 'Catalogue partagé';
+      default:
+        return source;
+    }
+  }
+
+  Future<void> _resolveVehicleImage({
+    bool showInfo = true,
+    bool forceRefresh = false,
+  }) async {
+    if (widget.readOnly || _resolvingVehicleImage) return;
+    try {
+      await VehicleMakeService.load();
+    } catch (_) {
+      // The legacy brand list can still resolve numeric values while offline.
+    }
+    if (!mounted) return;
+    if (forceRefresh && !_canForceRefreshVehicleImage) return;
+
+    final make = VehicleMakeService.nameFor(marque);
+    final model = type.text.trim();
+    final year = int.tryParse(modelYearController.text.trim());
+    final color = _normalizeVehiclePaint(colorController.text);
+    if (make.trim().isEmpty || model.isEmpty || year == null) {
+      if (mounted) {
+        setState(() {
+          _vehicleImageMessage =
+              'Renseignez la marque, le modèle et l’année modèle.';
+        });
+      }
+      return;
+    }
+
+    final loadedVehicleImageMatchesIdentity =
+        (widget.vehicle?.imageUrl?.trim().isNotEmpty ?? false) &&
+        VehicleMakeService.nameFor(widget.vehicle?.marque) ==
+            make &&
+        widget.vehicle?.type?.trim() == model &&
+        widget.vehicle?.modelYear == year &&
+        _normalizeVehiclePaint(widget.vehicle?.color) == color;
+    final imageMatchesCurrentIdentity =
+        (_resolvedImageMake == make &&
+            _resolvedImageModel == model &&
+            _resolvedImageYear == year &&
+            _resolvedImageColor == color) ||
+        loadedVehicleImageMatchesIdentity;
+
+    setState(() {
+      _resolvingVehicleImage = true;
+      _vehicleImageCandidates = [];
+      _vehicleImageMessage = forceRefresh
+          ? 'Recherche de nouvelles alternatives. L’image actuelle sera remplacée uniquement après ton choix…'
+          : 'Recherche de plusieurs propositions auprès de sources différentes…';
+      if (!imageMatchesCurrentIdentity && !forceRefresh) {
+        _resolvedImageUrl = null;
+        _resolvedImageFileId = null;
+        _resolvedImageSource = null;
+        _resolvedImageLicense = null;
+        _resolvedImageLicenseUrl = null;
+        _resolvedImageSourceUrl = null;
+        _resolvedImageAttribution = null;
+      }
+    });
+
+    try {
+      final result = await VehicleImageService.searchCandidates(
+        companyId: vehicleServices.companyId,
+        make: make,
+        model: model,
+        year: year,
+        color: color,
+        forceRefresh: forceRefresh,
+      );
+      if (!mounted) return;
+
+      setState(() {
+        _vehicleImageLookupCompleted = true;
+        _vehicleImageCandidates = result.candidates;
+
+        if (result.cachedImage != null) {
+          final cached = result.cachedImage!;
+          _resolvedImageUrl = cached.imageUrl;
+          _resolvedImageFileId = cached.fileId;
+          _resolvedImageSource = cached.source;
+          _resolvedImageLicense = cached.license;
+          _resolvedImageLicenseUrl = cached.licenseUrl;
+          _resolvedImageSourceUrl = cached.sourceUrl;
+          _resolvedImageAttribution = cached.attribution;
+          _resolvedImageMake = make;
+          _resolvedImageModel = model;
+          _resolvedImageYear = year;
+          _resolvedImageColor = color;
+          _vehicleImageMessage =
+              'Image déjà disponible dans le catalogue partagé.';
+        } else if (result.candidates.isNotEmpty) {
+          _vehicleImageMessage = result.candidates.length >= 2
+              ? '${result.candidates.length} propositions trouvées auprès de sources différentes. Vérifiez laquelle représente réellement ce véhicule.'
+              : 'Une seule source a fourni une image exploitable. Vérifiez-la avant de la sélectionner.';
+          _resolvedImageMake = make;
+          _resolvedImageModel = model;
+          _resolvedImageYear = year;
+          _resolvedImageColor = color;
+        } else {
+          if (!imageMatchesCurrentIdentity && !forceRefresh) {
+            _resolvedImageUrl = null;
+            _resolvedImageFileId = null;
+            _resolvedImageSource = null;
+            _resolvedImageLicense = null;
+            _resolvedImageLicenseUrl = null;
+            _resolvedImageSourceUrl = null;
+            _resolvedImageAttribution = null;
+          }
+          _vehicleImageMessage = forceRefresh && imageMatchesCurrentIdentity
+              ? 'Aucune alternative pertinente trouvée. L’image actuelle est conservée.'
+              : 'Aucune image suffisamment pertinente trouvée. Un administrateur peut importer une photo.';
+        }
+      });
+
+      if (showInfo && mounted) {
+        displayInfoBar(
+          context,
+          builder: (context, close) => InfoBar(
+            title: Text(
+              result.cachedImage != null
+                  ? 'Image du catalogue déjà disponible.'
+                  : result.candidates.isNotEmpty
+                      ? '${result.candidates.length} proposition(s) à comparer.'
+                      : 'Aucune image correspondante disponible.',
+            ),
+            severity: result.cachedImage != null || result.candidates.isNotEmpty
+                ? InfoBarSeverity.success
+                : InfoBarSeverity.warning,
+          ),
+          duration: snackbarShortDuration,
+        );
+      }
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _vehicleImageCandidates = [];
+        _vehicleImageMessage =
+            'La recherche d’image a échoué : ${error.toString()}';
+        if (!imageMatchesCurrentIdentity && !forceRefresh) {
+          _resolvedImageUrl = null;
+          _resolvedImageFileId = null;
+          _resolvedImageSource = null;
+          _resolvedImageLicense = null;
+          _resolvedImageLicenseUrl = null;
+          _resolvedImageSourceUrl = null;
+          _resolvedImageAttribution = null;
+          _vehicleImageLookupCompleted = false;
+        }
+      });
+      if (showInfo) {
+        displayInfoBar(
+          context,
+          builder: (context, close) => InfoBar(
+            title: const Text('La recherche d’image a échoué.'),
+            content: Text(error.toString()),
+            severity: InfoBarSeverity.error,
+          ),
+          duration: snackbarShortDuration,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _resolvingVehicleImage = false);
+      }
+    }
+  }
+
+  Future<void> _selectVehicleImageCandidate(
+    VehicleImageCandidate candidate,
+  ) async {
+    if (widget.readOnly || _resolvingVehicleImage) return;
+
+    final make = VehicleMakeService.nameFor(marque);
+    final model = type.text.trim();
+    final year = int.tryParse(modelYearController.text.trim());
+    final color = _normalizeVehiclePaint(colorController.text);
+    if (make.trim().isEmpty || model.isEmpty || year == null) return;
+
+    setState(() {
+      _resolvingVehicleImage = true;
+      _vehicleImageMessage =
+          'Enregistrement de la source choisie dans le catalogue partagé…';
+    });
+
+    try {
+      final result = await VehicleImageService.selectCandidate(
+        companyId: vehicleServices.companyId,
+        make: make,
+        model: model,
+        year: year,
+        color: color,
+        candidate: candidate,
+      );
+      if (!mounted) return;
+
+      setState(() {
+        _vehicleImageCandidates = [];
+        _vehicleImageLookupCompleted = true;
+        _resolvedImageUrl = result.imageUrl;
+        _resolvedImageFileId = result.fileId;
+        _resolvedImageSource = result.source;
+        _resolvedImageLicense = result.license;
+        _resolvedImageLicenseUrl = result.licenseUrl;
+        _resolvedImageSourceUrl = result.sourceUrl;
+        _resolvedImageAttribution = result.attribution;
+        _resolvedImageMake = make;
+        _resolvedImageModel = model;
+        _resolvedImageYear = year;
+        _resolvedImageColor = color;
+        _vehicleImageMessage = result.colorFallback
+            ? 'Image choisie, mais la couleur demandée est indisponible : peinture d’origine affichée.'
+            : 'Image choisie et enregistrée dans le catalogue partagé.';
+      });
+
+      displayInfoBar(
+        context,
+        builder: (context, close) => const InfoBar(
+          title: Text('Image enregistrée dans le catalogue partagé.'),
+          severity: InfoBarSeverity.success,
+        ),
+        duration: snackbarShortDuration,
+      );
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _vehicleImageMessage =
+            'Impossible d’enregistrer cette proposition : ${error.toString()}';
+      });
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Impossible d’enregistrer cette image.'),
+          content: Text(error.toString()),
+          severity: InfoBarSeverity.error,
+        ),
+        duration: snackbarShortDuration,
+      );
+    } finally {
+      if (mounted) setState(() => _resolvingVehicleImage = false);
+    }
+  }
+
+  Future<void> _pickAndUploadVehicleImage(ImageSource source) async {
+    if (widget.readOnly ||
+        !_canUploadVehicleImage ||
+        !_vehicleImageLookupCompleted ||
+        _vehicleImageCandidates.isNotEmpty ||
+        _resolvingVehicleImage ||
+        (_resolvedImageUrl?.isNotEmpty ?? false)) {
+      return;
+    }
+
+    final make = VehicleMakeService.nameFor(marque);
+    final model = type.text.trim();
+    final year = int.tryParse(modelYearController.text.trim());
+    final color = _normalizeVehiclePaint(colorController.text);
+    if (make.trim().isEmpty || model.isEmpty || year == null) {
+      displayInfoBar(
+        context,
+        builder: (context, close) => const InfoBar(
+          title: Text('Renseignez d’abord la marque, le modèle et l’année.'),
+          severity: InfoBarSeverity.warning,
+        ),
+        duration: snackbarShortDuration,
+      );
+      return;
+    }
+
+    try {
+      final picked = await _vehicleImagePicker.pickImage(
+        source: source,
+        preferredCameraDevice: CameraDevice.rear,
+        imageQuality: 82,
+        maxWidth: 1600,
+        maxHeight: 1200,
+      );
+      if (picked == null || !mounted) return;
+
+      final extension = picked.name.split('.').last.toLowerCase();
+      final mimeType = switch (extension) {
+        'png' => 'image/png',
+        'webp' => 'image/webp',
+        'jpg' || 'jpeg' => 'image/jpeg',
+        _ => '',
+      };
+      if (mimeType.isEmpty) {
+        displayInfoBar(
+          context,
+          builder: (context, close) => const InfoBar(
+            title: Text('Format non pris en charge. Utilisez JPG, PNG ou WebP.'),
+            severity: InfoBarSeverity.error,
+          ),
+          duration: snackbarShortDuration,
+        );
+        return;
+      }
+
+      final bytes = await picked.readAsBytes();
+      if (!mounted) return;
+      if (bytes.isEmpty || bytes.length > 5 * 1024 * 1024) {
+        displayInfoBar(
+          context,
+          builder: (context, close) => const InfoBar(
+            title: Text('La photo doit faire 5 Mo maximum.'),
+            severity: InfoBarSeverity.error,
+          ),
+          duration: snackbarShortDuration,
+        );
+        return;
+      }
+
+      setState(() {
+        _resolvingVehicleImage = true;
+        _vehicleImageMessage = 'Envoi de la photo et ajout au catalogue partagé…';
+      });
+
+      final result = await VehicleImageService.uploadCustom(
+        companyId: vehicleServices.companyId,
+        make: make,
+        model: model,
+        year: year,
+        color: color,
+        bytes: bytes,
+        mimeType: mimeType,
+        fileName: picked.name,
+      );
+      if (!mounted) return;
+
+      setState(() {
+        _vehicleImageLookupCompleted = result.found;
+        _vehicleImageCandidates = [];
+        _resolvedImageUrl = result.imageUrl;
+        _resolvedImageFileId = result.fileId;
+        _resolvedImageSource = result.source;
+        _resolvedImageLicense = result.license;
+        _resolvedImageLicenseUrl = result.licenseUrl;
+        _resolvedImageSourceUrl = result.sourceUrl;
+        _resolvedImageAttribution = result.attribution;
+        _resolvedImageMake = make;
+        _resolvedImageModel = model;
+        _resolvedImageYear = year;
+        _resolvedImageColor = color;
+        _vehicleImageMessage = result.found
+            ? 'Photo ajoutée au catalogue partagé pour ce modèle, cette année et cette couleur.'
+            : 'La photo n’a pas pu être ajoutée au catalogue partagé.';
+      });
+
+      if (result.found) {
+        displayInfoBar(
+          context,
+          builder: (context, close) => const InfoBar(
+            title: Text('Photo ajoutée au catalogue partagé.'),
+            severity: InfoBarSeverity.success,
+          ),
+          duration: snackbarShortDuration,
+        );
+      }
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _vehicleImageMessage = 'Échec de l’ajout de la photo : ${error.toString()}';
+      });
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Impossible d’ajouter cette photo.'),
+          content: Text(error.toString()),
+          severity: InfoBarSeverity.error,
+        ),
+        duration: snackbarShortDuration,
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _resolvingVehicleImage = false);
+      }
+    }
+  }
+
+  String? documentID;
+  bool uploading = false;
+  bool errorUploading = false;
+  bool errorChassis = false;
+  Future<void> confirmAndUpload() async {
+    final matriculeIsValid = autreMat
+        ? matriculeEtr.text.trim().length >= 4
+        : matr1.text.trim().isNotEmpty &&
+              matr2.text.trim().length >= 3 &&
+              matr3.text.trim().length >= 2;
+    final chassisIsValid = !chassisKey || numSer.text.trim().isNotEmpty;
+    final acquisitionDate = acquisitionDateController.text.trim();
+    final warrantyEndDate = warrantyEndDateController.text.trim();
+    final hasInvalidDate =
+        (acquisitionDate.isNotEmpty &&
+            DateTime.tryParse(acquisitionDate) == null) ||
+        (warrantyEndDate.isNotEmpty &&
+            DateTime.tryParse(warrantyEndDate) == null);
+
+    if (hasInvalidDate) {
+      if (!mounted) return;
+      displayInfoBar(
+        context,
+        builder: (context, close) => const InfoBar(
+          title: Text('Date invalide. Utilisez le format AAAA-MM-JJ.'),
+          severity: InfoBarSeverity.error,
+        ),
+        duration: snackbarShortDuration,
+      );
+      return;
+    }
+
+    if (!mounted) return;
+    setState(() {
+      erreurMatricule = !matriculeIsValid;
+      errorChassis = !chassisIsValid;
+    });
+
+    // Do not persist an incomplete vehicle record.
+    if (!matriculeIsValid || !chassisIsValid) return;
+
+    try {
+      await VehicleMakeService.load();
+    } catch (_) {
+      // Legacy brand indexes remain resolvable while offline.
+    }
+    if (!mounted) return;
+
+    final currentMake = VehicleMakeService.nameFor(marque);
+    final currentModel = type.text.trim();
+    final currentYear = int.tryParse(modelYearController.text.trim());
+    final currentColor = _normalizeVehiclePaint(colorController.text);
+    final imageIdentityChanged = currentMake != (_resolvedImageMake ?? '') ||
+        currentModel != (_resolvedImageModel ?? '') ||
+        currentYear != _resolvedImageYear ||
+        currentColor != (_resolvedImageColor ?? '');
+
+    if (!widget.readOnly &&
+        currentMake.isNotEmpty &&
+        currentModel.isNotEmpty &&
+        currentYear != null &&
+        !(_vehicleImageLookupCompleted && !imageIdentityChanged &&
+            (_resolvedImageUrl == null || _resolvedImageUrl!.isEmpty)) &&
+        ((_resolvedImageUrl == null || _resolvedImageUrl!.isEmpty) ||
+            imageIdentityChanged)) {
+      await _resolveVehicleImage(showInfo: false);
+    }
+
+    if (mounted) {
+      setState(() {
+        uploading = true;
+        errorUploading = false;
+      });
+      final selectedImageMake = VehicleMakeService.nameFor(marque);
+      final selectedImageModel = type.text.trim();
+      final selectedImageYear = int.tryParse(modelYearController.text.trim());
+      final selectedImageColor = _normalizeVehiclePaint(colorController.text);
+      final resolvedImageMatchesCurrentCriteria =
+          _resolvedImageMake == selectedImageMake &&
+          _resolvedImageModel == selectedImageModel &&
+          _resolvedImageYear == selectedImageYear &&
+          _resolvedImageColor == selectedImageColor;
+      final originalImageMake =
+          VehicleMakeService.nameFor(widget.vehicle?.marque);
+      final existingImageMatchesCurrentCriteria =
+          (widget.vehicle?.imageUrl?.trim().isNotEmpty ?? false) &&
+          originalImageMake == selectedImageMake &&
+          widget.vehicle?.type?.trim() == selectedImageModel &&
+          widget.vehicle?.modelYear == selectedImageYear &&
+          _normalizeVehiclePaint(widget.vehicle?.color) == selectedImageColor;
+      final useResolvedVehicleImage = resolvedImageMatchesCurrentCriteria;
+      final useExistingVehicleImage =
+          !useResolvedVehicleImage && existingImageMatchesCurrentCriteria;
+      final vehicleCustomFields = Map<String, dynamic>.from(
+        widget.vehicle?.customFields ?? const <String, dynamic>{},
+      );
+      final normalizedVinForMetadata =
+          numSer.text.replaceAll(RegExp(r'\s+'), '').toUpperCase();
+      if (_vinDecodeMetadata != null &&
+          _vinDecodeMetadata!['vin'] == normalizedVinForMetadata) {
+        vehicleCustomFields['_vehicleVinDecode'] = _vinDecodeMetadata;
+      } else {
+        final previousVinDecode = vehicleCustomFields['_vehicleVinDecode'];
+        if (previousVinDecode is Map &&
+            previousVinDecode['vin']?.toString() !=
+                normalizedVinForMetadata) {
+          vehicleCustomFields.remove('_vehicleVinDecode');
+        }
+      }
+      const imageMetadataKeys = [
+        '_vehicleImageSource',
+        '_vehicleImageSourceUrl',
+        '_vehicleImageLicense',
+        '_vehicleImageLicenseUrl',
+        '_vehicleImageAttribution',
+      ];
+      if (useResolvedVehicleImage && _resolvedImageUrl?.isNotEmpty == true) {
+        vehicleCustomFields['_vehicleImageSource'] = _resolvedImageSource;
+        vehicleCustomFields['_vehicleImageSourceUrl'] = _resolvedImageSourceUrl;
+        vehicleCustomFields['_vehicleImageLicense'] = _resolvedImageLicense;
+        vehicleCustomFields['_vehicleImageLicenseUrl'] = _resolvedImageLicenseUrl;
+        vehicleCustomFields['_vehicleImageAttribution'] = _resolvedImageAttribution;
+      } else if (!useExistingVehicleImage) {
+        for (final key in imageMetadataKeys) {
+          vehicleCustomFields.remove(key);
+        }
+      }
+
+      Vehicle vehicle = Vehicle(
+        id: documentID!,
+        matricule: autreMat
+            ? matriculeEtr.text
+            : '${matr1.text}-${matr2.text}-${matr3.text}',
+        matriculeEtrang: autreMat,
+        wilaya: int.tryParse(wilaya),
+        commune: communeCont.text,
+        date: selectedDate,
+        adresse: adresse.text,
+        quittance: double.tryParse(quittance.text),
+        numero: numero.text,
+        numeroSerie: numSer.text,
+        // Preserve extended data while editing a vehicle in the legacy form.
+        trim: _nullableText(trimController.text),
+        modelYear: int.tryParse(modelYearController.text.trim()),
+        color: _normalizeVehiclePaint(colorController.text),
+        engineDisplacement: int.tryParse(engineDisplacementController.text.trim()),
+        enginePowerHp: double.tryParse(enginePowerHpController.text.trim().replaceAll(',', '.')),
+        enginePowerKw: double.tryParse(enginePowerKwController.text.trim().replaceAll(',', '.')),
+        engineCode: _nullableText(engineCodeController.text),
+        transmission: _nullableText(transmissionController.text),
+        gearbox: _nullableText(gearboxController.text),
+        driveType: _nullableText(driveTypeController.text),
+        doors: int.tryParse(doorsController.text.trim()),
+        lengthMm: int.tryParse(lengthController.text.trim()),
+        widthMm: int.tryParse(widthController.text.trim()),
+        heightMm: int.tryParse(heightController.text.trim()),
+        acquisitionType: _nullableText(acquisitionTypeController.text),
+        acquisitionDate: _nullableText(acquisitionDateController.text),
+        purchasePrice: double.tryParse(
+          purchasePriceController.text.trim().replaceAll(',', '.'),
+        ),
+        supplier: _nullableText(supplierController.text),
+        warrantyEndDate: _nullableText(warrantyEndDateController.text),
+        fleetNumber: _nullableText(fleetNumberController.text),
+        currentMileage: int.tryParse(mileageController.text.trim()),
+        nextServiceMileage: int.tryParse(nextServiceMileageController.text.trim()),
+        // Image and custom metadata are preserved until their dedicated editors exist.
+        imageFileId: useResolvedVehicleImage
+            ? _resolvedImageFileId
+            : useExistingVehicleImage
+                ? widget.vehicle?.imageFileId
+                : null,
+        imageUrl: useResolvedVehicleImage
+            ? _resolvedImageUrl
+            : useExistingVehicleImage
+                ? widget.vehicle?.imageUrl
+                : null,
+        imageSource: useResolvedVehicleImage
+            ? _resolvedImageSource
+            : useExistingVehicleImage
+                ? widget.vehicle?.imageSource
+                : null,
+        customFields: vehicleCustomFields,
+        anneeUtil: selectedAnnee?.year,
+        energie: energie.text,
+        pays: pays,
+        placesAssises: int.tryParse(places.text),
+        poidsTotal: int.tryParse(poidsT.text),
+        prenom: fname.text,
+        nom: lname.text,
+        type: type.text,
+        profession: profession.text,
+        puissance: int.tryParse(puissance.text),
+        daira: dairaCont.text,
+        genre: genre?.toString(),
+        marque: marque,
+        matriculePrec: matriculesPrec,
+        carrosserie: caross.text,
+        charegeUtile: int.tryParse(charg.text),
+        createdBy: widget.vehicle?.createdBy ?? DatabaseGetter.me.value?.id,
+        lourd: lourd,
+        direction: selectedDirection.text
+            .toUpperCase()
+            .replaceAll(' ', '')
+            .trim(),
+        appartenance: selectedAppartenance.text
+            .toUpperCase()
+            .replaceAll(' ', '')
+            .trim(),
+        filliale: selectedFiliale.text.toUpperCase().replaceAll(' ', '').trim(),
+        departement: selectedDepartment.text
+            .toUpperCase()
+            .replaceAll(' ', '')
+            .trim(),
+        appartenanceconducteur: selectedAppartenanceEmploye.text
+            .toUpperCase()
+            .replaceAll(' ', '')
+            .trim(),
+        service: service,
+        decision: widget.vehicle?.decision ?? false,
+        emplacement: widget.vehicle?.emplacement,
+        etat: widget.vehicle?.etat,
+        etatactuel: widget.vehicle?.etatactuel ?? 0,
+        perimetre: widget.vehicle?.perimetre ?? 0,
+        matriculeConducteur: matempl.text,
+      );
+      final isUpdate = widget.vehicle != null;
+      try {
+        // The repository writes to SQLite and queues the remote mutation.
+        // A failure in the legacy remote-only activity log must not turn a
+        // successful local save into a visible upload failure.
+        if (isUpdate) {
+          await updateVehicle(vehicle);
+        } else {
+          await createVehicle(vehicle);
+        }
+
+        if (mounted) {
+          displayInfoBar(
+            context,
+            builder: (BuildContext context, void Function() close) => InfoBar(
+              title: const Text('done').tr(),
+              severity: InfoBarSeverity.success,
+            ),
+            duration: snackbarShortDuration,
+          );
+          setState(() {
+            uploading = false;
+            errorUploading = false;
+          });
+        }
+
+        try {
+          await uploadActivity(isUpdate, vehicle);
+        } catch (_) {
+          // Activity logging remains best-effort while offline.
+        }
+        widget.onSaved?.call(vehicle);
+      } catch (_) {
+        if (mounted) {
+          displayInfoBar(
+            context,
+            builder: (BuildContext context, void Function() close) => InfoBar(
+              title: const Text('echec').tr(),
+              severity: InfoBarSeverity.error,
+            ),
+            duration: snackbarShortDuration,
+          );
+          setState(() {
+            errorUploading = true;
+            uploading = false;
+          });
+        }
+      }
+    }
+  }
+
+  Future<void> updateVehicle(Vehicle vehicle) async {
+    vehicle.updatedAt = DateTime.now().toUtc();
+    final domainVehicle = VehicleMapper.toDomain(
+      vehicle,
+      companyId: DatabaseGetter.activeCompanyId ?? (throw StateError('Aucune entreprise active.')),
+    );
+    await vehicleServices.repository.updateVehicle(domainVehicle);
+  }
+
+  Future<void> createVehicle(Vehicle vehicle) async {
+    final now = DateTime.now().toUtc();
+    vehicle.createdAt = now;
+    vehicle.updatedAt = now;
+    final domainVehicle = VehicleMapper.toDomain(
+      vehicle,
+      companyId: DatabaseGetter.activeCompanyId ?? (throw StateError('Aucune entreprise active.')),
+    );
+    await vehicleServices.repository.createVehicle(domainVehicle);
+  }
+
+  Future<void> uploadActivity(bool update, Vehicle vehicle) async {
+    if (update) {
+      await DatabaseGetter().ajoutActivity(
+        1,
+        vehicle.id,
+        docName: vehicle.matricule,
+      );
+    } else {
+      await DatabaseGetter().ajoutActivity(
+        0,
+        vehicle.id,
+        docName: vehicle.matricule,
+      );
+    }
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
+
+class _VehicleMakePickerDialog extends StatefulWidget {
+  final String? selectedMakeId;
+
+  const _VehicleMakePickerDialog({this.selectedMakeId});
+
+  @override
+  State<_VehicleMakePickerDialog> createState() =>
+      _VehicleMakePickerDialogState();
+}
+
+class _VehicleMakePickerDialogState extends State<_VehicleMakePickerDialog> {
+  final TextEditingController _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final makes = VehicleMakeService.search(_query);
+    return ContentDialog(
+      title: const Text('Choisir une marque'),
+      content: SizedBox(
+        width: 520,
+        height: 540,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextBox(
+              controller: _searchController,
+              placeholder: 'Rechercher une marque…',
+              prefix: const Padding(
+                padding: EdgeInsetsDirectional.only(start: 8),
+                child: Icon(FluentIcons.search, size: 14),
+              ),
+              onChanged: (value) => setState(() => _query = value),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: makes.isEmpty
+                  ? const Center(child: Text('Aucune marque trouvée.'))
+                  : ListView.separated(
+                      itemCount: makes.length,
+                      separatorBuilder: (_, _) => Container(
+                        height: 1,
+                        color: Colors.grey[30],
+                      ),
+                      itemBuilder: (context, index) {
+                        final make = makes[index];
+                        final selected = make.id == widget.selectedMakeId;
+                        return Button(
+                          onPressed: () => Navigator.of(context).pop(make.id),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 7),
+                            child: Row(
+                              children: [
+                                VehicleMakeLogo(makeId: make.id, size: 34),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        make.name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        make.category,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.grey[100],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (selected)
+                                   Icon(
+                                    FluentIcons.check_mark,
+                                    color: Colors.green,
+                                    size: 16,
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Annuler'),
+        ),
+      ],
+    );
+  }
+}
+
+).hasMatch(vin)) {
+      setState(() {
+        _vinDecodeMessage =
+            'Saisissez un VIN valide de 17 caractères (sans I, O ni Q).';
+      });
+      return;
+    }
+
+    setState(() {
+      _decodingVin = true;
+      _vinDecodeMessage = 'Interrogation des décodeurs VIN…';
+    });
+
+    try {
+      final result = await VehicleVinService.decode(
+        companyId: vehicleServices.companyId,
+        vin: vin,
+      );
+      if (!mounted) return;
+
+      if (result.status == 'not_found') {
+        setState(() {
+          _vinDecodeMetadata = null;
+          _vinDecodeMessage =
+              'Aucune fiche constructeur exploitable n’a été retournée.';
+        });
+        return;
+      }
+
+      try {
+        await VehicleMakeService.load();
+      } catch (_) {
+        // Keep the cached/legacy make catalogue available when offline.
+      }
+
+      final data = result.data;
+      var populated = 0;
+
+      void fillIfEmpty(TextEditingController controller, dynamic rawValue) {
+        final value = rawValue?.toString().trim() ?? '';
+        if (controller.text.trim().isEmpty && value.isNotEmpty) {
+          controller.text = value;
+          populated++;
+        }
+      }
+
+      final decodedMake = data['make']?.toString().trim() ?? '';
+      if ((marque ?? '').trim().isEmpty && decodedMake.isNotEmpty) {
+        final normalizedMake = VehicleMakeService.normalize(decodedMake);
+        VehicleMake? matchedMake;
+        for (final candidate in VehicleMakeService.cached) {
+          if (VehicleMakeService.normalize(candidate.name) == normalizedMake ||
+              candidate.aliases.any(
+                (alias) =>
+                    VehicleMakeService.normalize(alias) == normalizedMake,
+              )) {
+            matchedMake = candidate;
+            break;
+          }
+        }
+        marque = matchedMake?.id ??
+            VehicleMakeService.canonicalId(decodedMake) ??
+            decodedMake;
+        populated++;
+      }
+
+      fillIfEmpty(type, data['model']);
+      fillIfEmpty(trimController, data['trim']);
+      fillIfEmpty(modelYearController, data['modelYear']);
+      fillIfEmpty(caross, data['body']);
+      fillIfEmpty(energie, data['fuel']);
+      fillIfEmpty(engineDisplacementController, data['engineDisplacementCc']);
+      fillIfEmpty(enginePowerHpController, data['enginePowerHp']);
+      fillIfEmpty(enginePowerKwController, data['enginePowerKw']);
+      fillIfEmpty(engineCodeController, data['engineCode'] ?? data['engine']);
+      fillIfEmpty(transmissionController, data['transmission']);
+      fillIfEmpty(driveTypeController, data['drive']);
+      fillIfEmpty(doorsController, data['doors']);
+
+      final providerLabel = result.providers.isEmpty
+          ? 'source inconnue'
+          : result.providers.join(' + ');
+      final warningText = result.warnings.isEmpty
+          ? ''
+          : ' ' + result.warnings.join(' ');
+
+      setState(() {
+        _vinDecodeMetadata = {
+          'vin': result.vin,
+          'status': result.status,
+          'providers': result.providers,
+          'decodedAt': DateTime.now().toUtc().toIso8601String(),
+          'data': result.data,
+          'warnings': result.warnings,
+        };
+        _vinDecodeMessage = result.status == 'decoded'
+            ? 'Décodage terminé via ' +
+                providerLabel +
+                ' : ' +
+                populated.toString() +
+                ' champ(s) renseigné(s).' +
+                warningText
+            : 'Décodage partiel via ' +
+                providerLabel +
+                '. Vérifiez les données manquantes.' +
+                warningText;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _vinDecodeMetadata = null;
+        _vinDecodeMessage = 'Échec du décodage VIN : ' + error.toString();
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _decodingVin = false);
+      }
+    }
   }
 
   Widget _identityField(
