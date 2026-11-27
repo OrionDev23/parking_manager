@@ -168,7 +168,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
     return ValueListenableBuilder(
       valueListenable: filterDocument,
       builder: (context, v, _) {
-        if (!startedWithFiltersOn && v != null && filterNow) {
+        if (v != null && filterNow) {
           searchController.text = v;
           conducteurDataSource.search(v);
           notEmpty = true;
