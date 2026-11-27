@@ -17,6 +17,9 @@ List<String> _parseMakeAliases(String? raw) => (raw ?? '')
     .toList(growable: false);
 
 class BrandList extends StatefulWidget {
+  static final ValueNotifier<String?> appBarSearchRequest =
+      ValueNotifier<String?>(null);
+
   const BrandList({super.key});
 
   @override
@@ -24,7 +27,6 @@ class BrandList extends StatefulWidget {
 }
 
 class _BrandListState extends State<BrandList> {
-  final TextEditingController _searchController = TextEditingController();
   String _query = '';
   bool _loading = true;
   bool _adding = false;
@@ -37,11 +39,20 @@ class _BrandListState extends State<BrandList> {
     super.initState();
     _loadMakes();
     _loadMakeCapabilities();
+    BrandList.appBarSearchRequest.addListener(_applyAppBarSearchRequest);
+    _applyAppBarSearchRequest();
+  }
+
+  void _applyAppBarSearchRequest() {
+    final query = BrandList.appBarSearchRequest.value;
+    if (query == null || !mounted) return;
+    setState(() => _query = query);
+    BrandList.appBarSearchRequest.value = null;
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    BrandList.appBarSearchRequest.removeListener(_applyAppBarSearchRequest);
     super.dispose();
   }
 
@@ -198,83 +209,42 @@ class _BrandListState extends State<BrandList> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final compact = constraints.maxWidth < 620;
-                final search = SizedBox(
-                  width: compact ? constraints.maxWidth : 360,
-                  height: 44,
-                  child: ParcotoTextBox(
-                    controller: _searchController,
-                    placeholder: 'Rechercher une marque ou un alias…',
-                    style: theme.writingStyle,
-                    placeholderStyle: placeStyle,
-                    cursorColor: theme.color,
-                    onChanged: (value) => setState(() => _query = value),
-                    suffix: _query.isEmpty
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  Button(
+                    onPressed: _loading
                         ? null
-                        : IconButton(
-                            icon: const Icon(FluentIcons.cancel, size: 13),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() => _query = '');
-                            },
-                          ),
+                        : () => _loadMakes(forceRefresh: true),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(FluentIcons.refresh, size: 13),
+                        SizedBox(width: 7),
+                        Text('Actualiser'),
+                      ],
+                    ),
                   ),
-                );
-                final actions = Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    Button(
-                      onPressed: _loading ? null : () => _loadMakes(forceRefresh: true),
-                      child: const Row(
+                  if (_canAddMake)
+                    FilledButton(
+                      onPressed: _adding ? null : _addMake,
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(FluentIcons.refresh, size: 13),
-                          SizedBox(width: 7),
-                          Text('Actualiser'),
+                          if (_adding)
+                            const ProgressRing(strokeWidth: 2)
+                          else
+                            const Icon(FluentIcons.add, size: 13),
+                          const SizedBox(width: 7),
+                          const Text('Ajouter une marque'),
                         ],
                       ),
                     ),
-                    if (_canAddMake)
-                      FilledButton(
-                        onPressed: _adding ? null : _addMake,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (_adding)
-                              const ProgressRing(strokeWidth: 2)
-                            else
-                              const Icon(FluentIcons.add, size: 13),
-                            const SizedBox(width: 7),
-                            const Text('Ajouter une marque'),
-                          ],
-                        ),
-                      ),
-                  ],
-                );
-                if (compact) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      search,
-                      const SizedBox(height: 10),
-                      Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: actions,
-                      ),
-                    ],
-                  );
-                }
-                return Row(
-                  children: [
-                    search,
-                    const Spacer(),
-                    actions,
-                  ],
-                );
-              },
+                ],
+              ),
             ),
             const SizedBox(height: 14),
             Row(
