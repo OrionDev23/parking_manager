@@ -22,6 +22,9 @@ class DisponibliteTable extends StatefulWidget {
 }
 
 class DisponibliteTableState extends State<DisponibliteTable> {
+  static final ValueNotifier<String?> appBarSearchRequest =
+      ValueNotifier<String?>(null);
+
   late DisponibiliteDataSource disponibiliteDataSource;
 
   bool assending = false;
@@ -37,6 +40,15 @@ class DisponibliteTableState extends State<DisponibliteTable> {
     );
     initColumns();
     super.initState();
+    appBarSearchRequest.addListener(_applyAppBarSearchRequest);
+    _applyAppBarSearchRequest();
+  }
+
+  void _applyAppBarSearchRequest() {
+    final query = appBarSearchRequest.value;
+    if (query == null || !mounted) return;
+    disponibiliteDataSource.search(query);
+    appBarSearchRequest.value = null;
   }
 
   int sortColumn = 2;
@@ -418,53 +430,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
               ),
             ),
             const SizedBox(width: 10),
-            SizedBox(
-              width: 350.px,
-              height: 45.px,
-              child: ParcotoTextBox(
-                onChanged: (s) {
-                  if (s.isEmpty) {
-                    notEmpty = false;
-                    disponibiliteDataSource.search('');
-                  } else {
-                    notEmpty = true;
-                  }
-                  setState(() {});
-                },
-                controller: searchController,
-                placeholder: 'search'.tr(),
-                style: appTheme.writingStyle,
-                cursorColor: appTheme.color.darker,
-                placeholderStyle: placeStyle,
-                onSubmitted: (s) {
-                  if (s.isNotEmpty) {
-                    disponibiliteDataSource.search(s);
-                    if (!notEmpty) {
-                      setState(() {
-                        notEmpty = true;
-                      });
-                    }
-                  } else {
-                    if (notEmpty) {
-                      setState(() {
-                        notEmpty = false;
-                      });
-                    }
-                  }
-                },
-                suffix: notEmpty
-                    ? IconButton(
-                        icon: const Icon(FluentIcons.cancel),
-                        onPressed: () {
-                          searchController.text = "";
-                          notEmpty = false;
-                          setState(() {});
-                          disponibiliteDataSource.search('');
-                        },
-                      )
-                    : null,
-              ),
-            ),
+
           ],
         ),
       ),
@@ -477,6 +443,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
 
   @override
   void dispose() {
+    appBarSearchRequest.removeListener(_applyAppBarSearchRequest);
     disponibiliteDataSource.dispose();
     super.dispose();
   }
