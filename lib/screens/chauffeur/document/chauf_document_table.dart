@@ -56,7 +56,6 @@ class CDocumentTableState extends State<CDocumentTable> {
   void _applyAppBarSearchRequest() {
     final query = appBarSearchRequest.value;
     if (query == null) return;
-    searchController.text = query;
     notEmpty = query.isNotEmpty;
     documentsDataSource.search(query);
     appBarSearchRequest.value = null;
