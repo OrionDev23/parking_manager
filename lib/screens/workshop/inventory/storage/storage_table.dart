@@ -161,6 +161,7 @@ class StorageTableState extends State<StorageTable> {
         );
         filterDocument.value = null;
         filterNow = false;
+        filterNow = false;
       } else {
         startedWithFiltersOn = false;
 
