@@ -126,7 +126,7 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
   String? _lastCrossSuggestionQuery;
   String _lastDispatchedQuery = '';
 
-  String get _placeholder => switch (scope) {
+  String get _placeholder => switch (widget.scope) {
         _ModuleSearchScope.platformCompanies => 'Rechercher une entreprise cliente...',
         _ModuleSearchScope.vehicles => 'Rechercher un véhicule...',
         _ModuleSearchScope.vehicleDocuments => 'Rechercher un document véhicule...',
