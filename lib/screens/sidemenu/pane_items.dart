@@ -478,28 +478,32 @@ class PaneItemsAndFooters {
         return 'vstates'.tr();
     }
 
-    NavigationPaneItem? find(List<NavigationPaneItem> items) {
+    String? textFromTitle(Widget? title) {
+      if (title is Text) {
+        return title.data ?? title.textSpan?.toPlainText();
+      }
+      if (title is RichText) return title.text.toPlainText();
+      return null;
+    }
+
+    String? findTitle(List<NavigationPaneItem> items) {
       for (final item in items) {
-        if ((item is PaneItem || item is PaneItemExpander) &&
-            item.key is ValueKey &&
+        if (item.key is ValueKey &&
             (item.key as ValueKey).value.toString() == key) {
-          return item;
+          if (item is PaneItem) return textFromTitle(item.title);
+          if (item is PaneItemExpander) {
+            return textFromTitle(item.title);
+          }
         }
         if (item is PaneItemExpander) {
-          final nested = find(item.items);
+          final nested = findTitle(item.items);
           if (nested != null) return nested;
         }
       }
       return null;
     }
 
-    final item = find(originalItems) ?? find(footerItems);
-    final title = item?.title;
-    if (title is Text) {
-      return title.data ?? title.textSpan?.toPlainText();
-    }
-    if (title is RichText) return title.text.toPlainText();
-    return null;
+    return findTitle(originalItems) ?? findTitle(footerItems);
   }
 
   static int? indexForPaneKey(String value) {
