@@ -589,7 +589,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     final imageUrl = v.imageUrl?.trim();
     // Match the reference layout: a clear vehicle thumbnail beside the identity.
     final width = compact ? double.infinity : 190.0;
-    final height = compact ? 160.0 : 130.0;
+    final height = compact ? 160.0 : 140.0;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
