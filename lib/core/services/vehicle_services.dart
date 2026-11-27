@@ -25,6 +25,7 @@ class VehicleServices {
   final AppwriteVehicleSource remoteSource;
   final SqliteSyncQueue syncQueue;
   final String companyId;
+  final String? teamId;
 
   VehicleServices._({
     required this.localDatabase,
@@ -33,6 +34,7 @@ class VehicleServices {
     required this.remoteSource,
     required this.syncQueue,
     required this.companyId,
+    required this.teamId,
   });
 
   static Future<VehicleServices> create({
@@ -80,6 +82,7 @@ class VehicleServices {
       remoteSource: remoteSource,
       syncQueue: syncQueue,
       companyId: companyId,
+      teamId: teamId,
       repository: kIsWeb
           ? _OnlineVehicleRepository(remoteSource)
           : VehicleRepositoryImpl(
