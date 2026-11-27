@@ -1110,7 +1110,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                   ),
                                                   if (candidate.colorFallback)
                                                     const Text(
-                                                      'Peinture d’origine',
+                                                      'Couleur non vérifiée',
                                                       style: TextStyle(fontSize: 9),
                                                     )
                                                   else if (candidate.license?.isNotEmpty == true)
@@ -3707,7 +3707,7 @@ class _VehicleFormState extends State<VehicleForm>
         _resolvedImageYear = year;
         _resolvedImageColor = color;
         _vehicleImageMessage = result.colorFallback
-            ? 'Image choisie, mais la couleur demandée est indisponible : peinture d’origine affichée.'
+            ? 'Image choisie, mais la couleur n’a pas pu être vérifiée pour cette photo.'
             : 'Image choisie et enregistrée dans le catalogue partagé.';
       });
 
@@ -6265,7 +6265,7 @@ class _VehicleMakePickerDialogState extends State<_VehicleMakePickerDialog> {
         _resolvedImageYear = year;
         _resolvedImageColor = color;
         _vehicleImageMessage = result.colorFallback
-            ? 'Image choisie, mais la couleur demandée est indisponible : peinture d’origine affichée.'
+            ? 'Image choisie, mais la couleur n’a pas pu être vérifiée pour cette photo.'
             : 'Image choisie et enregistrée dans le catalogue partagé.';
       });
 
