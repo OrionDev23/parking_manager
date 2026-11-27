@@ -62,6 +62,7 @@ class BrandTableState extends State<BrandTable> {
           searchKey: filterDocument.value,
         );
         filterDocument.value = null;
+        filterNow = false;
       } else {
         startedWithFiltersOn = false;
 
@@ -140,7 +141,7 @@ class BrandTableState extends State<BrandTable> {
     return ValueListenableBuilder(
       valueListenable: filterDocument,
       builder: (context, v, _) {
-        if (!startedWithFiltersOn && v != null && filterNow) {
+        if (v != null && filterNow) {
           searchController.text = v;
           brandDataSource.search(v);
           notEmpty = true;
@@ -148,65 +149,7 @@ class BrandTableState extends State<BrandTable> {
           filterNow = false;
         }
         return DataTableParc(
-          header: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: 350.px,
-                  height: 45.px,
-                  child: ParcotoTextBox(
-                    onChanged: (s) {
-                      if (s.isEmpty) {
-                        notEmpty = false;
-                        brandDataSource.search('');
-                      } else {
-                        notEmpty = true;
-                      }
-                      setState(() {});
-                    },
-                    controller: searchController,
-                    placeholder: 'search'.tr(),
-                    style: appTheme.writingStyle,
-                    cursorColor: appTheme.color.darker,
-                    placeholderStyle: placeStyle,
-                    prefix: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: Icon(FluentIcons.search, size: 14),
-                    ),
-                    onSubmitted: (s) {
-                      if (s.isNotEmpty) {
-                        brandDataSource.search(s);
-                        if (!notEmpty) {
-                          setState(() {
-                            notEmpty = true;
-                          });
-                        }
-                      } else {
-                        if (notEmpty) {
-                          setState(() {
-                            notEmpty = false;
-                          });
-                        }
-                      }
-                    },
-                    suffix: notEmpty
-                        ? IconButton(
-                            icon: const Icon(FluentIcons.cancel),
-                            onPressed: () {
-                              searchController.text = "";
-                              notEmpty = false;
-                              setState(() {});
-                              brandDataSource.search('');
-                            },
-                          )
-                        : null,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          header: null,
           sortAscending: assending,
           sortColumnIndex: sortColumn,
           columns: columns,
