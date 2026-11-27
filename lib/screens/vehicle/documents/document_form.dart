@@ -1,20 +1,36 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 
+import '../../../main.dart' show vehicleServices;
 import '../../../providers/client_database.dart';
+import '../../../providers/vehicle_provider.dart';
 import '../../../serializables/vehicle/document_vehicle.dart';
 import '../../../serializables/vehicle/vehicle.dart';
 import '../../../theme.dart';
-import '../../../widgets/zone_box.dart';
 import '../manager/vehicles_table.dart';
+
+const String _vehicleDocumentBucketId = 'images';
+const int _maxVehicleDocumentBytes = 15000000;
+
+const Map<String, String> _vehicleDocumentTypes = {
+  'registration_card': 'vehicle_doc_type_registration_card',
+  'insurance': 'vehicle_doc_type_insurance',
+  'technical_inspection': 'vehicle_doc_type_technical_inspection',
+  'invoice': 'vehicle_doc_type_invoice',
+  'maintenance': 'vehicle_doc_type_maintenance',
+  'authorization': 'vehicle_doc_type_authorization',
+  'reception_sheet': 'vehicle_doc_type_reception_sheet',
+  'other': 'vehicle_doc_type_other',
+};
 
 Size _responsiveDocumentSelectorSize(BuildContext context) {
   final screenSize = MediaQuery.sizeOf(context);
   return Size(
-    (screenSize.width - 32).clamp(0.0, 700.0).toDouble(),
-    (screenSize.height - 80).clamp(0.0, 550.0).toDouble(),
+    (screenSize.width - 32).clamp(280.0, 700.0).toDouble(),
+    (screenSize.height - 80).clamp(320.0, 550.0).toDouble(),
   );
 }
 
@@ -28,333 +44,679 @@ class DocumentForm extends StatefulWidget {
   DocumentFormState createState() => DocumentFormState();
 }
 
-class DocumentFormState extends State<DocumentForm>
-    with AutomaticKeepAliveClientMixin<DocumentForm> {
-  DateTime? selectedDate;
-  TextEditingController nom = TextEditingController();
+class DocumentFormState extends State<DocumentForm> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
 
-  Vehicle? selectedVehicle;
+  DateTime? _issueDate;
+  DateTime? _expiryDate;
+  String _documentType = 'other';
+  Vehicle? _selectedVehicle;
+  PlatformFile? _pendingFile;
+  String? _documentId;
+  bool _removeExistingFile = false;
+  bool _loadingVehicle = false;
+  bool _pickingFile = false;
+  bool _saving = false;
+  bool _changes = false;
 
-  String? documentID;
+  String? get _existingFileId =>
+      widget.vd?.fileId?.trim().isNotEmpty == true
+          ? widget.vd!.fileId
+          : null;
 
-  bool loadingVehicle = false;
+  String? get _currentVehicleId =>
+      _selectedVehicle?.id ?? widget.vd?.vehicle ?? widget.vehicle?.id;
+
+  String? get _currentVehicleRegistration =>
+      _selectedVehicle?.matricule ??
+      widget.vehicle?.matricule ??
+      widget.vd?.vehiclemat;
 
   @override
   void initState() {
-    initValues();
     super.initState();
-  }
-
-  void initValues() {
+    _documentId = widget.vd?.id ?? ID.unique();
+    _selectedVehicle = widget.vehicle;
     if (widget.vd != null) {
-      nom.text = widget.vd!.nom;
-      documentID = widget.vd!.id;
-      selectedDate = widget.vd!.dateExpiration;
-      if (widget.vd!.vehicle != null) {
-        downloadVehicle(widget.vd!.vehicle!);
+      final document = widget.vd!;
+      _nameController.text = document.nom;
+      _notesController.text = document.notes ?? '';
+      _documentType = _vehicleDocumentTypes.containsKey(document.documentType)
+          ? document.documentType!
+          : 'other';
+      _issueDate = document.issueDate;
+      _expiryDate = document.dateExpiration;
+      if (document.vehicle != null) {
+        _loadLinkedVehicle(document.vehicle!);
       }
-    } else if (widget.vehicle != null) {
-      selectedVehicle = widget.vehicle;
-    }
-    documentID ??= DateTime.now()
-        .difference(DatabaseGetter.ref)
-        .inMilliseconds
-        .toString();
-  }
-
-  void downloadVehicle(String id) async {
-    loadingVehicle = true;
-    await DatabaseGetter.database!
-        .getRow(databaseId: databaseId, tableId: vehiculeid, rowId: id)
-        .then((value) {
-          if (value.data.isNotEmpty) {
-            selectedVehicle = value.convertTo((p0) => Vehicle.fromJson(p0));
-          }
-        });
-    if (mounted) {
-      setState(() {
-        loadingVehicle = false;
-      });
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    var appTheme = context.watch<AppTheme>();
-    final screenSize = MediaQuery.sizeOf(context);
-    final formWidth = (screenSize.width - 32).clamp(0.0, 420.0).toDouble();
-    final compact = screenSize.width < 640;
-    // Keep the form's internal geometry stable. On mobile, the scroll
-    // viewport shrinks when the virtual keyboard opens; the fields must not.
-    final formHeight = compact
-        ? 500.0
-        : (screenSize.height - 100).clamp(320.0, 500.0).toDouble();
-    final panelHeight = compact
-        ? 300.0
-        : (formHeight - 80).clamp(240.0, 300.0).toDouble();
-    final content = SizedBox(
-      width: formWidth,
-      height: formHeight,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: appTheme.backGroundColor,
-              boxShadow: kElevationToShadow[2],
-              borderRadius: BorderRadius.circular(10),
+  void dispose() {
+    _nameController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadLinkedVehicle(String vehicleId) async {
+    setState(() => _loadingVehicle = true);
+    try {
+      final row = await DatabaseGetter().getDocument(vehiculeid, vehicleId);
+      if (!mounted) return;
+      if (row != null) {
+        setState(() {
+          _selectedVehicle = row.convertTo(
+            (data) => Vehicle.fromJson(data),
+          );
+        });
+      }
+    } catch (error) {
+      debugPrint('[Vehicle documents] linked vehicle lookup failed: $error');
+    } finally {
+      if (mounted) setState(() => _loadingVehicle = false);
+    }
+  }
+
+  void _refreshChanges() {
+    final original = widget.vd;
+    final changed = original == null
+        ? _nameController.text.trim().isNotEmpty ||
+            _currentVehicleId != null ||
+            _pendingFile != null ||
+            _issueDate != null ||
+            _expiryDate != null ||
+            _notesController.text.trim().isNotEmpty ||
+            _documentType != 'other'
+        : _nameController.text.trim() != original.nom ||
+            _currentVehicleId != original.vehicle ||
+            _documentType != (original.documentType ?? 'other') ||
+            _issueDate != original.issueDate ||
+            _expiryDate != original.dateExpiration ||
+            _notesController.text.trim() != (original.notes ?? '') ||
+            _pendingFile != null ||
+            _removeExistingFile;
+
+    if (_changes != changed && mounted) {
+      setState(() => _changes = changed);
+    }
+  }
+
+  String _mimeTypeFor(String fileName) {
+    final extension = fileName.split('.').last.toLowerCase();
+    switch (extension) {
+      case 'pdf':
+        return 'application/pdf';
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'webp':
+        return 'image/webp';
+      default:
+        return 'application/octet-stream';
+    }
+  }
+
+  String _formatFileSize(int? bytes) {
+    if (bytes == null || bytes <= 0) return '';
+    if (bytes < 1024 * 1024) {
+      return (bytes / 1024).toStringAsFixed(0) + ' Ko';
+    }
+    return (bytes / (1024 * 1024)).toStringAsFixed(1) + ' Mo';
+  }
+
+  List<String> _filePermissions(String teamId) => [
+        'read("team:$teamId")',
+        'update("team:$teamId/admin")',
+        'update("team:$teamId/manager")',
+        'delete("team:$teamId/admin")',
+      ];
+
+  Future<void> _pickAttachment() async {
+    if (_pickingFile || _saving) return;
+    setState(() => _pickingFile = true);
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: const ['pdf', 'jpg', 'jpeg', 'png', 'webp'],
+        withData: true,
+        allowMultiple: false,
+      );
+      if (!mounted || result == null || result.files.isEmpty) return;
+
+      final file = result.files.single;
+      final bytes = file.bytes;
+      if (bytes == null || bytes.isEmpty) {
+        throw StateError('Le fichier sélectionné ne peut pas être lu.');
+      }
+      if (bytes.length > _maxVehicleDocumentBytes) {
+        throw StateError('La pièce jointe ne doit pas dépasser 15 Mo.');
+      }
+
+      setState(() {
+        _pendingFile = file;
+        _removeExistingFile = false;
+      });
+      _refreshChanges();
+    } catch (error) {
+      if (mounted) {
+        _showMessage(
+          error.toString().replaceFirst('Bad state: ', ''),
+          isError: true,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _pickingFile = false);
+    }
+  }
+
+  void _removeAttachment() {
+    if (_pendingFile != null) {
+      setState(() => _pendingFile = null);
+    } else if (_existingFileId != null) {
+      setState(() => _removeExistingFile = true);
+    }
+    _refreshChanges();
+  }
+
+  Future<Map<String, dynamic>> _uploadPendingFile() async {
+    final selected = _pendingFile;
+    if (selected == null) {
+      throw StateError('Aucun fichier à téléverser.');
+    }
+    final bytes = selected.bytes;
+    if (bytes == null || bytes.isEmpty) {
+      throw StateError('Le contenu de la pièce jointe est vide.');
+    }
+
+    final client = DatabaseGetter.client;
+    final teamId = vehicleServices.teamId;
+    if (client == null) {
+      throw StateError('La connexion Appwrite n’est pas initialisée.');
+    }
+    if (teamId == null || teamId.trim().isEmpty) {
+      throw StateError(
+        'L’équipe de l’entreprise n’est pas disponible. Le fichier ne sera pas téléversé sans permissions privées.',
+      );
+    }
+
+    final extension = selected.name.split('.').last.toLowerCase();
+    if (!const ['pdf', 'jpg', 'jpeg', 'png', 'webp'].contains(extension)) {
+      throw StateError('Format de fichier non autorisé.');
+    }
+
+    final fileId = ID.unique();
+    final safeName = _documentId! + '_' + fileId + '.' + extension;
+    final uploaded = await Storage(client).createFile(
+      bucketId: _vehicleDocumentBucketId,
+      fileId: fileId,
+      file: InputFile.fromBytes(
+        bytes: bytes,
+        filename: safeName,
+      ),
+      permissions: _filePermissions(teamId),
+    );
+
+    return {
+      'fileId': uploaded.$id,
+      'fileName': selected.name,
+      'mimeType': _mimeTypeFor(selected.name),
+      'fileSize': bytes.length,
+    };
+  }
+
+  Future<void> _deleteStoredFile(String? fileId) async {
+    if (fileId == null || fileId.trim().isEmpty) return;
+    final client = DatabaseGetter.client;
+    if (client == null) return;
+    try {
+      await Storage(client).deleteFile(
+        bucketId: _vehicleDocumentBucketId,
+        fileId: fileId,
+      );
+    } catch (error) {
+      debugPrint('[Vehicle documents] old attachment cleanup failed: $error');
+    }
+  }
+
+  Future<void> _downloadExistingFile() async {
+    final fileId = _existingFileId;
+    final client = DatabaseGetter.client;
+    if (fileId == null || client == null) return;
+
+    try {
+      final bytes = await Storage(client).getFileDownload(
+        bucketId: _vehicleDocumentBucketId,
+        fileId: fileId,
+      );
+      final fileName = widget.vd?.fileName ?? 'document-' + fileId;
+      await FilePicker.platform.saveFile(
+        dialogTitle: 'Enregistrer le document',
+        fileName: fileName,
+        bytes: bytes,
+      );
+    } catch (error) {
+      if (mounted) {
+        _showMessage('Téléchargement impossible : $error', isError: true);
+      }
+    }
+  }
+
+  Future<void> _selectVehicle() async {
+    if (_loadingVehicle ||
+        _saving ||
+        widget.vehicle != null ||
+        widget.vd?.vehicle != null) {
+      return;
+    }
+    final selected = await showDialog<Vehicle>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => ContentDialog(
+        constraints: BoxConstraints.tight(
+          _responsiveDocumentSelectorSize(dialogContext),
+        ),
+        title: const Text('selectvehicle').tr(),
+        content: const VehicleTable(selectV: true),
+        actions: [
+          Button(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('fermer').tr(),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || selected == null) return;
+    setState(() => _selectedVehicle = selected);
+    _refreshChanges();
+  }
+
+  void _showMessage(String message, {bool isError = false}) {
+    displayInfoBar(
+      context,
+      builder: (context, close) => InfoBar(
+        title: Text(message),
+        severity: isError ? InfoBarSeverity.error : InfoBarSeverity.success,
+      ),
+      duration: snackbarShortDuration,
+    );
+  }
+
+  Future<void> _confirm() async {
+    if (_saving) return;
+    final name = _nameController.text.trim();
+    final vehicleId = _currentVehicleId;
+    if (name.isEmpty) {
+      _showMessage('Le nom du document est obligatoire.', isError: true);
+      return;
+    }
+    if (vehicleId == null || vehicleId.isEmpty) {
+      _showMessage('Associez ce document à un véhicule.', isError: true);
+      return;
+    }
+    if (_issueDate != null &&
+        _expiryDate != null &&
+        _expiryDate!.isBefore(_issueDate!)) {
+      _showMessage(
+        'La date d’expiration ne peut pas précéder la date d’émission.',
+        isError: true,
+      );
+      return;
+    }
+    if (!_changes && _pendingFile == null && !_removeExistingFile) return;
+
+    setState(() => _saving = true);
+    String? newlyUploadedFileId;
+    try {
+      final oldFileId = _existingFileId;
+      Map<String, dynamic>? uploadedMetadata;
+      if (_pendingFile != null) {
+        uploadedMetadata = await _uploadPendingFile();
+        newlyUploadedFileId = uploadedMetadata['fileId']?.toString();
+      }
+
+      final keepExisting = uploadedMetadata == null && !_removeExistingFile;
+      final document = DocumentVehicle(
+        id: _documentId!,
+        nom: name,
+        vehicle: vehicleId,
+        vehiclemat: _currentVehicleRegistration,
+        dateExpiration: _expiryDate,
+        createdBy: widget.vd?.createdBy ?? DatabaseGetter.me.value?.id,
+        documentType: _documentType,
+        fileId: uploadedMetadata?['fileId']?.toString() ??
+            (keepExisting ? oldFileId : null),
+        fileName: uploadedMetadata?['fileName']?.toString() ??
+            (keepExisting ? widget.vd?.fileName : null),
+        mimeType: uploadedMetadata?['mimeType']?.toString() ??
+            (keepExisting ? widget.vd?.mimeType : null),
+        fileSize: uploadedMetadata?['fileSize'] as int? ??
+            (keepExisting ? widget.vd?.fileSize : null),
+        issueDate: _issueDate,
+        notes: _notesController.text.trim().isEmpty
+            ? null
+            : _notesController.text.trim(),
+      );
+
+      try {
+        if (widget.vd != null) {
+          await DatabaseGetter().updateDocument(
+            collectionId: vehicDoc,
+            documentId: _documentId!,
+            data: document.toJson(),
+          );
+        } else {
+          await DatabaseGetter().addDocument(
+            collectionId: vehicDoc,
+            documentId: _documentId!,
+            data: document.toJson(),
+          );
+        }
+      } catch (_) {
+        if (newlyUploadedFileId != null) {
+          await _deleteStoredFile(newlyUploadedFileId);
+        }
+        rethrow;
+      }
+
+      final replaced = oldFileId != null &&
+          oldFileId != document.fileId &&
+          (uploadedMetadata != null || _removeExistingFile);
+      if (replaced) await _deleteStoredFile(oldFileId);
+
+      try {
+        await DatabaseGetter().ajoutActivity(
+          widget.vd != null ? 8 : 7,
+          _documentId!,
+          docName: document.nom,
+        );
+      } catch (error) {
+        debugPrint('[Vehicle documents] activity write failed: $error');
+      }
+
+      try {
+        await context.read<VehicleProvider>().refreshDocuments();
+      } catch (error) {
+        debugPrint('[Vehicle documents] refresh after save failed: $error');
+      }
+
+      if (!mounted) return;
+      setState(() {
+        _pendingFile = null;
+        _removeExistingFile = false;
+        _changes = false;
+      });
+      _showMessage('Document enregistré.');
+      if (widget.vehicle != null) {
+        await Future.delayed(const Duration(milliseconds: 150));
+        if (mounted) Navigator.of(context).pop();
+      }
+    } catch (error) {
+      if (mounted) {
+        _showMessage(
+          error.toString().replaceFirst('Bad state: ', ''),
+          isError: true,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Widget _fieldLabel(String label, Widget child) {
+    final appTheme = context.watch<AppTheme>();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Text(
+            label,
+            style: appTheme.writingStyle.copyWith(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: appTheme.mutedTextColor,
             ),
-            padding: const EdgeInsets.all(5),
-            width: formWidth,
-            height: panelHeight,
+          ),
+        ),
+        child,
+      ],
+    );
+  }
+
+  Widget _vehicleSelector(AppTheme appTheme) {
+    final registration = _currentVehicleRegistration;
+    return Button(
+      onPressed: widget.vehicle != null || widget.vd?.vehicle != null
+          ? null
+          : _selectVehicle,
+      child: Row(
+        children: [
+          const Icon(FluentIcons.car, size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              _loadingVehicle
+                  ? 'Chargement du véhicule…'
+                  : (registration?.isNotEmpty == true
+                      ? registration!
+                      : 'Sélectionner un véhicule'),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          if (widget.vehicle == null && widget.vd?.vehicle == null)
+            const Icon(FluentIcons.chevron_down, size: 12),
+        ],
+      ),
+    );
+  }
+
+  Widget _attachmentField(AppTheme appTheme) {
+    final selected = _pendingFile;
+    final currentFileName = widget.vd?.fileName;
+    final hasExisting = _existingFileId != null && !_removeExistingFile;
+
+    if (selected == null && !hasExisting) {
+      return Button(
+        onPressed: _pickingFile || _saving ? null : _pickAttachment,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_pickingFile)
+              const ProgressRing(strokeWidth: 2)
+            else
+              const Icon(FluentIcons.attach, size: 15),
+            const SizedBox(width: 8),
+            Text(
+              _pickingFile
+                  ? 'Lecture du fichier…'
+                  : 'Joindre un PDF ou une image',
+            ),
+          ],
+        ),
+      );
+    }
+
+    final fileName = selected?.name ?? currentFileName ?? 'Document attaché';
+    final size = selected?.size ?? widget.vd?.fileSize;
+    final isPdf = fileName.toLowerCase().endsWith('.pdf');
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: appTheme.fillColor,
+        border: Border.all(color: appTheme.borderColor),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(isPdf ? FluentIcons.pdf : FluentIcons.picture, size: 20),
+          const SizedBox(width: 9),
+          Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Flexible(
-                  child: ZoneBox(
-                    label: 'vehicule'.tr(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: ListTile(
-                        title: Text(
-                          selectedVehicle?.matricule ??
-                              widget.vehicle?.matricule ??
-                              widget.vd?.vehiclemat ??
-                              '/',
-                        ),
-                        onPressed:
-                            widget.vehicle != null ||
-                                loadingVehicle ||
-                                widget.vd?.vehicle != null
-                            ? null
-                            : () async {
-                                selectedVehicle = await showDialog<Vehicle>(
-                                  context: context,
-                                  barrierDismissible: true,
-                                  builder: (context) {
-                                    return ContentDialog(
-                                      constraints: BoxConstraints.tight(
-                                        _responsiveDocumentSelectorSize(context),
-                                      ),
-                                      title: const Text('selectvehicle').tr(),
-                                      style: ContentDialogThemeData(
-                                        titleStyle: appTheme.writingStyle
-                                            .copyWith(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                      ),
-                                      content: const VehicleTable(
-                                        selectV: true,
-                                      ),
-                                      actions: [
-                                        Button(
-                                          child: const Text('fermer').tr(),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                                setState(() {});
-                                checkForChanges();
-                              },
-                      ),
-                    ),
+                Text(
+                  fileName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: appTheme.writingStyle.copyWith(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                bigSpace,
-                Flexible(
-                  child: ZoneBox(
-                    label: 'nom'.tr(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: ParcotoTextBox(
-                        controller: nom,
-                        style: appTheme.writingStyle,
-                        cursorColor: appTheme.color.darker,
-                        placeholderStyle: placeStyle,
-                        placeholder: 'nom'.tr(),
-                        onChanged: (s) {
-                          checkForChanges();
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                bigSpace,
-                Flexible(
-                  child: ZoneBox(
-                    label: 'dateexp'.tr(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: ParcotoFieldSurface(child: DatePicker(
-                        selected: selectedDate,
-                        onChanged: (d) {
-                          setState(() {
-                            selectedDate = d;
-                          });
-                          checkForChanges();
-                        },
-                      )),
-                    ),
+                Text(
+                  [
+                    if (size != null) _formatFileSize(size),
+                    if (selected != null) 'En attente d’enregistrement',
+                    if (selected == null) 'Déjà enregistré',
+                  ].join(' • '),
+                  style: appTheme.writingStyle.copyWith(
+                    fontSize: 10,
+                    color: appTheme.mutedTextColor,
                   ),
                 ),
               ],
             ),
           ),
-          bigSpace,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              FilledButton(
-                onPressed: changes ? () => confirm(appTheme) : null,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 5,
-                  ),
-                  child: uploading
-                      ? const ProgressRing()
-                      : const Text('confirmer').tr(),
-                ),
-              ),
-            ],
+          if (selected == null && hasExisting)
+            IconButton(
+              icon: const Icon(FluentIcons.download, size: 15),
+              onPressed: _saving ? null : _downloadExistingFile,
+            ),
+          IconButton(
+            icon: const Icon(FluentIcons.delete, size: 15),
+            onPressed: _saving ? null : _removeAttachment,
           ),
+          if (selected == null && hasExisting)
+            IconButton(
+              icon: const Icon(FluentIcons.replace, size: 15),
+              onPressed: _saving ? null : _pickAttachment,
+            ),
         ],
       ),
     );
-    return compact
-        ? SingleChildScrollView(
-            padding: const EdgeInsets.all(8),
-            child: content,
-          )
-        : content;
   }
 
   @override
-  bool get wantKeepAlive => true;
+  Widget build(BuildContext context) {
+    final appTheme = context.watch<AppTheme>();
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final compact = screenWidth < 640;
+    final width = screenWidth < 720
+        ? (screenWidth - 32).clamp(260.0, 520.0).toDouble()
+        : 520.0;
 
-  bool changes = false;
-  bool uploading = false;
-
-  void checkForChanges() {
-    if (widget.vd != null) {
-      if (nom.text.isNotEmpty && nom.text != widget.vd!.nom) {
-        if (!changes) {
-          setState(() {
-            changes = true;
-          });
-        }
-        return;
-      }
-      if (selectedVehicle != null) {
-        if (!changes) {
-          setState(() {
-            changes = true;
-          });
-        }
-        return;
-      }
-      if (selectedDate != widget.vd?.dateExpiration) {
-        if (!changes) {
-          setState(() {
-            changes = true;
-          });
-        }
-        return;
-      }
-    } else {
-      if (nom.text.isNotEmpty) {
-        if (!changes) {
-          setState(() {
-            changes = true;
-          });
-          return;
-        }
-      }
-    }
-  }
-
-  void confirm(AppTheme appTheme) async {
-    checkForChanges();
-    if (changes) {
-      setState(() {
-        uploading = true;
-      });
-
-      DocumentVehicle dv = DocumentVehicle(
-        id: documentID!,
-        nom: nom.text,
-        vehicle: selectedVehicle?.id,
-        vehiclemat: selectedVehicle?.matricule,
-        dateExpiration: selectedDate,
-        createdBy: DatabaseGetter.me.value?.id,
-      );
-      if (widget.vd != null) {
-        await DatabaseGetter().updateDocument(
-          collectionId: vehicDoc,
-          documentId: documentID!,
-          data: dv.toJson(),
-        );
-        DatabaseGetter().ajoutActivity(
-          8,
-          documentID!,
-          docName: selectedVehicle?.matricule,
-        );
-      } else {
-        await DatabaseGetter().addDocument(
-          collectionId: vehicDoc,
-          documentId: documentID!,
-          data: dv.toJson(),
-        );
-        DatabaseGetter().ajoutActivity(
-          7,
-          documentID!,
-          docName: selectedVehicle?.matricule,
-        );
-      }
-
-      setState(() {
-        changes = false;
-        uploading = false;
-      });
-
-      Future.delayed(Duration.zero).whenComplete(() {
-        if (mounted) {
-          displayInfoBar(
-            context,
-            builder: (BuildContext context, void Function() close) {
-              return InfoBar(
-                title: const Text('done').tr(),
-                severity: InfoBarSeverity.success,
-                style: InfoBarThemeData(
-                  iconColor: (c) {
-                    switch (c) {
-                      case InfoBarSeverity.success:
-                        return appTheme.color.lightest;
-                      case InfoBarSeverity.error:
-                        return appTheme.color.darkest;
-                      case InfoBarSeverity.info:
-                        return appTheme.color;
-                      default:
-                        return appTheme.color;
-                    }
-                  },
+    final content = Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: width),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _fieldLabel('Véhicule', _vehicleSelector(appTheme)),
+            const SizedBox(height: 14),
+            _fieldLabel(
+              'Type de document',
+              ComboBox<String>(
+                value: _documentType,
+                isExpanded: true,
+                items: _vehicleDocumentTypes.entries
+                    .map(
+                      (entry) => ComboBoxItem<String>(
+                        value: entry.key,
+                        child: Text(entry.value.tr()),
+                      ),
+                    )
+                    .toList(growable: false),
+                onChanged: _saving
+                    ? null
+                    : (value) {
+                        if (value == null) return;
+                        setState(() => _documentType = value);
+                        _refreshChanges();
+                      },
+              ),
+            ),
+            const SizedBox(height: 14),
+            _fieldLabel(
+              'Nom / désignation',
+              TextBox(
+                controller: _nameController,
+                enabled: !_saving,
+                placeholder: 'Ex. : Assurance 2026, carte grise…',
+                onChanged: (_) => _refreshChanges(),
+              ),
+            ),
+            const SizedBox(height: 14),
+            _fieldLabel(
+              'Date d’émission',
+              DatePicker(
+                selected: _issueDate,
+                onChanged: _saving
+                    ? null
+                    : (value) {
+                        setState(() => _issueDate = value);
+                        _refreshChanges();
+                      },
+              ),
+            ),
+            const SizedBox(height: 14),
+            _fieldLabel(
+              'Date d’expiration',
+              DatePicker(
+                selected: _expiryDate,
+                onChanged: _saving
+                    ? null
+                    : (value) {
+                        setState(() => _expiryDate = value);
+                        _refreshChanges();
+                      },
+              ),
+            ),
+            const SizedBox(height: 14),
+            _fieldLabel('Pièce jointe', _attachmentField(appTheme)),
+            const SizedBox(height: 14),
+            _fieldLabel(
+              'Notes internes',
+              TextBox(
+                controller: _notesController,
+                enabled: !_saving,
+                placeholder: 'Informations complémentaires…',
+                maxLines: 3,
+                onChanged: (_) => _refreshChanges(),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                FilledButton(
+                  onPressed: _changes && !_saving && !_pickingFile
+                      ? _confirm
+                      : null,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 7,
+                    ),
+                    child: _saving
+                        ? const ProgressRing(strokeWidth: 2)
+                        : Text('confirmer'.tr()),
+                  ),
                 ),
-              );
-            },
-            duration: snackbarShortDuration,
-          );
-        }
-        Future.delayed(snackbarShortDuration).whenComplete(() {
-          if (widget.vehicle != null && mounted) {
-            Navigator.pop(context);
-          } else {}
-        });
-      });
-    }
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(compact ? 10 : 16),
+      child: content,
+    );
   }
 }
