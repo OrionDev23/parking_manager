@@ -19,11 +19,13 @@ class CompanyWorkspaceSwitcher extends StatefulWidget {
   static final Map<String, String> companyNamesById = {};
 
   final bool compact;
+  final bool iconOnly;
   final VoidCallback? onCompanyChanged;
 
   const CompanyWorkspaceSwitcher({
     super.key,
     this.compact = false,
+    this.iconOnly = false,
     this.onCompanyChanged,
   });
 
@@ -421,6 +423,28 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
     final platformHome = session?.isPlatformSuperAdmin == true &&
         session?.isPlatformCompanyContext != true;
     final interactive = session != null;
+
+    if (widget.iconOnly) {
+      return Tooltip(
+        message: _companyLabel,
+        child: IconButton(
+          icon: _loading
+              ? const SizedBox(
+                  width: 15,
+                  height: 15,
+                  child: ProgressRing(),
+                )
+              : Icon(
+                  platformHome
+                      ? FluentIcons.shield
+                      : FluentIcons.company_directory,
+                  color: theme.color,
+                  size: 19,
+                ),
+          onPressed: interactive && !_loading ? _openSwitcher : null,
+        ),
+      );
+    }
 
     return Tooltip(
       message: interactive
