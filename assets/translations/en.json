@@ -900,5 +900,7 @@
   "vehicle_field_transmission": "Transmission",
   "vehicle_field_usage_type": "Type of use",
   "vehicle_details_unavailable": "Unavailable",
-  "vehicle_details_loading": "Loading…"
+  "vehicle_details_loading": "Loading…",
+  "vehicle_algerian_homologation_group": "Algerian registration and homologation data",
+  "vehicle_algerian_homologation_description": "Algerian registration-card information, kept separate from manufacturer specifications."
 }
