@@ -238,14 +238,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             child: SingleChildScrollView(
               controller: _contentScrollController,
               padding: EdgeInsets.fromLTRB(
-                compact ? 12 : 22,
-                18,
-                compact ? 12 : 22,
-                28,
+                compact ? 12 : 16,
+                compact ? 14 : 14,
+                compact ? 12 : 16,
+                24,
               ),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1440),
+                  constraints: const BoxConstraints(maxWidth: 1800),
                   child: _content(accent),
                 ),
               ),
@@ -587,8 +587,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
   Widget _vehicleAvatar(Color accent, {required bool compact}) {
     final imageUrl = v.imageUrl?.trim();
-    final width = compact ? double.infinity : 198.0;
-    final height = compact ? 174.0 : 142.0;
+    // Desktop identity data deserves more space than the vehicle thumbnail.
+    final width = compact ? double.infinity : 132.0;
+    final height = compact ? 150.0 : 96.0;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
@@ -603,7 +604,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         child: imageUrl != null && imageUrl.isNotEmpty
             ? Image.network(
                 imageUrl,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
                 errorBuilder: (_, _, _) =>
                     Icon(FluentIcons.car, size: 36, color: accent),
               )
