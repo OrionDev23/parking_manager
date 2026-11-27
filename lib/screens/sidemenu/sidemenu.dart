@@ -332,17 +332,17 @@ class PanesListState extends State<PanesList>
                               ? ParcotoTokens.space3
                               : ParcotoTokens.space5,
                         ),
-                        color: widget.appTheme.mode == ThemeMode.dark
-                            ? const Color(0xFF493515)
-                            : const Color(0xFFFFF1D6),
+                        color: widget.appTheme.color.withValues(
+                          alpha: widget.appTheme.mode == ThemeMode.dark
+                              ? .18
+                              : .10,
+                        ),
                         child: Row(
                           children: [
                             Icon(
                               FluentIcons.shield,
                               size: compact ? 14 : 16,
-                              color: widget.appTheme.mode == ThemeMode.dark
-                                  ? const Color(0xFFFFD27A)
-                                  : const Color(0xFF8A5700),
+                              color: widget.appTheme.color,
                             ),
                             const SizedBox(width: ParcotoTokens.space2),
                             Expanded(
@@ -355,9 +355,7 @@ class PanesListState extends State<PanesList>
                                 style: TextStyle(
                                   fontSize: compact ? 10 : 12,
                                   fontWeight: FontWeight.w600,
-                                  color: widget.appTheme.mode == ThemeMode.dark
-                                      ? const Color(0xFFFFD27A)
-                                      : const Color(0xFF704600),
+                                  color: widget.appTheme.textColor,
                                 ),
                               ),
                             ),
