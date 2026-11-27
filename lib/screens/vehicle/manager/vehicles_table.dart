@@ -68,7 +68,6 @@ class VehicleTableState extends State<VehicleTable> {
           filters: filters,
         );
       } else {
-        searchController.text = filterVehicule.value!;
         vehicleDataSource = VehiculeDataSource(
           current: context,
           selectC: widget.selectV,
@@ -400,10 +399,6 @@ class VehicleTableState extends State<VehicleTable> {
   final rowPerPageC = 12;
   int rowPerPage = 12;
 
-  TextEditingController searchController = TextEditingController();
-
-  bool notEmpty = false;
-
   FlyoutController filterFlyout = FlyoutController();
   String? marque;
   int? genre;
@@ -431,9 +426,8 @@ class VehicleTableState extends State<VehicleTable> {
           valueListenable: filterVehicule,
           builder: (context, v, _) {
             if (!startedWithFiltersOn && filterNow && v != null) {
-              searchController.text = v;
               vehicleDataSource.search(v);
-              notEmpty = true;
+
               filtered = true;
               filterNow = false;
             }
@@ -441,13 +435,6 @@ class VehicleTableState extends State<VehicleTable> {
               horizontalScroll: true,
               header: LayoutBuilder(
                 builder: (context, constraints) {
-                  final compactToolbar = constraints.maxWidth < 760;
-                  final searchWidth = compactToolbar
-                      ? (constraints.maxWidth - 48)
-                          .clamp(180.0, 320.0)
-                          .toDouble()
-                      : 300.0;
-
                   return Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
@@ -553,44 +540,6 @@ class VehicleTableState extends State<VehicleTable> {
                             const Text('export').tr(),
                           ],
                         ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: searchWidth,
-                      height: 38,
-                      child: ParcotoTextBox(
-                        controller: searchController,
-                        placeholder: 'search'.tr(),
-                        style: appTheme.writingStyle,
-                        cursorColor: appTheme.color.darker,
-                        placeholderStyle: placeStyle,
-                onSubmitted: (s) {
-                          final query = s.trim();
-                          vehicleDataSource.search(query);
-                          setState(() {
-                            notEmpty = query.isNotEmpty;
-                          });
-                        },
-                        onChanged: (s) {
-                          if (s.isEmpty) {
-                            notEmpty = false;
-                            vehicleDataSource.search('');
-                          } else {
-                            notEmpty = true;
-                          }
-                          setState(() {});
-                        },
-                        suffix: notEmpty
-                            ? IconButton(
-                                icon: const Icon(FluentIcons.cancel),
-                                onPressed: () {
-                                  searchController.clear();
-                                  notEmpty = false;
-                                  vehicleDataSource.search('');
-                                  setState(() {});
-                                },
-                              )
-                            : const Icon(FluentIcons.search),
                       ),
                     ),
                     Tooltip(
