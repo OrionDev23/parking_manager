@@ -9,7 +9,6 @@ import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
 import 'package:parc_oto/screens/sidemenu/global_search.dart';
 import 'package:parc_oto/screens/sidemenu/parcoto_navigation_shell.dart';
-import 'package:parc_oto/screens/sidemenu/company_workspace_switcher.dart';
 import 'package:parc_oto/ui/design_system/parcoto_tokens.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -199,7 +198,6 @@ class PanesListState extends State<PanesList>
                 index.value = i;
               },
               appTheme: widget.appTheme,
-              search: ContextualSearchLauncher(paneKey: activePaneKey),
               topBar: Container(
                 height: (compact
                         ? ParcotoTokens.mobileTopbarHeight
@@ -235,13 +233,12 @@ class PanesListState extends State<PanesList>
                             children: [
                               if (compact) ...[
                                 if (isSignedIn) ...[
-                                  const Expanded(
-                                    child: CompanyWorkspaceSwitcher(
-                                      compact: true,
-                                    ),
+                                  const Spacer(),
+                                  ContextualSearchLauncher(
+                                    paneKey: activePaneKey,
+                                    compact: true,
                                   ),
                                   const SizedBox(width: ParcotoTokens.space2),
-                                  ContextualSearchLauncher(paneKey: activePaneKey, compact: true),
                                 ] else ...[
                                   Image.asset(
                                     'assets/images/logo.webp',
@@ -252,14 +249,12 @@ class PanesListState extends State<PanesList>
                                   const Spacer(),
                                 ],
                               ] else if (isSignedIn) ...[
-                                const SizedBox(
-                                  width: 230,
-                                  child: CompanyWorkspaceSwitcher(),
+                                Expanded(
+                                  child: ContextualSearchLauncher(
+                                    paneKey: activePaneKey,
+                                  ),
                                 ),
                                 const SizedBox(width: ParcotoTokens.space4),
-                                 Expanded(
-                                  child: ContextualSearchLauncher(paneKey: activePaneKey),
-                                ),
                               ] else ...[
                                 Image.asset(
                                   'assets/images/logo.webp',
