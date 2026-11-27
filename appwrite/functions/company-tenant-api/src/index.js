@@ -2523,9 +2523,20 @@ async function decodeVehicleVin({ userId, input, log }) {
     return null;
   };
   const engineText = pick(autoDev?.engine, nhtsa?.EngineModel);
-  const displacementL = numberValue(nhtsa?.DisplacementL);
-  const powerHp = numberValue(nhtsa?.EngineHP);
-  const powerKw = numberValue(nhtsa?.EngineKW);
+  const engineDescription = String(engineText || '');
+  const displacementFromText = engineDescription.match(/(\\d+(?:\\.\\d+)?)\\s*L\\b/i);
+  const hpFromText = engineDescription.match(/(\\d+(?:\\.\\d+)?)\\s*(?:hp|bhp)\\b/i);
+  const kwFromText = engineDescription.match(/(\\d+(?:\\.\\d+)?)\\s*kW\\b/i);
+  const displacementL = numberValue(
+    nhtsa?.DisplacementL,
+    displacementFromText?.[1],
+  );
+  const rawPowerKw = numberValue(nhtsa?.EngineKW, kwFromText?.[1]);
+  const rawPowerHp = numberValue(nhtsa?.EngineHP, hpFromText?.[1]);
+  const powerHp = rawPowerHp ??
+    (rawPowerKw == null ? null : rawPowerKw * 1.34102209);
+  const powerKw = rawPowerKw ??
+    (rawPowerHp == null ? null : rawPowerHp * 0.745699872);
   const data = {
     make: pick(autoDev?.make, autoVehicle.make, nhtsa?.Make),
     model: pick(autoDev?.model, autoVehicle.model, nhtsa?.Model),
@@ -2561,6 +2572,7 @@ async function decodeVehicleVin({ userId, input, log }) {
     data,
     warnings: [
       ...(autoDev?.ambiguous ? ['Le VIN correspond à plusieurs finitions possibles.'] : []),
+      ...(autoDev?.reason ? [`Auto.dev : ${String(autoDev.reason)}`] : []),
       ...(nhtsa && String(nhtsa.ErrorCode || '0') !== '0'
         ? [String(nhtsa.ErrorText || 'Le décodeur NHTSA a signalé des champs incomplets.')]
         : []),
