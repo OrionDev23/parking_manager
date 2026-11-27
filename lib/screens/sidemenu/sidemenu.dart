@@ -300,6 +300,7 @@ class PanesListState extends State<PanesList>
                                   message: 'Notifications',
                                   child: NotifList(
                                     companyId: session!.company.companyId,
+                                    userId: session.userId,
                                   ),
                                 ),
                               if (!loading &&
