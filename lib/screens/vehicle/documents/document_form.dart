@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
@@ -53,7 +55,7 @@ class DocumentFormState extends State<DocumentForm> {
   String _documentType = 'other';
   Vehicle? _selectedVehicle;
   PlatformFile? _pendingFile;
-  List<int>? _pendingFileBytes;
+  Uint8List? _pendingFileBytes;
   String? _documentId;
   bool _removeExistingFile = false;
   bool _loadingVehicle = false;
