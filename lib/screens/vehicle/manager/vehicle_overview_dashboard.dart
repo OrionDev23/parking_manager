@@ -11,6 +11,14 @@ class VehicleOverviewDashboard extends StatelessWidget {
   final String statusLabel;
   final String? driverName;
   final int? documentsCount;
+  final List<({
+    String title,
+    String expiryLabel,
+    String statusLabel,
+    bool warning,
+    bool expired,
+  })> registeredDocuments;
+  final String? nearestDocumentLabel;
   final String? latestActivityLabel;
   final String? latestActivityDate;
   final String? latestActivityNote;
@@ -33,6 +41,8 @@ class VehicleOverviewDashboard extends StatelessWidget {
     required this.statusLabel,
     required this.driverName,
     required this.documentsCount,
+    this.registeredDocuments = const [],
+    this.nearestDocumentLabel,
     required this.latestActivityLabel,
     required this.latestActivityDate,
     required this.latestActivityNote,
