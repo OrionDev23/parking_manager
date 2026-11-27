@@ -53,6 +53,7 @@ class ReparationTableState extends State<ReparationTable> {
         searchKey: filterDocument.value,
       );
       filterDocument.value = null;
+        filterNow = false;
     } else {
       startedWithFiltersOn = false;
 
@@ -206,7 +207,7 @@ class ReparationTableState extends State<ReparationTable> {
     return ValueListenableBuilder(
       valueListenable: filterDocument,
       builder: (context, v, _) {
-        if (!startedWithFiltersOn && v != null && filterNow) {
+        if (v != null && filterNow) {
           searchController.text = v;
           reparationDataSource.search(v);
           notEmpty = true;
@@ -214,70 +215,7 @@ class ReparationTableState extends State<ReparationTable> {
           filterNow = false;
         }
         return DataTableParc(
-          header: LayoutBuilder(
-            builder: (context, constraints) {
-              final searchWidth = (constraints.maxWidth - 20)
-                  .clamp(140.0, 350.0)
-                  .toDouble();
-
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 5.0,
-                  horizontal: 10,
-                ),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: SizedBox(
-                    width: searchWidth,
-                    height: 45.px,
-                    child: ParcotoTextBox(
-                      onChanged: (s) {
-                        if (s.isEmpty) {
-                          notEmpty = false;
-                          reparationDataSource.search('');
-                        } else {
-                          notEmpty = true;
-                        }
-                        setState(() {});
-                      },
-                      controller: searchController,
-                      placeholder: 'search'.tr(),
-                      style: appTheme.writingStyle,
-                      cursorColor: appTheme.color.darker,
-                      placeholderStyle: placeStyle,
-                      onSubmitted: (s) {
-                        if (s.isNotEmpty) {
-                          reparationDataSource.search(s);
-                          if (!notEmpty) {
-                            setState(() {
-                              notEmpty = true;
-                            });
-                          }
-                        } else {
-                          if (notEmpty) {
-                            setState(() {
-                              notEmpty = false;
-                            });
-                          }
-                        }
-                      },
-                      suffix: notEmpty
-                          ? IconButton(
-                              icon: const Icon(FluentIcons.cancel),
-                              onPressed: () {
-                                searchController.text = "";
-                                notEmpty = false;
-                                setState(() {});
-                                reparationDataSource.search('');
-                              },
-                            )
-                          : null,
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
+          header: null,
           sortAscending: assending,
           sortColumnIndex: sortColumn,
           columns: columns,
