@@ -148,6 +148,7 @@ class PaneItemsAndFooters {
       ],
     );
     atelier = PaneItemExpander(
+      key: const ValueKey('atelier'),
       icon: Icon(
         Icons.home_repair_service_outlined,
         color: appTheme.color.lightest,
@@ -408,6 +409,51 @@ class PaneItemsAndFooters {
   /// Resolves a destination using the same selectable-item ordering as
   /// NavigationPane. Headers and separators are structural and do not occupy
   /// a selected index.
+  /// Returns the selected destination key using the exact same flattened
+  /// ordering as ParcotoNavigationShell. This is used by the global shell to
+  /// choose a search adapter for the currently visible screen.
+  static String? paneKeyForIndex(int selectedIndex) {
+    final selectableItems = <NavigationPaneItem>[];
+
+    void flatten(List<NavigationPaneItem> items) {
+      for (final item in items) {
+        if (item is PaneItemHeader || item is PaneItemSeparator) continue;
+        if (item is PaneItem || item is PaneItemExpander) {
+          selectableItems.add(item);
+          if (item is PaneItemExpander) flatten(item.items);
+        }
+      }
+    }
+
+    flatten(originalItems);
+    flatten(footerItems);
+    if (selectedIndex < 0 || selectedIndex >= selectableItems.length) {
+      return null;
+    }
+
+    final selected = selectableItems[selectedIndex];
+    final rawKey = selected.key;
+    final key = rawKey is ValueKey ? rawKey.value.toString() : null;
+    if (key == null || key.isEmpty) return null;
+
+    // The vehicle dashboard is a nested workspace. Its selected legacy
+    // section is more specific than the parent NavigationPane destination.
+    if (key == 'vehicles') {
+      switch (VehicleDashboard.selectedSection.value) {
+        case 1:
+          return 'vehicle-documents';
+        case 2:
+          return VehicleDashboard.selectedReference.value == 1
+              ? 'vehicle-states'
+              : 'vehicle-brands';
+        default:
+          return 'vehicle-manager';
+      }
+    }
+
+    return key;
+  }
+
   static int? indexForPaneKey(String value) {
     if (_isLegacyVehiclePaneKey(value)) value = 'vehicles';
     final mainIndex = _findPaneIndex(originalItems, value, 0);
