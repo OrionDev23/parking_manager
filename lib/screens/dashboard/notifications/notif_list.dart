@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:material_ui/material_ui.dart' show Badge, LinearProgressIndicator;
+import 'package:material_ui/material_ui.dart' show Badge;
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/driver_provider.dart';
 import 'package:parc_oto/providers/planning_provider.dart';
@@ -9,13 +9,17 @@ import 'package:parc_oto/serializables/conducteur/document_chauffeur.dart';
 import 'package:parc_oto/serializables/planning.dart';
 import 'package:parc_oto/serializables/vehicle/document_vehicle.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../serializables/notification.dart';
 import '../../../theme.dart';
-import '../../../widgets/on_tap_scale.dart';
 import 'notification_list_tile.dart';
 
+/// Company-scoped operational alerts derived from documents and planning.
+///
+/// Read/unread state is deliberately not inferred from the badge count:
+/// the current legacy source only provides actionable alerts, not persisted
+/// per-user read receipts. A user-scoped Appwrite notification-state store
+/// is required before we can accurately show shared unread counts.
 class NotifList extends StatefulWidget {
   final String? companyId;
 
@@ -27,12 +31,19 @@ class NotifList extends StatefulWidget {
 
 class NotifListState extends State<NotifList>
     with AutomaticKeepAliveClientMixin {
-  static ValueNotifier<int> changes = ValueNotifier(0);
-
+  static final ValueNotifier<int> changes = ValueNotifier<int>(0);
   static List<PNotification> tiles = [];
-
   static bool loaded = false;
   static String? _loadedCompanyId;
+
+  bool loading = false;
+  String? loadError;
+
+  List<Planning> plannings = [];
+  List<DocumentVehicle> docVehic = [];
+  List<DocumentChauffeur> docChauf = [];
+
+  DateTime get _throughDate => DateTime.now().add(const Duration(days: 60));
 
   @override
   void initState() {
@@ -46,150 +57,153 @@ class NotifListState extends State<NotifList>
     if (oldWidget.companyId != widget.companyId) {
       loaded = false;
       _loadedCompanyId = null;
-      tiles.clear();
+      tiles = [];
+      changes.value++;
       getNotifs();
     }
   }
 
   static void remove(String id) {
-    for (int i = 0; i < tiles.length; i++) {
-      if (tiles[i].id == id) {
-        tiles.removeAt(i);
-        break;
+    tiles.removeWhere((item) => item.id == id);
+  }
+
+  Future<void> getNotifs({bool force = false}) async {
+    final companyId = widget.companyId;
+    if (companyId == null || companyId.isEmpty) {
+      tiles = [];
+      loaded = false;
+      _loadedCompanyId = null;
+      loading = false;
+      if (mounted) setState(() {});
+      changes.value++;
+      return;
+    }
+
+    if (!force && loaded && _loadedCompanyId == companyId) return;
+    if (loading) return;
+
+    loading = true;
+    loadError = null;
+    if (mounted) setState(() {});
+    changes.value++;
+
+    try {
+      await Future.wait([
+        getVehicDocs(),
+        getPlanningDocs(),
+        getChaufDocs(),
+      ]);
+
+      if (!mounted) return;
+      if (widget.companyId != companyId ||
+          DatabaseGetter.activeCompanyId != companyId) {
+        return;
+      }
+
+      createNotifListFromLists();
+      _loadedCompanyId = companyId;
+      loaded = true;
+    } catch (error) {
+      if (!mounted ||
+          widget.companyId != companyId ||
+          DatabaseGetter.activeCompanyId != companyId) {
+        return;
+      }
+      loadError = error.toString();
+      loaded = false;
+    } finally {
+      if (mounted) {
+        loading = false;
+        setState(() {});
+        changes.value++;
       }
     }
   }
 
-  bool loading = false;
-
-  List<Planning> plannings = [];
-  List<DocumentVehicle> docVehic = [];
-  List<DocumentChauffeur> docChauf = [];
-
-  Future<void> getNotifs() async {
-    final companyId = widget.companyId;
-    if (companyId == null) {
-      tiles.clear();
-      loaded = false;
-      _loadedCompanyId = null;
-      return;
-    }
-    if (loaded && _loadedCompanyId == companyId) return;
-
-    loading = true;
-    loaded = false;
-    tiles.clear();
-    if (mounted) setState(() {});
-
-    await Future.wait([getVehicDocs(), getPlanningDocs(), getChaufDocs()]);
-    if (!mounted) return;
-    if (widget.companyId != companyId ||
-        DatabaseGetter.activeCompanyId != companyId) {
-      loading = false;
-      setState(() {});
-      return;
-    }
-
-    createNotifListFromLists();
-    _loadedCompanyId = companyId;
-    loaded = true;
-    loading = false;
-    setState(() {});
-  }
-
-  DateTime beforTime = DateTime.now().add(const Duration(days: 60));
-
   Future<void> getVehicDocs() async {
-    docVehic = await VehicleProvider().getDocumentsBeforeTime(beforTime);
+    docVehic = await VehicleProvider().getDocumentsBeforeTime(_throughDate);
   }
 
   Future<void> getChaufDocs() async {
-    docChauf = await DriverProvider().getConduDocumentsBeforeTime(beforTime);
+    docChauf =
+        await DriverProvider().getConduDocumentsBeforeTime(_throughDate);
   }
 
   Future<void> getPlanningDocs() async {
-    plannings = await PlanningProvider().getPlanningBeforeTime(beforTime);
+    plannings = await PlanningProvider().getPlanningBeforeTime(_throughDate);
   }
 
   void createNotifListFromLists() {
-    int i;
-    for (i = 0; i < docVehic.length; i++) {
-      tiles.add(
+    final next = <PNotification>[];
+
+    for (final document in docVehic) {
+      final expiry = document.dateExpiration;
+      if (expiry == null) continue;
+      next.add(
         PNotification(
-          id: docVehic[i].id,
-          title: docVehic[i].nom,
+          id: 'vehicle-document:${document.id}',
+          title: document.nom,
           type: 0,
-          date: docVehic[i].dateExpiration!,
+          date: expiry,
         ),
       );
     }
-    for (i = 0; i < docChauf.length; i++) {
-      tiles.add(
+
+    for (final document in docChauf) {
+      final expiry = document.dateExpiration;
+      if (expiry == null) continue;
+      next.add(
         PNotification(
-          id: docChauf[i].id,
-          title: docChauf[i].nom,
+          id: 'driver-document:${document.id}',
+          title: document.nom,
           type: 1,
-          date: docChauf[i].dateExpiration!,
+          date: expiry,
         ),
       );
     }
-    for (i = 0; i < plannings.length; i++) {
-      tiles.add(
+
+    for (final planning in plannings) {
+      next.add(
         PNotification(
-          id: plannings[i].id,
-          title: plannings[i].subject,
+          id: 'planning:${planning.id}',
+          title: planning.subject,
           type: 2,
-          date: plannings[i].startTime,
+          date: planning.startTime,
         ),
       );
     }
 
-    tiles.sort((a, b) => a.date.compareTo(b.date));
+    next.sort((a, b) => a.date.compareTo(b.date));
+    tiles = next;
   }
-
-  FlyoutController flyoutController = FlyoutController();
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var appTheme = context.watch<AppTheme>();
-    if (loading) {
-      return const Center(
-        child: SizedBox(
-          width: 64,
-          height: 16,
-          child: LinearProgressIndicator(),
-        ),
-      );
-    }
-    return ValueListenableBuilder(
+    final appTheme = context.watch<AppTheme>();
+
+    return ValueListenableBuilder<int>(
       valueListenable: changes,
-      builder: (context, c, w) {
-        return FlyoutTarget(
-          controller: flyoutController,
-          child: OnTapScaleAndFade(
-            onTap: loading
-                ? null
-                : () {
-                    showNotifications();
-                  },
-            child: Badge(
-              backgroundColor: appTheme.color.lightest,
-              alignment: Alignment.bottomRight,
-              offset: const Offset(5, 5),
-              label: Text(tiles.length.toString()),
-              isLabelVisible: tiles.isNotEmpty,
-              child: tiles.isNotEmpty
-                  ? Icon(
-                      FluentIcons.ringer_solid,
-                      size: 24,
-                      color: appTheme.color.darkest,
-                    )
-                  : Icon(
-                      FluentIcons.ringer,
-                      size: 24,
-                      color: appTheme.color.darkest,
-                    ),
+      builder: (context, revision, _) {
+        final count = tiles.length;
+        final label = count > 99 ? '99+' : count.toString();
+        return Tooltip(
+          message: 'Notifications et alertes',
+          child: IconButton(
+            onPressed: showNotifications,
+            icon: Badge(
+              backgroundColor: count == 0
+                  ? appTheme.mutedTextColor
+                  : appTheme.color,
+              alignment: Alignment.topRight,
+              offset: const Offset(5, -4),
+              label: Text(label),
+              isLabelVisible: count > 0,
+              child: Icon(
+                count > 0 ? FluentIcons.ringer_solid : FluentIcons.ringer,
+                size: 21,
+                color: appTheme.textColor,
+              ),
             ),
           ),
         );
@@ -198,66 +212,157 @@ class NotifListState extends State<NotifList>
   }
 
   void showNotifications() {
-    flyoutController.showFlyout(
-      autoModeConfiguration: FlyoutAutoConfiguration(
-        preferredMode: FlyoutPlacementMode.bottomLeft,
-      ),
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setS) {
-            return FlyoutContent(
-              child: SizedBox(
-                height: 270.px,
-                width: 400.px,
-                child: loading
-                    ? const ProgressBar()
-                    : Column(
-                        children: [
-                          SizedBox(
-                            width: 400.px,
-                            height: 40.px,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+    final viewport = MediaQuery.sizeOf(context);
+    final panelWidth = (viewport.width - 28).clamp(300.0, 540.0).toDouble();
+    final panelHeight = (viewport.height - 150).clamp(260.0, 520.0).toDouble();
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => ValueListenableBuilder<int>(
+        valueListenable: changes,
+        builder: (context, revision, _) {
+          final currentCount = tiles.length;
+          return ContentDialog(
+            constraints: BoxConstraints(
+              maxWidth: panelWidth,
+              maxHeight: panelHeight + 120,
+            ),
+            title: Row(
+              children: [
+                const Icon(FluentIcons.ringer_solid, size: 19),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'Notifications',
+                    style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700),
+                  ),
+                ),
+                Text(
+                  '$currentCount à traiter',
+                  style: TextStyle(
+                    color: Colors.grey[100],
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Tooltip(
+                  message: 'Actualiser les alertes',
+                  child: IconButton(
+                    icon: const Icon(FluentIcons.refresh, size: 15),
+                    onPressed: loading
+                        ? null
+                        : () => getNotifs(force: true),
+                  ),
+                ),
+              ],
+            ),
+            content: SizedBox(
+              width: panelWidth,
+              height: panelHeight,
+              child: loading
+                  ? const Center(child: ProgressRing())
+                  : loadError != null
+                      ? _errorState(dialogContext)
+                      : tiles.isEmpty
+                          ? _emptyState()
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Text(
-                                  'notifications'.tr().toUpperCase(),
+                                  'Documents arrivant à échéance et plannings à venir dans les 60 prochains jours.',
                                   style: TextStyle(
                                     color: Colors.grey[100],
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
                                   ),
                                 ),
-                                smallSpace,
-                                IconButton(
-                                  icon: const Icon(FluentIcons.refresh),
-                                  onPressed: () {
-                                    loaded = false;
-                                    getNotifs().then((value) {
-                                      setS(() {});
-                                    });
-                                    setS(() {});
-                                  },
+                                const SizedBox(height: 12),
+                                Expanded(
+                                  child: ListView.separated(
+                                    itemCount: tiles.length,
+                                    separatorBuilder: (_, _) => Divider(
+                                      style: DividerThemeData(
+                                        thickness: 1,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[30],
+                                        ),
+                                      ),
+                                    ),
+                                    itemBuilder: (context, index) =>
+                                        NotificationTile(
+                                      key: ValueKey(tiles[index].id),
+                                      pNotification: tiles[index],
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                          Flexible(
-                            child: ListView(
-                              children: tiles
-                                  .map(
-                                    (e) => NotificationTile(pNotification: e),
-                                  )
-                                  .toList(),
-                            ),
-                          ),
-                        ],
-                      ),
+            ),
+            actions: [
+              Button(
+                child: const Text('Fermer'),
+                onPressed: () => Navigator.of(dialogContext).pop(),
               ),
-            );
-          },
-        );
-      },
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _emptyState() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            FluentIcons.check_mark,
+            size: 34,
+            color: Colors.green,
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Aucune alerte à traiter',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            'Les documents et plannings sont à jour pour le moment.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey[100], fontSize: 11),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _errorState(BuildContext dialogContext) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(FluentIcons.warning, size: 30, color: Colors.orange),
+          const SizedBox(height: 10),
+          const Text(
+            'Impossible de charger les alertes',
+            style: TextStyle(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            loadError ?? '',
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey[100], fontSize: 10),
+          ),
+          const SizedBox(height: 12),
+          FilledButton(
+            onPressed: () => getNotifs(force: true),
+            child: const Text('Réessayer'),
+          ),
+        ],
+      ),
     );
   }
 
