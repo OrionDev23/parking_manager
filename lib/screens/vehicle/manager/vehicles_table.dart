@@ -2,7 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:parc_oto/admin_parameters.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/repair_provider.dart';
