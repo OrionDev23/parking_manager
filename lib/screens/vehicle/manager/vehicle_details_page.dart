@@ -1237,12 +1237,69 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   Widget _overview(Color accent) {
     final documents = VehicleProvider.documentsVehicules.values
         .where(_matchesVehicleDocument)
-        .toList();
-    final documentsWithDeadline =
-        documents.where((doc) => doc.dateExpiration != null).length;
+        .toList()
+      ..sort((a, b) {
+        final aDate = a.dateExpiration;
+        final bDate = b.dateExpiration;
+        if (aDate == null && bDate == null) return a.nom.compareTo(b.nom);
+        if (aDate == null) return 1;
+        if (bDate == null) return -1;
+        return aDate.compareTo(bDate);
+      });
     final documentsUnavailable = _documentsLoadFailed ||
         (!VehicleProvider.downloadedDocuments &&
             !VehicleProvider.downloadingDocuments);
+    final documentsWithDeadline =
+        documents.where((document) => document.dateExpiration != null).length;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final registeredDocuments = documents.map((document) {
+      final expiration = document.dateExpiration;
+      final expiryDay = expiration == null
+          ? null
+          : DateTime(expiration.year, expiration.month, expiration.day);
+      final expired = expiryDay != null && expiryDay.isBefore(today);
+      final daysRemaining = expiryDay?.difference(today).inDays;
+      final warning = expiration == null ||
+          expired ||
+          (daysRemaining != null && daysRemaining <= 30);
+      final statusLabel = expiration == null
+          ? 'Échéance non renseignée'
+          : expired
+              ? 'Document expiré'
+              : daysRemaining == 0
+                  ? 'Expire aujourd’hui'
+                  : daysRemaining != null && daysRemaining <= 30
+                      ? 'Expire dans $daysRemaining jours'
+                      : 'Valide';
+      return (
+        title: document.nom.trim().isEmpty
+            ? 'Document sans nom'
+            : document.nom.trim(),
+        expiryLabel: expiration == null
+            ? 'Date d’expiration inconnue'
+            : 'Expiration : ${_date(expiration)}',
+        statusLabel: statusLabel,
+        warning: warning,
+        expired: expired,
+      );
+    }).toList(growable: false);
+
+    final documentsWithExpiry = documents
+        .where((document) => document.dateExpiration != null)
+        .toList()
+      ..sort((a, b) => a.dateExpiration!.compareTo(b.dateExpiration!));
+    String? nearestDocumentLabel;
+    if (!documentsUnavailable && documentsWithExpiry.isNotEmpty) {
+      final nextDocument = documentsWithExpiry.first;
+      final nextDate = nextDocument.dateExpiration!;
+      final isPast = DateTime(nextDate.year, nextDate.month, nextDate.day)
+          .isBefore(today);
+      nearestDocumentLabel =
+          '${nextDocument.nom.trim().isEmpty ? 'Document' : nextDocument.nom.trim()}'
+          ' • ${_date(nextDate)}${isPast ? ' (échue)' : ''}';
+    }
+
     final latestActivity =
         _vehicleStates.isEmpty ? null : _vehicleStates.first;
     final driversForVehicle = _driversMatchingVehicleRegistration();
@@ -1261,6 +1318,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       documentsCount: documentsUnavailable ? null : documents.length,
       documentsWithDeadline:
           documentsUnavailable ? null : documentsWithDeadline,
+      registeredDocuments:
+          documentsUnavailable ? const [] : registeredDocuments,
+      nearestDocumentLabel:
+          documentsUnavailable ? null : nearestDocumentLabel,
       latestActivityLabel: latestActivity == null
           ? null
           : VehiclesUtilities.getEtatName(latestActivity.type).tr(),
