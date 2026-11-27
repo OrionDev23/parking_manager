@@ -30,6 +30,7 @@ import '../../../theme.dart';
 import '../../../utilities/algeria_lists.dart';
 import '../../../widgets/select_dialog/select_dialog.dart';
 import '../../../widgets/forms/parcoto_form_field.dart';
+import '../../../widgets/vehicle_image_view.dart';
 
 Size _responsiveVehicleCountryDialogSize(BuildContext context) {
   final screenSize = MediaQuery.sizeOf(context);
@@ -711,24 +712,21 @@ class _VehicleFormState extends State<VehicleForm>
                       color: appTheme.color.withValues(alpha: .08),
                       borderRadius: BorderRadius.circular(11),
                     ),
-                    child: imageUrl != null && imageUrl.isNotEmpty
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(11),
-                            child: Image.network(
-                              imageUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) => Icon(
-                                FluentIcons.car,
-                                size: 42,
-                                color: appTheme.color,
-                              ),
-                            ),
-                          )
-                        : Icon(
-                            FluentIcons.car,
-                            size: 42,
-                            color: appTheme.color,
-                          ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(11),
+                      child: VehicleImageView(
+                        fileId: _resolvedImageFileId,
+                        imageUrl: imageUrl,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: 118,
+                        placeholder: Icon(
+                          FluentIcons.car,
+                          size: 42,
+                          color: appTheme.color,
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 13),
                   Text(
