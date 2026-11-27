@@ -291,7 +291,35 @@ class VehicleOverviewDashboard extends StatelessWidget {
       accent,
       LayoutBuilder(
         builder: (context, constraints) {
-          final columns = constraints.maxWidth >  Widget _statusPanel(
+          final compact = constraints.maxWidth < 420;
+          final columns = compact ? 1 : 2;
+          const spacing = 8.0;
+          final itemWidth =
+              (constraints.maxWidth - spacing * (columns - 1)) / columns;
+
+          return Wrap(
+            spacing: spacing,
+            runSpacing: spacing,
+            children: [
+              for (final metric in metrics)
+                SizedBox(
+                  width: itemWidth,
+                  child: _metric(
+                    metric.icon,
+                    metric.label,
+                    metric.value,
+                    accent,
+                    compact: compact,
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _statusPanel(
     BuildContext context,
     Color accent,
     Color statusColor,
