@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/driver_provider.dart';
 import 'package:parc_oto/providers/planning_provider.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
@@ -15,139 +14,218 @@ import '../../sidemenu/pane_items.dart';
 class NotificationTile extends StatefulWidget {
   final PNotification pNotification;
 
-  const NotificationTile({super.key, required this.pNotification});
+  const NotificationTile({
+    super.key,
+    required this.pNotification,
+  });
 
   @override
   State<NotificationTile> createState() => _NotificationTileState();
 }
 
 class _NotificationTileState extends State<NotificationTile> {
-  bool toDelete = false;
+  bool confirmingDismiss = false;
 
-  String typedText = '';
+  DateTime get _day => DateTime(
+        widget.pNotification.date.year,
+        widget.pNotification.date.month,
+        widget.pNotification.date.day,
+      );
 
-  @override
-  void initState() {
-    loadText();
-    super.initState();
+  int get _daysFromToday {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return _day.difference(today).inDays;
   }
 
-  void loadText() {
-    String day = '';
-    int differenceInDays = widget.pNotification.date
-        .difference(DateTime.now())
-        .inDays;
+  String get _description {
+    final days = _daysFromToday;
+    final subject = '«${widget.pNotification.title}»';
 
-    if (differenceInDays < 0) {
-      day = "a expiré";
-    } else if (differenceInDays == 0) {
-      day = "expire aujourd'hui";
-    } else if (differenceInDays == 1) {
-      day = "expire demain";
-    } else {
-      day = "expire dans $differenceInDays jours";
+    if (widget.pNotification.type == 2) {
+      if (days < 0) {
+        return 'Le planning $subject a commencé il y a ${days.abs()} jour(s).';
+      }
+      if (days == 0) return 'Le planning $subject commence aujourd’hui.';
+      if (days == 1) return 'Le planning $subject commence demain.';
+      return 'Le planning $subject commence dans $days jours.';
     }
 
-    if (widget.pNotification.type == 0) {
-      typedText = "Le document '${widget.pNotification.title}' $day";
-    } else if (widget.pNotification.type == 1) {
-      typedText = "Le document '${widget.pNotification.title}' $day";
-    } else {
-      typedText = "Le planning '${widget.pNotification.title}' $day";
+    if (days < 0) {
+      return 'Le document $subject est expiré depuis ${days.abs()} jour(s).';
     }
+    if (days == 0) return 'Le document $subject expire aujourd’hui.';
+    if (days == 1) return 'Le document $subject expire demain.';
+    return 'Le document $subject expire dans $days jours.';
+  }
+
+  String get _dateLabel {
+    return DateFormat('dd/MM/yyyy').format(widget.pNotification.date);
+  }
+
+  Color _severityColor(AppTheme theme) {
+    if (_daysFromToday < 0) return Colors.red;
+    if (_daysFromToday <= 7) return Colors.orange;
+    return theme.color;
   }
 
   @override
   Widget build(BuildContext context) {
-    var appTheme = context.watch<AppTheme>();
-    return ListTile(
-      onPressed: toDelete ? null : goThere,
-      title: toDelete
-          ? deleteNotifWidget()
-          : Text(
-              typedText,
-              style: TextStyle(color: appTheme.color.lightest, fontSize: 14),
+    final theme = context.watch<AppTheme>();
+    final severityColor = _severityColor(theme);
+    final icon = widget.pNotification.type == 2
+        ? FluentIcons.event
+        : FluentIcons.document;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      decoration: BoxDecoration(
+        color: severityColor.withValues(alpha: .055),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: severityColor.withValues(alpha: .22),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: severityColor.withValues(alpha: .12),
+              borderRadius: BorderRadius.circular(9),
             ),
-      trailing: toDelete
-          ? null
-          : IconButton(
-              icon: Icon(FluentIcons.cancel, color: appTheme.color.darkest),
-              onPressed: () {
-                setState(() {
-                  toDelete = true;
-                });
-              },
+            child: Icon(icon, color: severityColor, size: 17),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: confirmingDismiss
+                ? _dismissConfirmation(theme)
+                : GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: goThere,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _description,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: theme.textColor,
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${widget.pNotification.type == 2 ? 'Date du planning' : 'Date d’expiration'} : $_dateLabel',
+                          style: TextStyle(
+                            color: theme.mutedTextColor,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+          ),
+          const SizedBox(width: 6),
+          if (!confirmingDismiss)
+            Tooltip(
+              message: 'Masquer cette alerte sur cet appareil',
+              child: IconButton(
+                icon: Icon(
+                  FluentIcons.dismiss,
+                  size: 14,
+                  color: theme.mutedTextColor,
+                ),
+                onPressed: () => setState(() => confirmingDismiss = true),
+              ),
             ),
+        ],
+      ),
     );
   }
 
-  Widget deleteNotifWidget() {
-    const textStyle = TextStyle(fontSize: 13);
-    return Row(
+  Widget _dismissConfirmation(AppTheme theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('deletenotif', style: textStyle).tr(),
-        const Spacer(),
-        Button(
-          onPressed: deleteThis,
-          child: const Text('oui', style: textStyle).tr(),
+        Text(
+          'Masquer cette alerte sur cet appareil ?',
+          style: TextStyle(
+            color: theme.textColor,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        bigSpace,
-        FilledButton(
-          child: const Text('non', style: textStyle).tr(),
-          onPressed: () {
-            toDelete = false;
-            setState(() {});
-          },
+        const SizedBox(height: 7),
+        Wrap(
+          spacing: 7,
+          children: [
+            Button(
+              onPressed: dismiss,
+              child: const Text('Masquer'),
+            ),
+            Button(
+              onPressed: () => setState(() => confirmingDismiss = false),
+              child: const Text('Annuler'),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  void deleteThis() async {
-    String recordName = widget.pNotification.type == 0
+  Future<void> dismiss() async {
+    final recordName = widget.pNotification.type == 0
         ? 'removedDocs'
         : widget.pNotification.type == 1
-        ? 'removedCondDocs'
-        : 'removedPlanning';
+            ? 'removedCondDocs'
+            : 'removedPlanning';
 
-    late List<String> storedData;
-    if (widget.pNotification.type == 0) {
-      VehicleProvider.removedVehiDocs = prefs.getStringList(recordName) ?? [];
-      storedData = VehicleProvider.removedVehiDocs;
-    } else if (widget.pNotification.type == 1) {
-      DriverProvider.removedCondDocs = prefs.getStringList(recordName) ?? [];
-      storedData = DriverProvider.removedCondDocs;
-    } else {
-      PlanningProvider.removedPlanDocs = prefs.getStringList(recordName) ?? [];
-      storedData = PlanningProvider.removedPlanDocs;
+    try {
+      late List<String> storedData;
+      if (widget.pNotification.type == 0) {
+        VehicleProvider.removedVehiDocs = prefs.getStringList(recordName) ?? [];
+        storedData = VehicleProvider.removedVehiDocs;
+      } else if (widget.pNotification.type == 1) {
+        DriverProvider.removedCondDocs = prefs.getStringList(recordName) ?? [];
+        storedData = DriverProvider.removedCondDocs;
+      } else {
+        PlanningProvider.removedPlanDocs = prefs.getStringList(recordName) ?? [];
+        storedData = PlanningProvider.removedPlanDocs;
+      }
+
+      if (!storedData.contains(widget.pNotification.id)) {
+        storedData.add(widget.pNotification.id);
+      }
+      await prefs.setStringList(recordName, storedData);
+
+      if (!mounted) return;
+      if (widget.pNotification.type == 0) {
+        VehicleProvider.removedVehiDocs = storedData;
+      } else if (widget.pNotification.type == 1) {
+        DriverProvider.removedCondDocs = storedData;
+      } else {
+        PlanningProvider.removedPlanDocs = storedData;
+      }
+
+      NotifListState.remove(widget.pNotification.id);
+      NotifListState.changes.value++;
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => confirmingDismiss = false);
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Impossible de masquer cette alerte'),
+          content: Text(error.toString()),
+          severity: InfoBarSeverity.error,
+        ),
+      );
     }
-
-    storedData.add(widget.pNotification.id);
-
-    await prefs
-        .setStringList(recordName, storedData)
-        .then((value) {
-          if (!mounted) return;
-          if (widget.pNotification.type == 0) {
-            VehicleProvider.removedVehiDocs.add(widget.pNotification.id);
-          } else if (widget.pNotification.type == 1) {
-            DriverProvider.removedCondDocs.add(widget.pNotification.id);
-          } else {
-            PlanningProvider.removedPlanDocs.add(widget.pNotification.id);
-          }
-          Navigator.pop(context);
-        })
-        .onError((error, stackTrace) {
-          if (!mounted) return;
-          Navigator.pop(context);
-
-          if (kDebugMode) {
-            print(stackTrace);
-          }
-        });
-
-    NotifListState.remove(widget.pNotification.id);
-    NotifListState.changes.value++;
   }
 
   void goThere() {
