@@ -178,10 +178,6 @@ class ChauffeurTableState extends State<ChauffeurTable> {
         return DataTableParc(
           header: LayoutBuilder(
             builder: (context, constraints) {
-              final searchWidth = (constraints.maxWidth - 200)
-                  .clamp(140.0, 350.0)
-                  .toDouble();
-
               return Padding(
                 padding: const EdgeInsets.symmetric(
                   vertical: 5.0,
@@ -464,53 +460,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: searchWidth,
-                  height: 45.px,
-                  child: TextBox(
-                    onChanged: (s) {
-                      if (s.isEmpty) {
-                        notEmpty = false;
-                        conducteurDataSource.search('');
-                      } else {
-                        notEmpty = true;
-                      }
-                      setState(() {});
-                    },
-                    controller: searchController,
-                    placeholder: 'search'.tr(),
-                    style: appTheme.writingStyle,
-                    cursorColor: appTheme.color.darker,
-                    placeholderStyle: placeStyle,
-                    onSubmitted: (s) {
-                      if (s.isNotEmpty) {
-                        conducteurDataSource.search(s);
-                        if (!notEmpty) {
-                          setState(() {
-                            notEmpty = true;
-                          });
-                        }
-                      } else {
-                        if (notEmpty) {
-                          setState(() {
-                            notEmpty = false;
-                          });
-                        }
-                      }
-                    },
-                    suffix: notEmpty
-                        ? IconButton(
-                            icon: const Icon(FluentIcons.cancel),
-                            onPressed: () {
-                              searchController.text = "";
-                              notEmpty = false;
-                              setState(() {});
-                              conducteurDataSource.search('');
-                            },
-                          )
-                        : null,
-                  ),
-                ),
+
                   ],
                 ),
               );
