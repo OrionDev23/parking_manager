@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/providers/vehicle_provider.dart';
 
 import '../../main.dart' show authService, driverServices, vehicleServices;
 import '../../providers/parts_provider.dart';
