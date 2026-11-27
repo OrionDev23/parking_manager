@@ -8,6 +8,9 @@ import '../../ui/design_system/parcoto_surface.dart';
 import '../../ui/design_system/parcoto_tokens.dart';
 
 class PlatformCompaniesScreen extends StatefulWidget {
+  static final ValueNotifier<String?> appBarSearchRequest =
+      ValueNotifier<String?>(null);
+
   const PlatformCompaniesScreen({super.key});
 
   @override
@@ -17,7 +20,7 @@ class PlatformCompaniesScreen extends StatefulWidget {
 
 class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
   final _repository = PlatformCompaniesRepository();
-  final _search = TextEditingController();
+  String _searchQuery = '';
   bool _loading = true;
   String? _error;
   List<PlatformCompany> _companies = [];
@@ -29,11 +32,24 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
   void initState() {
     super.initState();
     _load();
+    PlatformCompaniesScreen.appBarSearchRequest.addListener(
+      _applyAppBarSearchRequest,
+    );
+    _applyAppBarSearchRequest();
+  }
+
+  void _applyAppBarSearchRequest() {
+    final query = PlatformCompaniesScreen.appBarSearchRequest.value;
+    if (query == null || !mounted) return;
+    setState(() => _searchQuery = query);
+    PlatformCompaniesScreen.appBarSearchRequest.value = null;
   }
 
   @override
   void dispose() {
-    _search.dispose();
+    PlatformCompaniesScreen.appBarSearchRequest.removeListener(
+      _applyAppBarSearchRequest,
+    );
     super.dispose();
   }
 
@@ -59,7 +75,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
   }
 
   List<PlatformCompany> get _visibleCompanies {
-    final query = _search.text.trim().toLowerCase();
+    final query = _searchQuery.trim().toLowerCase();
     if (query.isEmpty) return _companies;
     return _companies.where((company) =>
       company.name.toLowerCase().contains(query) ||
@@ -397,11 +413,6 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                   ),
           );
 
-          final search = TextBox(
-            controller: _search,
-            placeholder: 'Rechercher une entreprise...',
-            onChanged: (_) => setState(() {}),
-          );
           final refreshButton = Button(
             onPressed: _loading ? null : _load,
             child: const Row(
@@ -463,34 +474,10 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
               horizontalPadding,
               ParcotoTokens.space2,
             ),
-            child: compact
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      search,
-                      const SizedBox(height: 10),
-                      actions,
-                    ],
-                  )
-                : Row(
-                    children: [
-                      Expanded(child: search),
-                      const SizedBox(width: 10),
-                      Button(
-                        onPressed: _loading ? null : _load,
-                        child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                          Icon(FluentIcons.refresh), SizedBox(width: 8), Text('Actualiser'),
-                        ]),
-                      ),
-                      const SizedBox(width: 8),
-                      FilledButton(
-                        onPressed: _repository.canCreateCompany ? _openCreateDialog : null,
-                        child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                          Icon(FluentIcons.add), SizedBox(width: 8), Text('Nouvelle entreprise'),
-                        ]),
-                      ),
-                    ],
-                  ),
+            child: Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: actions,
+            ),
           );
 
           Widget companyResults({bool shrinkWrap = false}) {
