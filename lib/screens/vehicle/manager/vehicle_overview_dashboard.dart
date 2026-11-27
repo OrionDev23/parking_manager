@@ -110,7 +110,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
               children: [
                 Expanded(flex: 8, child: summary),
                 const SizedBox(width: 14),
-                SizedBox(width: 310, child: status),
+                SizedBox(width: 280, child: status),
               ],
             );
           },
@@ -495,9 +495,21 @@ class VehicleOverviewDashboard extends StatelessWidget {
     Color accent,
   ) {
     return LayoutBuilder(
-      builder: (context, constraints) => SizedBox(
-        width: 218,
-        child: Container(
+      builder: (context, constraints) {
+        // Use three columns on wide summary panels, two on medium panels,
+        // and one on narrow layouts instead of leaving a blank third column.
+        final availableWidth = constraints.maxWidth;
+        final columns = availableWidth >= 650
+            ? 3
+            : availableWidth >= 430
+                ? 2
+                : 1;
+        final metricWidth =
+            (availableWidth - ((columns - 1) * 10)) / columns;
+
+        return SizedBox(
+          width: metricWidth,
+          child: Container(
           padding: const EdgeInsets.all(11),
           decoration: BoxDecoration(
             color: accent.withValues(alpha: .045),
@@ -522,8 +534,9 @@ class VehicleOverviewDashboard extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
