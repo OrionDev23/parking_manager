@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:material_ui/material_ui.dart' show Badge;
 import 'package:parc_oto/providers/client_database.dart';
@@ -141,7 +140,7 @@ class NotifListState extends State<NotifList>
       if (expiry == null) continue;
       next.add(
         PNotification(
-          id: 'vehicle-document:${document.id}',
+          id: document.id,
           title: document.nom,
           type: 0,
           date: expiry,
@@ -154,7 +153,7 @@ class NotifListState extends State<NotifList>
       if (expiry == null) continue;
       next.add(
         PNotification(
-          id: 'driver-document:${document.id}',
+          id: document.id,
           title: document.nom,
           type: 1,
           date: expiry,
@@ -165,7 +164,7 @@ class NotifListState extends State<NotifList>
     for (final planning in plannings) {
       next.add(
         PNotification(
-          id: 'planning:${planning.id}',
+          id: planning.id,
           title: planning.subject,
           type: 2,
           date: planning.startTime,
@@ -194,7 +193,7 @@ class NotifListState extends State<NotifList>
             icon: Badge(
               backgroundColor: count == 0
                   ? appTheme.mutedTextColor
-                  : appTheme.color,
+                  : appTheme.color.lightest,
               alignment: Alignment.topRight,
               offset: const Offset(5, -4),
               label: Text(label),
@@ -281,13 +280,9 @@ class NotifListState extends State<NotifList>
                                 Expanded(
                                   child: ListView.separated(
                                     itemCount: tiles.length,
-                                    separatorBuilder: (_, _) => Divider(
-                                      style: DividerThemeData(
-                                        thickness: 1,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[30],
-                                        ),
-                                      ),
+                                    separatorBuilder: (_, _) => Container(
+                                      height: 1,
+                                      color: Colors.grey[30],
                                     ),
                                     itemBuilder: (context, index) =>
                                         NotificationTile(
