@@ -20,7 +20,6 @@ import '../chauffeur/document/chauf_document_table.dart';
 import '../chauffeur/disponibilite/disponibilite_table.dart';
 import '../logs/logging/log_table.dart';
 import '../workshop/inventory/storage/storage_table.dart';
-import '../workshop/inventory/fournisseurs/fournisseur_table.dart';
 import '../workshop/parts/brands/brand_table.dart';
 import '../workshop/parts/categories/category_table.dart';
 import '../workshop/parts/options/option_table.dart';
