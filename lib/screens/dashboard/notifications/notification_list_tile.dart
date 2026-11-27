@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/driver_provider.dart';
 import 'package:parc_oto/providers/planning_provider.dart';
@@ -136,7 +135,7 @@ class _NotificationTileState extends State<NotificationTile> {
               message: 'Masquer cette alerte sur cet appareil',
               child: IconButton(
                 icon: Icon(
-                  FluentIcons.dismiss,
+                  FluentIcons.cancel,
                   size: 14,
                   color: theme.mutedTextColor,
                 ),
