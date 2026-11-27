@@ -63,6 +63,7 @@ class PartsTableState extends State<PartsTable> {
         );
         filterDocument.value = null;
         filterNow = false;
+        filterNow = false;
       } else {
         startedWithFiltersOn = false;
 
