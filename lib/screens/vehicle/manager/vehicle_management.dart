@@ -3,6 +3,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
+import 'package:parc_oto/screens/sidemenu/page_refresh_registry.dart';
 import 'package:provider/provider.dart';
 
 import '../../../admin_parameters.dart';
@@ -43,10 +44,13 @@ class VehicleManagementState extends State<VehicleManagement>
   _VehicleWorkspaceView _workspaceView = _VehicleWorkspaceView.fleet;
   Vehicle? _selectedVehicle;
   Vehicle? _editingVehicle;
+  late final PageRefreshCallback _pageRefreshHandler;
 
   @override
   void initState() {
     super.initState();
+    _pageRefreshHandler = _refreshVehicles;
+    PageRefreshRegistry.instance.register('vehicle-manager', _pageRefreshHandler);
     selectedBrand = brandFilterRequest.value;
     brandFilterRequest.value = null;
     final initialSearch = externalSearchRequest.value;
@@ -89,6 +93,7 @@ class VehicleManagementState extends State<VehicleManagement>
 
   @override
   void dispose() {
+    PageRefreshRegistry.instance.unregister('vehicle-manager', _pageRefreshHandler);
     externalSearchRequest.removeListener(_handleExternalSearchRequest);
     brandFilterRequest.removeListener(_handleExternalBrandFilter);
     searchController.dispose();
@@ -149,38 +154,21 @@ class VehicleManagementState extends State<VehicleManagement>
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              screenWidth < 720 ? 16 : 26,
-              screenWidth < 720 ? 8 : 10,
-              screenWidth < 720 ? 16 : 22,
-              6,
-            ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final actions = Wrap(
+          if ((showImportVehicles && DatabaseGetter().isAdmin()) ||
+              screenWidth < 1080)
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                screenWidth < 720 ? 16 : 26,
+                4,
+                screenWidth < 720 ? 16 : 22,
+                6,
+              ),
+              child: Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: Wrap(
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    Tooltip(
-                      message: 'Actualiser le parc',
-                      child: Button(
-                        onPressed: VehicleProvider.downloadingVehicles
-                            ? null
-                            : _refreshVehicles,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(FluentIcons.refresh,
-                                size: 14, color: theme.mutedTextColor),
-                            if (constraints.maxWidth >= 680) ...[
-                              const SizedBox(width: 7),
-                              const Text('Actualiser'),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
                     if (showImportVehicles && DatabaseGetter().isAdmin())
                       Button(
                         onPressed: importList,
@@ -206,32 +194,9 @@ class VehicleManagementState extends State<VehicleManagement>
                         ),
                       ),
                   ],
-                );
-                if (constraints.maxWidth < 900) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _pageTitle(theme),
-                      const SizedBox(height: 10),
-                      Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: actions,
-                      ),
-                    ],
-                  );
-                }
-
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(child: _pageTitle(theme)),
-                    const SizedBox(width: 14),
-                    actions,
-                  ],
-                );
-              },
+                ),
+              ),
             ),
-          ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: screenWidth < 720 ? 16 : 26),
             child: _buildMetrics(theme, allVehicles),
@@ -408,28 +373,6 @@ class VehicleManagementState extends State<VehicleManagement>
               theme: theme,
             ),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _pageTitle(AppTheme theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Parc automobile',
-          style: TextStyle(
-            color: theme.textColor,
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -.45,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Retrouvez vos véhicules, leur état et leurs informations essentielles.',
-          style: TextStyle(color: theme.mutedTextColor, fontSize: 12),
         ),
       ],
     );

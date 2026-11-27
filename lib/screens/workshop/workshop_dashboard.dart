@@ -13,6 +13,7 @@ import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
 import '../../widgets/module_dashboard_metric.dart';
 import '../sidemenu/pane_items.dart';
+import '../sidemenu/page_refresh_registry.dart';
 
 class WorkshopDashboard extends StatefulWidget {
   const WorkshopDashboard({super.key});
@@ -28,11 +29,14 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
       DatabaseCounters().countStockEntries();
   int _stockMetricRevision = 0;
   bool? _hasInternet;
+  late final PageRefreshCallback _pageRefreshHandler;
 
   @override
   void initState() {
     super.initState();
     _partsProvider = PartsProvider();
+    _pageRefreshHandler = _refreshCatalog;
+    PageRefreshRegistry.instance.register('atelier', _pageRefreshHandler);
     _companyRevisionListener = () {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) unawaited(_refreshCatalog());
@@ -71,6 +75,7 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
 
   @override
   void dispose() {
+    PageRefreshRegistry.instance.unregister('atelier', _pageRefreshHandler);
     DatabaseGetter.companyRevisionListenable.removeListener(
       _companyRevisionListener,
     );
@@ -120,13 +125,6 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                     heroDescription:
                         'Accédez aux pièces, aux références et aux partenaires de votre chaîne d’approvisionnement.',
                     icon: FluentIcons.repair,
-                    trailing: Tooltip(
-                      message: 'Actualiser les données',
-                      child: IconButton(
-                        icon: const Icon(FluentIcons.refresh),
-                        onPressed: isLoading ? null : _refreshCatalog,
-                      ),
-                    ),
                   ),
                   const SizedBox(height: 22),
                   Text(

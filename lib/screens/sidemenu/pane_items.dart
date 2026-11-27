@@ -462,6 +462,46 @@ class PaneItemsAndFooters {
     return key;
   }
 
+  /// Resolves the localized title for the currently active page.
+  /// Vehicle sub-sections are nested inside a single legacy workspace.
+  static String? pageTitleForKey(String? key) {
+    if (key == null || key.isEmpty) return null;
+
+    switch (key) {
+      case 'vehicle-manager':
+        return 'Parc automobile';
+      case 'vehicle-documents':
+        return 'gestiondocument'.tr();
+      case 'vehicle-brands':
+        return 'brands'.tr();
+      case 'vehicle-states':
+        return 'vstates'.tr();
+    }
+
+    NavigationPaneItem? find(List<NavigationPaneItem> items) {
+      for (final item in items) {
+        if ((item is PaneItem || item is PaneItemExpander) &&
+            item.key is ValueKey &&
+            (item.key as ValueKey).value.toString() == key) {
+          return item;
+        }
+        if (item is PaneItemExpander) {
+          final nested = find(item.items);
+          if (nested != null) return nested;
+        }
+      }
+      return null;
+    }
+
+    final item = find(originalItems) ?? find(footerItems);
+    final title = item?.title;
+    if (title is Text) {
+      return title.data ?? title.textSpan?.toPlainText();
+    }
+    if (title is RichText) return title.text.toPlainText();
+    return null;
+  }
+
   static int? indexForPaneKey(String value) {
     if (_isLegacyVehiclePaneKey(value)) value = 'vehicles';
     final mainIndex = _findPaneIndex(originalItems, value, 0);

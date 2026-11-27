@@ -21,6 +21,7 @@ import '../../serializables/reparation/reparation.dart';
 import '../../theme.dart';
 import '../../ui/design_system/parcoto_tokens.dart';
 import '../sidemenu/pane_items.dart';
+import '../sidemenu/page_refresh_registry.dart';
 import 'models/dashboard_models.dart';
 import 'widgets/dashboard_widgets.dart';
 
@@ -45,6 +46,7 @@ class _DashboardState extends State<Dashboard>
   bool _reloadScheduled = false;
   String? _loadMessage;
   String? _loadedCompanyId;
+  late final PageRefreshCallback _pageRefreshHandler;
 
   @override
   void initState() {
@@ -57,6 +59,8 @@ class _DashboardState extends State<Dashboard>
     _logs = LogProvider();
     _plannings = PlanningProvider();
     _repairs = RepairProvider();
+    _pageRefreshHandler = _refreshDashboard;
+    PageRefreshRegistry.instance.register('dashboard', _pageRefreshHandler);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) unawaited(_refreshDashboard());
@@ -65,6 +69,7 @@ class _DashboardState extends State<Dashboard>
 
   @override
   void dispose() {
+    PageRefreshRegistry.instance.unregister('dashboard', _pageRefreshHandler);
     _vehicles.dispose();
     _drivers.dispose();
     _logs.dispose();
@@ -185,20 +190,6 @@ class _DashboardState extends State<Dashboard>
                         ],
                       ),
                     ),
-                  const SizedBox(width: ParcotoTokens.space2),
-                  Tooltip(
-                    message: 'Actualiser les données',
-                    child: IconButton(
-                      icon: _refreshing
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: ProgressRing(),
-                            )
-                          : const Icon(FluentIcons.refresh),
-                      onPressed: _refreshing ? null : _refreshDashboard,
-                    ),
-                  ),
                 ],
               ),
               const SizedBox(height: ParcotoTokens.space5),

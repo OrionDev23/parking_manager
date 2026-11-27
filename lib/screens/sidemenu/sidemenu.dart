@@ -9,6 +9,7 @@ import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
 import 'package:parc_oto/screens/sidemenu/global_search.dart';
 import 'package:parc_oto/screens/sidemenu/parcoto_navigation_shell.dart';
+import 'package:parc_oto/screens/sidemenu/page_refresh_registry.dart';
 import 'package:parc_oto/ui/design_system/parcoto_tokens.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -196,6 +197,8 @@ class PanesListState extends State<PanesList>
               builder: (context, _) {
                 final activePaneKey =
                     PaneItemsAndFooters.paneKeyForIndex(selectedIndex);
+                final activePageTitle =
+                    PaneItemsAndFooters.pageTitleForKey(activePaneKey);
                 return ParcotoNavigationShell(
               items: PaneItemsAndFooters.originalItems,
               footerItems: PaneItemsAndFooters.footerItems,
@@ -240,12 +243,25 @@ class PanesListState extends State<PanesList>
                             children: [
                               if (compact) ...[
                                 if (isSignedIn) ...[
-                                  const Spacer(),
+                                  Expanded(
+                                    child: Text(
+                                      activePageTitle ?? 'Parcoto',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: widget.appTheme.textColor,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
                                   ContextualSearchLauncher(
                                     paneKey: activePaneKey,
                                     compact: true,
                                   ),
-                                  const SizedBox(width: ParcotoTokens.space2),
+                                  const SizedBox(width: ParcotoTokens.space1),
+                                  PageRefreshButton(pageKey: activePaneKey),
+                                  const SizedBox(width: ParcotoTokens.space1),
                                 ] else ...[
                                   Image.asset(
                                     'assets/images/logo.webp',
@@ -256,12 +272,28 @@ class PanesListState extends State<PanesList>
                                   const Spacer(),
                                 ],
                               ] else if (isSignedIn) ...[
+                                SizedBox(
+                                  width: 190,
+                                  child: Text(
+                                    activePageTitle ?? 'Parcoto',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: widget.appTheme.textColor,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: ParcotoTokens.space4),
                                 Expanded(
                                   child: ContextualSearchLauncher(
                                     paneKey: activePaneKey,
                                   ),
                                 ),
-                                const SizedBox(width: ParcotoTokens.space4),
+                                const SizedBox(width: ParcotoTokens.space2),
+                                PageRefreshButton(pageKey: activePaneKey),
+                                const SizedBox(width: ParcotoTokens.space2),
                               ] else ...[
                                 Image.asset(
                                   'assets/images/logo.webp',
