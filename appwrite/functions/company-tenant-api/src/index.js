@@ -315,7 +315,7 @@ function quotaExceededFailure(label, used, maximum) {
   );
 }
 
-async function createQuotaResource(userId, input) {
+async function createQuotaResource(userId, input, log = () => {}) {
   const resourceKey = String(input.resource || '');
   const resource = QUOTA_RESOURCES[resourceKey];
   const companyId = String(input.companyId || '').trim();
@@ -432,7 +432,7 @@ async function createQuotaResource(userId, input) {
   }
 }
 
-async function deleteQuotaResource(userId, input) {
+async function deleteQuotaResource(userId, input, log = () => {}) {
   const resourceKey = String(input.resource || '');
   const resource = QUOTA_RESOURCES[resourceKey];
   const companyId = String(input.companyId || '').trim();
@@ -1382,6 +1382,31 @@ function vehicleImageModelBase(model) {
   ).trim();
 }
 
+function vehicleImageColorMatchState(candidate, color) {
+  if (color === 'original') return { matches: true, fallback: false };
+  const metadataText = normalizeImageSearchText([
+    candidate.title, candidate.description, candidate.make, candidate.model,
+    candidate.tags,
+  ].filter(Boolean).join(' '));
+  const requestedTerms = VEHICLE_IMAGE_COLOR_TERMS[color] || [];
+  const requestedMatch = requestedTerms.some(term =>
+    metadataText.includes(normalizeImageSearchText(term))
+  );
+  const anyKnownColorMatch = Object.entries(VEHICLE_IMAGE_COLOR_TERMS)
+    .filter(([key]) => key !== color)
+    .some(([, terms]) => terms.some(term =>
+      metadataText.includes(normalizeImageSearchText(term))
+    ));
+
+  // A source that does not describe paint colour can still provide a useful
+  // model/year image. A source that explicitly describes a different colour
+  // is rejected rather than misrepresented.
+  return {
+    matches: requestedMatch || !anyKnownColorMatch,
+    fallback: !requestedMatch && !anyKnownColorMatch,
+  };
+}
+
 function vehicleImageCandidateMatches(candidate, { make, model, year, color }) {
   const descriptiveText = normalizeImageSearchText([
     candidate.title, candidate.description, candidate.make, candidate.model,
@@ -1442,10 +1467,7 @@ function vehicleImageCandidateMatches(candidate, { make, model, year, color }) {
           year >= generationRange[0] &&
           year <= generationRange[1]);
 
-  const colorTerms = VEHICLE_IMAGE_COLOR_TERMS[color] || [];
-  const colorMatches = color === 'original' ||
-    colorTerms.some(term => metadataText.includes(normalizeImageSearchText(term)));
-
+  const colorMatches = vehicleImageColorMatchState(candidate, color).matches;
   return makeMatches && modelMatches && yearMatches && colorMatches;
 }
 function isAllowedCommercialImageLicense(value) {
@@ -1531,9 +1553,14 @@ async function downloadExternalVehicleImage(url) {
 async function searchWikimediaVehicleImage(criteria) {
   const aliases = vehicleImageModelAliases(criteria.model);
   const colourTerms = VEHICLE_IMAGE_COLOR_TERMS[criteria.color] || [];
-  const queryVariants = aliases.slice(0, 2).map(alias => [
-    criteria.make, alias, colourTerms[0] || '', 'car',
-  ].filter(Boolean).join(' '));
+  const queryVariants = [
+    ...aliases.slice(0, 2).map(alias => [
+      criteria.make, alias, colourTerms[0] || '', 'car',
+    ].filter(Boolean).join(' ')),
+    ...aliases.slice(0, 2).map(alias => [
+      criteria.make, alias, String(criteria.year), 'car',
+    ].filter(Boolean).join(' ')),
+  ].filter((query, index, all) => all.indexOf(query) === index);
   const candidates = [];
   const seen = new Set();
 
@@ -1599,10 +1626,8 @@ async function searchWikimediaVehicleImage(criteria) {
   return candidates.slice(0, 5);
 }
 async function searchTrustCarVehicleImage(criteria) {
-  // TrustCar accepts make/model/year but has no paint-color parameter.
-  // For a requested paint color, do not silently pretend its image matches.
-  if (criteria.color !== 'original') return [];
-
+  // TrustCar accepts make/model/year but has no paint-colour parameter.
+  // It can still be offered as an explicitly unverified-colour alternative.
   const aliases = vehicleImageModelAliases(criteria.model);
   const generationRange = vehicleImageGenerationRange(criteria.make, criteria.model);
   const requestedModel = String(criteria.model || '').trim();
@@ -1675,6 +1700,7 @@ async function searchTrustCarVehicleImage(criteria) {
         `${title} — © ${author || 'Auteur non indiqué'} (${license}), via Wikimedia Commons`
       ).slice(0, 1000),
       source: 'trustcar',
+      colorFallback: criteria.color !== 'original',
     };
     if (vehicleImageCandidateMatches(candidate, criteria)) {
       candidates.push(candidate);
@@ -1687,10 +1713,15 @@ async function searchTrustCarVehicleImage(criteria) {
 async function searchOpenverseVehicleImage(criteria) {
   const aliases = vehicleImageModelAliases(criteria.model);
   const colourTerms = VEHICLE_IMAGE_COLOR_TERMS[criteria.color] || [];
-  const queryVariants = aliases.slice(0, 2).map(alias => [
-    criteria.make, alias, String(criteria.year),
-    colourTerms[0] || '', 'car',
-  ].filter(Boolean).join(' '));
+  const queryVariants = [
+    ...aliases.slice(0, 2).map(alias => [
+      criteria.make, alias, String(criteria.year),
+      colourTerms[0] || '', 'car',
+    ].filter(Boolean).join(' ')),
+    ...aliases.slice(0, 2).map(alias => [
+      criteria.make, alias, String(criteria.year), 'car',
+    ].filter(Boolean).join(' ')),
+  ].filter((query, index, all) => all.indexOf(query) === index);
   const candidates = [];
   const seen = new Set();
 
@@ -1974,10 +2005,12 @@ async function searchVehicleImageCandidates({ userId, input, log }) {
           if (seenImages.has(contentHash)) continue;
           seenImages.add(candidate.imageUrl);
           seenImages.add(contentHash);
+          const colorState = vehicleImageColorMatchState(candidate, color);
+          const colorFallback = candidate.colorFallback === true || colorState.fallback;
           candidates.push({
             ...candidate,
-            actualColor: candidate.actualColor || color,
-            colorFallback: candidate.colorFallback === true,
+            actualColor: candidate.actualColor || (colorFallback ? 'original' : color),
+            colorFallback,
           });
           acceptedFromProvider += 1;
           if (acceptedFromProvider >= maxCandidatesPerProvider ||
@@ -2337,6 +2370,153 @@ async function uploadCustomVehicleImage({ userId, input }) {
     userId,
   });
 }
+async function decodeVehicleVin({ userId, input, log }) {
+  const companyId = String(input.companyId || '').trim();
+  if (!companyId) {
+    const failure = new Error('companyId is required.');
+    failure.status = 400;
+    throw failure;
+  }
+  await requireVehicleImageAccess(userId, companyId);
+
+  const vin = String(input.vin || '').replace(/\\s+/g, '').toUpperCase();
+  if (!/^[A-HJ-NPR-Z0-9]{17}$/.test(vin)) {
+    const failure = new Error('Le VIN doit contenir exactement 17 caractères (sans I, O ou Q).');
+    failure.status = 400;
+    failure.code = 'invalid_vin';
+    throw failure;
+  }
+
+  const apiKey = String(process.env.AUTODEV_API_KEY || '').trim();
+  let autoDev = null;
+  let nhtsa = null;
+  const providers = [];
+  const providerErrors = [];
+
+  if (apiKey) {
+    try {
+      const response = await fetch(`https://api.auto.dev/vin/${encodeURIComponent(vin)}`, {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          Accept: 'application/json',
+        },
+        signal: AbortSignal.timeout(12000),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (response.status === 200 || response.status === 207) {
+        autoDev = payload;
+        providers.push('auto.dev');
+      } else if (response.status === 404) {
+        providerErrors.push('auto.dev: véhicule non trouvé');
+      } else {
+        providerErrors.push(`auto.dev: HTTP ${response.status}`);
+        log(`VIN decode auto.dev returned status=${response.status}`);
+      }
+    } catch (failure) {
+      providerErrors.push(`auto.dev: ${failure.message}`);
+      log(`VIN decode auto.dev failed: ${failure.message}`);
+    }
+  }
+
+  const autoVehicle = autoDev?.vehicle && typeof autoDev.vehicle === 'object'
+    ? autoDev.vehicle
+    : {};
+  const hasCoreAutoFields = Boolean(
+    autoDev?.make || autoVehicle.make ||
+    autoDev?.model || autoVehicle.model ||
+    autoDev?.year || autoVehicle.year
+  );
+
+  // vPIC is free and requires no API key. It is used as the default provider,
+  // and as a complementary fallback when the global decoder is partial.
+  if (!apiKey || !hasCoreAutoFields ||
+      !autoDev?.trim || !autoDev?.engine || !autoDev?.transmission) {
+    try {
+      const response = await fetch(
+        `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValuesExtended/${encodeURIComponent(vin)}?format=json`,
+        {
+          headers: { Accept: 'application/json' },
+          signal: AbortSignal.timeout(12000),
+        },
+      );
+      if (!response.ok) {
+        throw new Error(`NHTSA vPIC returned HTTP ${response.status}.`);
+      }
+      const payload = await response.json();
+      nhtsa = Array.isArray(payload.Results) ? payload.Results[0] : null;
+      if (nhtsa) providers.push('NHTSA vPIC');
+    } catch (failure) {
+      providerErrors.push(`NHTSA vPIC: ${failure.message}`);
+      log(`VIN decode NHTSA failed: ${failure.message}`);
+    }
+  }
+
+  const pick = (...values) => {
+    for (const value of values) {
+      if (value === undefined || value === null) continue;
+      const text = String(value).trim();
+      if (text && !['not applicable', 'not known', '0', 'unknown'].includes(text.toLowerCase())) {
+        return value;
+      }
+    }
+    return null;
+  };
+  const numberValue = (...values) => {
+    for (const value of values) {
+      const parsed = Number.parseFloat(String(value ?? '').replace(',', '.'));
+      if (Number.isFinite(parsed) && parsed > 0) return parsed;
+    }
+    return null;
+  };
+  const engineText = pick(autoDev?.engine, nhtsa?.EngineModel);
+  const displacementL = numberValue(nhtsa?.DisplacementL);
+  const powerHp = numberValue(nhtsa?.EngineHP);
+  const powerKw = numberValue(nhtsa?.EngineKW);
+  const data = {
+    make: pick(autoDev?.make, autoVehicle.make, nhtsa?.Make),
+    model: pick(autoDev?.model, autoVehicle.model, nhtsa?.Model),
+    modelYear: numberValue(autoVehicle.year, autoDev?.year, nhtsa?.ModelYear),
+    trim: pick(autoDev?.trim, nhtsa?.Trim, nhtsa?.Series),
+    body: pick(autoDev?.body, autoDev?.style, nhtsa?.BodyClass, nhtsa?.VehicleType),
+    engine: engineText,
+    engineDisplacementCc: displacementL ? Math.round(displacementL * 1000) : null,
+    enginePowerHp: powerHp,
+    enginePowerKw: powerKw,
+    engineCode: pick(nhtsa?.EngineModel, nhtsa?.EngineConfiguration),
+    fuel: pick(autoDev?.fuel, nhtsa?.FuelTypePrimary),
+    transmission: pick(autoDev?.transmission, nhtsa?.TransmissionStyle),
+    drive: pick(autoDev?.drive, nhtsa?.DriveType),
+    doors: numberValue(autoDev?.doors, nhtsa?.Doors),
+    manufacturer: pick(autoVehicle.manufacturer, nhtsa?.Manufacturer),
+    origin: pick(autoDev?.origin, nhtsa?.PlantCountry),
+    vinValid: autoDev?.vinValid === true || (nhtsa && String(nhtsa.ErrorCode || '0') === '0'),
+    checksum: typeof autoDev?.checksum === 'boolean' ? autoDev.checksum : null,
+    ambiguous: autoDev?.ambiguous === true,
+    yearAmbiguous: autoDev?.yearAmbiguous === true,
+  };
+  const hasAnyData = Object.entries(data).some(([key, value]) =>
+    !['vinValid', 'checksum', 'ambiguous', 'yearAmbiguous'].includes(key) &&
+    value !== null && value !== undefined && value !== ''
+  );
+  const hasIdentity = Boolean(data.make && data.model && data.modelYear);
+  return {
+    ok: true,
+    vin,
+    status: hasIdentity ? 'decoded' : hasAnyData ? 'partial' : 'not_found',
+    providers: [...new Set(providers)],
+    data,
+    warnings: [
+      ...(autoDev?.ambiguous ? ['Le VIN correspond à plusieurs finitions possibles.'] : []),
+      ...(nhtsa && String(nhtsa.ErrorCode || '0') !== '0'
+        ? [String(nhtsa.ErrorText || 'Le décodeur NHTSA a signalé des champs incomplets.')]
+        : []),
+      ...providerErrors,
+      ...(!apiKey ? ['Auto.dev n’est pas configuré ; le décodage gratuit NHTSA vPIC a été utilisé.'] : []),
+    ],
+    note: 'Le décodage VIN est indicatif. Vérifiez les caractéristiques sur la carte grise et les documents constructeur avant validation.',
+  };
+}
+
 function parseExecutionInput(req, log) {
   const bodyJson = req.bodyJson;
   if (bodyJson && typeof bodyJson === 'object' && !Array.isArray(bodyJson)) {
@@ -2557,6 +2737,11 @@ export default async (context) => requestContext.run(
 
     if (action === 'vehicle_image_search_candidates') {
       const result = await searchVehicleImageCandidates({ userId, input, log });
+      return json(res, 200, result);
+    }
+
+    if (action === 'vehicle_vin_decode') {
+      const result = await decodeVehicleVin({ userId, input, log });
       return json(res, 200, result);
     }
 
@@ -3251,12 +3436,12 @@ export default async (context) => requestContext.run(
     }
 
     if (action === 'tenant_create_resource') {
-      const result = await createQuotaResource(userId, input);
+      const result = await createQuotaResource(userId, input, log);
       return json(res, result.created ? 201 : 200, { ok: true, ...result });
     }
 
     if (action === 'tenant_delete_resource') {
-      const result = await deleteQuotaResource(userId, input);
+      const result = await deleteQuotaResource(userId, input, log);
       return json(res, 200, { ok: true, ...result });
     }
 
