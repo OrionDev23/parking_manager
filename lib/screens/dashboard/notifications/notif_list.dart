@@ -109,10 +109,10 @@ class NotifListState extends State<NotifList>
     changes.value++;
 
     try {
-      await Future.wait([
-        getVehicDocs(),
-        getPlanningDocs(),
-        getChaufDocs(),
+      final results = await Future.wait([
+        VehicleProvider().getDocumentsBeforeTime(_throughDate),
+        PlanningProvider().getPlanningBeforeTime(_throughDate),
+        DriverProvider().getConduDocumentsBeforeTime(_throughDate),
       ]);
 
       if (!mounted ||
@@ -123,6 +123,9 @@ class NotifListState extends State<NotifList>
         return;
       }
 
+      docVehic = results[0] as List<DocumentVehicle>;
+      plannings = results[1] as List<Planning>;
+      docChauf = results[2] as List<DocumentChauffeur>;
       createNotifListFromLists();
       _loadedCompanyId = companyId;
       _loadedUserId = userId;
@@ -144,19 +147,6 @@ class NotifListState extends State<NotifList>
         changes.value++;
       }
     }
-  }
-
-  Future<void> getVehicDocs() async {
-    docVehic = await VehicleProvider().getDocumentsBeforeTime(_throughDate);
-  }
-
-  Future<void> getChaufDocs() async {
-    docChauf =
-        await DriverProvider().getConduDocumentsBeforeTime(_throughDate);
-  }
-
-  Future<void> getPlanningDocs() async {
-    plannings = await PlanningProvider().getPlanningBeforeTime(_throughDate);
   }
 
   void createNotifListFromLists() {
