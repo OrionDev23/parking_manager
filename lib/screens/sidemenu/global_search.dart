@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/providers/vehicle_provider.dart';
 
 import '../../main.dart' show authService, driverServices, vehicleServices;
 import '../../providers/parts_provider.dart';
@@ -80,15 +81,7 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
         _ModuleSearchScope.parts => 'Rechercher une pièce...',
       };
 
-  @override
-  void didUpdateWidget(covariant _ModuleSearchLauncher oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.scope != widget.scope) {
-      _crossSearchTimer?.cancel();
-      _controller.clear();
-      _lastCrossSuggestionQuery = null;
-    }
-  }
+
 
   @override
   void didUpdateWidget(covariant _ModuleSearchLauncher oldWidget) {
