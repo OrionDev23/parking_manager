@@ -72,6 +72,7 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
   final TextEditingController _controller = TextEditingController();
   Timer? _crossSearchTimer;
   String? _lastCrossSuggestionQuery;
+  String _lastDispatchedQuery = '';
 
   String get _placeholder => switch (widget.scope) {
         _ModuleSearchScope.vehicles => 'Rechercher un véhicule...',
@@ -90,6 +91,17 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
   }
 
   @override
+  void didUpdateWidget(covariant _ModuleSearchLauncher oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.scope != widget.scope) {
+      _crossSearchTimer?.cancel();
+      _controller.clear();
+      _lastCrossSuggestionQuery = null;
+      _lastDispatchedQuery = '';
+    }
+  }
+
+  @override
   void dispose() {
     _crossSearchTimer?.cancel();
     _controller.dispose();
@@ -98,6 +110,10 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
 
   void _dispatchLocalSearch(String value) {
     final query = value.trim();
+    if (query != _lastDispatchedQuery) {
+      _lastDispatchedQuery = query;
+      _lastCrossSuggestionQuery = null;
+    }
     switch (widget.scope) {
       case _ModuleSearchScope.vehicles:
         VehicleManagementState.externalSearchRequest.value = query;
