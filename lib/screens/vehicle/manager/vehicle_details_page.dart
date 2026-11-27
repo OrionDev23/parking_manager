@@ -1953,7 +1953,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         bucketId: 'images',
         fileId: fileId,
       );
-      await FilePicker.platform.saveFile(
+      await FilePicker.saveFile(
         dialogTitle: 'vehicle_doc_download_title'.tr(),
         fileName: document.fileName?.trim().isNotEmpty == true
             ? document.fileName!.trim()
