@@ -874,7 +874,16 @@ class VehicleManagementState extends State<VehicleManagement>
         child: LayoutBuilder(
           builder: (context, constraints) {
             final compact = constraints.maxWidth < 760;
-            final visibleVehicles = vehicles.take(6).toList(growable: false);
+            final vehiclesToComplete = vehicles.where((vehicle) {
+              final hasAssignment = [
+                vehicle.filliale,
+                vehicle.direction,
+                vehicle.departement,
+              ].any((value) => value?.trim().isNotEmpty == true);
+              return vehicle.currentMileage == null ||
+                  !hasAssignment ||
+                  vehicle.imageUrl?.trim().isNotEmpty != true;
+            }).take(6).toList(growable: false);
             return SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -956,7 +965,7 @@ class VehicleManagementState extends State<VehicleManagement>
                       final narrow = lowerConstraints.maxWidth < 820;
                       final vehiclePanel = _fleetVehicleListPanel(
                         theme,
-                        visibleVehicles,
+                        vehiclesToComplete,
                         total,
                         onSelectVehicle,
                       );
@@ -1012,12 +1021,12 @@ class VehicleManagementState extends State<VehicleManagement>
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Véhicules du parc',
+                  'Informations à compléter',
                   style: TextStyle(color: theme.textColor, fontSize: 14, fontWeight: FontWeight.w700),
                 ),
               ),
               Text(
-                '$total au total',
+                '${vehicles.length} à compléter',
                 style: TextStyle(color: theme.mutedTextColor, fontSize: 10),
               ),
             ],
@@ -1025,7 +1034,7 @@ class VehicleManagementState extends State<VehicleManagement>
           const SizedBox(height: 12),
           if (vehicles.isEmpty)
             Text(
-              'Aucun véhicule ne correspond aux filtres actuels.',
+              'Aucune information manquante sur les champs suivis.',
               style: TextStyle(color: theme.mutedTextColor, fontSize: 11),
             )
           else
@@ -1033,13 +1042,6 @@ class VehicleManagementState extends State<VehicleManagement>
               if (index > 0) Divider(height: 12, color: theme.borderColor),
               _fleetVehicleCard(theme, vehicles[index], onSelectVehicle),
             ],
-          if (total > vehicles.length) ...[
-            const SizedBox(height: 10),
-            Text(
-              'Affichage des ${vehicles.length} premiers véhicules. Utilisez la recherche ou les filtres pour retrouver les autres.',
-              style: TextStyle(color: theme.mutedTextColor, fontSize: 10),
-            ),
-          ],
         ],
       ),
     );
@@ -1141,6 +1143,13 @@ class VehicleManagementState extends State<VehicleManagement>
                           style: TextStyle(color: statusColor, fontSize: 9, fontWeight: FontWeight.w700),
                         ),
                       ),
+                      if (vehicle.currentMileage == null)
+                        _fleetMissingTag(theme, 'Kilométrage'),
+                      if (![vehicle.filliale, vehicle.direction, vehicle.departement]
+                          .any((value) => value?.trim().isNotEmpty == true))
+                        _fleetMissingTag(theme, 'Affectation'),
+                      if (vehicle.imageUrl?.trim().isNotEmpty != true)
+                        _fleetMissingTag(theme, 'Photo'),
                       if (vehicle.currentMileage != null)
                         Text(
                           '${vehicle.currentMileage} km',
@@ -1155,6 +1164,20 @@ class VehicleManagementState extends State<VehicleManagement>
             Icon(FluentIcons.chevron_right, color: theme.mutedTextColor, size: 14),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _fleetMissingTag(AppTheme theme, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.orange.withValues(alpha: .10),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        '$label à renseigner',
+        style: const TextStyle(color: Colors.orange, fontSize: 9, fontWeight: FontWeight.w600),
       ),
     );
   }
