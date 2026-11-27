@@ -1741,7 +1741,128 @@ class _VehicleFormState extends State<VehicleForm>
   Future<void> _decodeVehicleVin() async {
     if (widget.readOnly || _decodingVin) return;
     final vin = numSer.text.replaceAll(RegExp(r'\s+'), '').toUpperCase();
-    if (!RegExp(r'^[A-HJ-NPR-Z0-9]{17}    AppTheme appTheme, {
+    if (!RegExp(r'^[A-HJ-NPR-Z0-9]{17}$').hasMatch(vin)) {
+      setState(() {
+        _vinDecodeMessage =
+            'Saisissez un VIN valide de 17 caractères (sans I, O ni Q).';
+      });
+      return;
+    }
+
+    setState(() {
+      _decodingVin = true;
+      _vinDecodeMessage = 'Interrogation des décodeurs VIN…';
+    });
+
+    try {
+      final result = await VehicleVinService.decode(
+        companyId: vehicleServices.companyId,
+        vin: vin,
+      );
+      if (!mounted) return;
+
+      if (result.status == 'not_found') {
+        setState(() {
+          _vinDecodeMetadata = null;
+          _vinDecodeMessage =
+              'Aucune fiche constructeur exploitable n’a été retournée.';
+        });
+        return;
+      }
+
+      try {
+        await VehicleMakeService.load();
+      } catch (_) {
+        // Keep the cached/legacy make catalogue available when offline.
+      }
+
+      final data = result.data;
+      var populated = 0;
+
+      void fillIfEmpty(TextEditingController controller, dynamic rawValue) {
+        final value = rawValue?.toString().trim() ?? '';
+        if (controller.text.trim().isEmpty && value.isNotEmpty) {
+          controller.text = value;
+          populated++;
+        }
+      }
+
+      final decodedMake = data['make']?.toString().trim() ?? '';
+      if ((marque ?? '').trim().isEmpty && decodedMake.isNotEmpty) {
+        final normalizedMake = VehicleMakeService.normalize(decodedMake);
+        VehicleMake? matchedMake;
+        for (final candidate in VehicleMakeService.cached) {
+          if (VehicleMakeService.normalize(candidate.name) == normalizedMake ||
+              candidate.aliases.any(
+                (alias) =>
+                    VehicleMakeService.normalize(alias) == normalizedMake,
+              )) {
+            matchedMake = candidate;
+            break;
+          }
+        }
+        marque = matchedMake?.id ??
+            VehicleMakeService.canonicalId(decodedMake) ??
+            decodedMake;
+        populated++;
+      }
+
+      fillIfEmpty(type, data['model']);
+      fillIfEmpty(trimController, data['trim']);
+      fillIfEmpty(modelYearController, data['modelYear']);
+      fillIfEmpty(caross, data['body']);
+      fillIfEmpty(energie, data['fuel']);
+      fillIfEmpty(engineDisplacementController, data['engineDisplacementCc']);
+      fillIfEmpty(enginePowerHpController, data['enginePowerHp']);
+      fillIfEmpty(enginePowerKwController, data['enginePowerKw']);
+      fillIfEmpty(engineCodeController, data['engineCode'] ?? data['engine']);
+      fillIfEmpty(transmissionController, data['transmission']);
+      fillIfEmpty(driveTypeController, data['drive']);
+      fillIfEmpty(doorsController, data['doors']);
+
+      final providerLabel = result.providers.isEmpty
+          ? 'source inconnue'
+          : result.providers.join(' + ');
+      final warningText = result.warnings.isEmpty
+          ? ''
+          : ' ' + result.warnings.join(' ');
+
+      setState(() {
+        _vinDecodeMetadata = {
+          'vin': result.vin,
+          'status': result.status,
+          'providers': result.providers,
+          'decodedAt': DateTime.now().toUtc().toIso8601String(),
+          'data': result.data,
+          'warnings': result.warnings,
+        };
+        _vinDecodeMessage = result.status == 'decoded'
+            ? 'Décodage terminé via ' +
+                providerLabel +
+                ' : ' +
+                populated.toString() +
+                ' champ(s) renseigné(s).' +
+                warningText
+            : 'Décodage partiel via ' +
+                providerLabel +
+                '. Vérifiez les données manquantes.' +
+                warningText;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _vinDecodeMetadata = null;
+        _vinDecodeMessage = 'Échec du décodage VIN : ' + error.toString();
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _decodingVin = false);
+      }
+    }
+  }
+
+  Widget _identityField(
+  AppTheme appTheme, {
     required double width,
     required String label,
     required Widget child,
