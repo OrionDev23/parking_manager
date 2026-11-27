@@ -188,7 +188,7 @@ class UsersTableState extends State<UsersTable> {
   @override
   void dispose() {
     appBarSearchRequest.removeListener(_applyAppBarSearchRequest);
-    userDataSource.dispose();
+    searchController.dispose();
     super.dispose();
   }
 }
