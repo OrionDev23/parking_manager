@@ -111,7 +111,7 @@ class PlanningProvider extends ChangeNotifier {
   static List<String> removedPlanDocs = [];
 
   Future<List<Planning>> getPlanningBeforeTime(DateTime expiration) async {
-    removedPlanDocs = prefs.getStringList('removedPlanning') ?? [];
+    removedPlanDocs = prefs.getStringList(userScopedPreferenceKey('removedPlanning')) ?? [];
     while (downloadingPlanning) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
