@@ -2325,11 +2325,33 @@ class _VehicleFormState extends State<VehicleForm>
           ),
         ),
       ),
-      if (!_isCompactViewport)
-        StaggeredGridTile.fit(
-          crossAxisCellCount: _isCompactViewport ? 12 : 2,
-          child: SizedBox(height: height),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text('Puissance fiscale (CV)', style: TextStyle(fontSize: 12)),
+                ParcotoTextBox(
+                  enabled: !widget.readOnly,
+                  placeholder: '0000',
+                  controller: puissance,
+                  maxLength: 4,
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                ),
+              ],
+            ),
+          ),
         ),
+      ),
       StaggeredGridTile.fit(
         crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
@@ -3092,33 +3114,7 @@ class _VehicleFormState extends State<VehicleForm>
           ),
         ),
       ),
-      StaggeredGridTile.fit(
-        crossAxisCellCount: _isCompactViewport ? 12 : 2,
-        child: Container(
-          height: height,
-          padding: EdgeInsets.zero,
-          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: Column(
-              children: [
-                const Text('Puissance fiscale (CV)', style: TextStyle(fontSize: 12)),
-                ParcotoTextBox(
-                  enabled: !widget.readOnly,
-                  placeholder: '0000',
-                  controller: puissance,
-                  maxLength: 4,
-                  placeholderStyle: placeStyle,
-                  cursorColor: appTheme.color.darker,
-                  style: appTheme.writingStyle,
 
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
       StaggeredGridTile.fit(
         crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
@@ -4883,11 +4879,33 @@ class _VehicleMakePickerDialogState extends State<_VehicleMakePickerDialog> {
           ),
         ),
       ),
-      if (!_isCompactViewport)
-        StaggeredGridTile.fit(
-          crossAxisCellCount: _isCompactViewport ? 12 : 2,
-          child: SizedBox(height: height),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text('Puissance fiscale (CV)', style: TextStyle(fontSize: 12)),
+                ParcotoTextBox(
+                  enabled: !widget.readOnly,
+                  placeholder: '0000',
+                  controller: puissance,
+                  maxLength: 4,
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                ),
+              ],
+            ),
+          ),
         ),
+      ),
       StaggeredGridTile.fit(
         crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
@@ -5650,33 +5668,7 @@ class _VehicleMakePickerDialogState extends State<_VehicleMakePickerDialog> {
           ),
         ),
       ),
-      StaggeredGridTile.fit(
-        crossAxisCellCount: _isCompactViewport ? 12 : 2,
-        child: Container(
-          height: height,
-          padding: EdgeInsets.zero,
-          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: Column(
-              children: [
-                const Text('Puissance fiscale (CV)', style: TextStyle(fontSize: 12)),
-                ParcotoTextBox(
-                  enabled: !widget.readOnly,
-                  placeholder: '0000',
-                  controller: puissance,
-                  maxLength: 4,
-                  placeholderStyle: placeStyle,
-                  cursorColor: appTheme.color.darker,
-                  style: appTheme.writingStyle,
 
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
       StaggeredGridTile.fit(
         crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
