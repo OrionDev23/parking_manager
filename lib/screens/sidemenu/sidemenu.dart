@@ -5,7 +5,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
 import 'package:parc_oto/screens/sidemenu/global_search.dart';
@@ -258,7 +257,7 @@ class PanesListState extends State<PanesList>
                                   child: CompanyWorkspaceSwitcher(),
                                 ),
                                 const SizedBox(width: ParcotoTokens.space4),
-                                const Expanded(
+                                 Expanded(
                                   child: ContextualSearchLauncher(paneKey: activePaneKey),
                                 ),
                               ] else ...[
