@@ -21,8 +21,13 @@ import 'notification_list_tile.dart';
 /// is required before we can accurately show shared unread counts.
 class NotifList extends StatefulWidget {
   final String? companyId;
+  final String? userId;
 
-  const NotifList({super.key, required this.companyId});
+  const NotifList({
+    super.key,
+    required this.companyId,
+    required this.userId,
+  });
 
   @override
   State<NotifList> createState() => NotifListState();
@@ -34,7 +39,9 @@ class NotifListState extends State<NotifList>
   static List<PNotification> tiles = [];
   static bool loaded = false;
   static String? _loadedCompanyId;
+  static String? _loadedUserId;
 
+  int _loadGeneration = 0;
   bool loading = false;
   String? loadError;
 
@@ -53,12 +60,16 @@ class NotifListState extends State<NotifList>
   @override
   void didUpdateWidget(covariant NotifList oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.companyId != widget.companyId) {
+    if (oldWidget.companyId != widget.companyId ||
+        oldWidget.userId != widget.userId) {
+      _loadGeneration++;
+      loading = false;
       loaded = false;
       _loadedCompanyId = null;
+      _loadedUserId = null;
       tiles = [];
       changes.value++;
-      getNotifs();
+      getNotifs(force: true);
     }
   }
 
@@ -68,19 +79,30 @@ class NotifListState extends State<NotifList>
 
   Future<void> getNotifs({bool force = false}) async {
     final companyId = widget.companyId;
-    if (companyId == null || companyId.isEmpty) {
+    final userId = widget.userId;
+    if (companyId == null ||
+        companyId.isEmpty ||
+        userId == null ||
+        userId.isEmpty) {
       tiles = [];
       loaded = false;
       _loadedCompanyId = null;
+      _loadedUserId = null;
       loading = false;
       if (mounted) setState(() {});
       changes.value++;
       return;
     }
 
-    if (!force && loaded && _loadedCompanyId == companyId) return;
+    if (!force &&
+        loaded &&
+        _loadedCompanyId == companyId &&
+        _loadedUserId == userId) {
+      return;
+    }
     if (loading) return;
 
+    final generation = ++_loadGeneration;
     loading = true;
     loadError = null;
     if (mounted) setState(() {});
@@ -93,25 +115,30 @@ class NotifListState extends State<NotifList>
         getChaufDocs(),
       ]);
 
-      if (!mounted) return;
-      if (widget.companyId != companyId ||
+      if (!mounted ||
+          generation != _loadGeneration ||
+          widget.companyId != companyId ||
+          widget.userId != userId ||
           DatabaseGetter.activeCompanyId != companyId) {
         return;
       }
 
       createNotifListFromLists();
       _loadedCompanyId = companyId;
+      _loadedUserId = userId;
       loaded = true;
     } catch (error) {
       if (!mounted ||
+          generation != _loadGeneration ||
           widget.companyId != companyId ||
+          widget.userId != userId ||
           DatabaseGetter.activeCompanyId != companyId) {
         return;
       }
       loadError = error.toString();
       loaded = false;
     } finally {
-      if (mounted) {
+      if (mounted && generation == _loadGeneration) {
         loading = false;
         setState(() {});
         changes.value++;
@@ -263,7 +290,7 @@ class NotifListState extends State<NotifList>
               child: loading
                   ? const Center(child: ProgressRing())
                   : loadError != null
-                      ? _errorState(dialogContext)
+                      ? _errorState()
                       : tiles.isEmpty
                           ? _emptyState()
                           : Column(
@@ -332,7 +359,7 @@ class NotifListState extends State<NotifList>
     );
   }
 
-  Widget _errorState(BuildContext dialogContext) {
+  Widget _errorState() {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
