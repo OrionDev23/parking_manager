@@ -183,25 +183,23 @@ class DocumentFormState extends State<DocumentForm> {
     if (_pickingFile || _saving) return;
     setState(() => _pickingFile = true);
     try {
-      // file_picker 13.x returns the selected PlatformFile list directly.
-      // Read the bytes explicitly for web, mobile and desktop.
-      final files = await FilePicker.platform.pickFiles(
+      // Use the single-file API from file_picker 13.0+.
+      final file = await FilePicker.pickFile(
         type: FileType.custom,
         allowedExtensions: const ['pdf', 'jpg', 'jpeg', 'png', 'webp'],
       );
-      if (!mounted || files.isEmpty) return;
+      if (!mounted || file == null) return;
 
-      final file = files.first;
       final reportedSize = file.lengthSync() ?? await file.length();
       if (reportedSize != null && reportedSize > _maxVehicleDocumentBytes) {
-        throw StateError('La pièce jointe ne doit pas dépasser 15 Mo.');
+        throw StateError('vehicle_doc_file_size_limit'.tr());
       }
       final bytes = await file.readAsBytes();
       if (bytes.isEmpty) {
-        throw StateError('Le fichier sélectionné est vide ou illisible.');
+        throw StateError('vehicle_doc_file_unreadable'.tr());
       }
       if (bytes.length > _maxVehicleDocumentBytes) {
-        throw StateError('La pièce jointe ne doit pas dépasser 15 Mo.');
+        throw StateError('vehicle_doc_file_size_limit'.tr());
       }
 
       setState(() {
@@ -237,27 +235,27 @@ class DocumentFormState extends State<DocumentForm> {
   Future<Map<String, dynamic>> _uploadPendingFile() async {
     final selected = _pendingFile;
     if (selected == null) {
-      throw StateError('Aucun fichier à téléverser.');
+      throw StateError('vehicle_doc_file_missing'.tr());
     }
     final bytes = _pendingFileBytes;
     if (bytes == null || bytes.isEmpty) {
-      throw StateError('Le contenu de la pièce jointe est vide.');
+      throw StateError('vehicle_doc_attachment_empty'.tr());
     }
 
     final client = DatabaseGetter.client;
     final teamId = vehicleServices.teamId;
     if (client == null) {
-      throw StateError('La connexion Appwrite n’est pas initialisée.');
+      throw StateError('vehicle_doc_client_uninitialized'.tr());
     }
     if (teamId == null || teamId.trim().isEmpty) {
       throw StateError(
-        'L’équipe de l’entreprise n’est pas disponible. Le fichier ne sera pas téléversé sans permissions privées.',
+        'vehicle_doc_team_context_missing'.tr(),
       );
     }
 
     final extension = selected.name.split('.').last.toLowerCase();
     if (!const ['pdf', 'jpg', 'jpeg', 'png', 'webp'].contains(extension)) {
-      throw StateError('Format de fichier non autorisé.');
+      throw StateError('vehicle_doc_file_format_invalid'.tr());
     }
 
     final fileId = ID.unique();
@@ -307,14 +305,14 @@ class DocumentFormState extends State<DocumentForm> {
       );
       final fileName = widget.vd?.fileName ?? 'document-' + fileId;
       await FilePicker.platform.saveFile(
-        dialogTitle: 'Enregistrer le document',
+        dialogTitle: 'vehicle_doc_download_title'.tr(),
         fileName: fileName,
         bytes: bytes,
         mimeType: widget.vd?.mimeType ?? _mimeTypeFor(fileName),
       );
     } catch (error) {
       if (mounted) {
-        _showMessage('Téléchargement impossible : $error', isError: true);
+        _showMessage('vehicle_doc_download_failed'.tr() + ': ' + error.toString(), isError: true);
       }
     }
   }
@@ -364,18 +362,18 @@ class DocumentFormState extends State<DocumentForm> {
     final name = _nameController.text.trim();
     final vehicleId = _currentVehicleId;
     if (name.isEmpty) {
-      _showMessage('Le nom du document est obligatoire.', isError: true);
+      _showMessage('vehicle_doc_name_required'.tr(), isError: true);
       return;
     }
     if (vehicleId == null || vehicleId.isEmpty) {
-      _showMessage('Associez ce document à un véhicule.', isError: true);
+      _showMessage('vehicle_doc_vehicle_required'.tr(), isError: true);
       return;
     }
     if (_issueDate != null &&
         _expiryDate != null &&
         _expiryDate!.isBefore(_issueDate!)) {
       _showMessage(
-        'La date d’expiration ne peut pas précéder la date d’émission.',
+        'vehicle_doc_issue_expiry_order'.tr(),
         isError: true,
       );
       return;
@@ -464,7 +462,7 @@ class DocumentFormState extends State<DocumentForm> {
         _removeExistingFile = false;
         _changes = false;
       });
-      _showMessage('Document enregistré.');
+      _showMessage('vehicle_doc_saved'.tr());
       if (widget.vehicle != null) {
         await Future.delayed(const Duration(milliseconds: 150));
         if (mounted) Navigator.of(context).pop();
@@ -515,10 +513,10 @@ class DocumentFormState extends State<DocumentForm> {
           Expanded(
             child: Text(
               _loadingVehicle
-                  ? 'Chargement du véhicule…'
+                  ? 'vehicle_doc_loading_vehicle'.tr()
                   : (registration?.isNotEmpty == true
                       ? registration!
-                      : 'Sélectionner un véhicule'),
+                      : 'vehicle_doc_select_vehicle'.tr()),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -548,8 +546,8 @@ class DocumentFormState extends State<DocumentForm> {
             const SizedBox(width: 8),
             Text(
               _pickingFile
-                  ? 'Lecture du fichier…'
-                  : 'Joindre un PDF ou une image',
+                  ? 'vehicle_doc_reading_file'.tr()
+                  : 'vehicle_doc_pick_attachment'.tr(),
             ),
           ],
         ),
@@ -586,8 +584,8 @@ class DocumentFormState extends State<DocumentForm> {
                 Text(
                   [
                     if (size != null) _formatFileSize(size),
-                    if (selected != null) 'En attente d’enregistrement',
-                    if (selected == null) 'Déjà enregistré',
+                    if (selected != null) 'vehicle_doc_file_pending'.tr(),
+                    if (selected == null) 'vehicle_doc_file_saved'.tr(),
                   ].join(' • '),
                   style: appTheme.writingStyle.copyWith(
                     fontSize: 10,
@@ -631,10 +629,10 @@ class DocumentFormState extends State<DocumentForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _fieldLabel('Véhicule', _vehicleSelector(appTheme)),
+            _fieldLabel('vehicle_doc_field_vehicle'.tr(), _vehicleSelector(appTheme)),
             const SizedBox(height: 14),
             _fieldLabel(
-              'Type de document',
+              'vehicle_doc_field_type'.tr(),
               ComboBox<String>(
                 value: _documentType,
                 isExpanded: true,
@@ -657,7 +655,7 @@ class DocumentFormState extends State<DocumentForm> {
             ),
             const SizedBox(height: 14),
             _fieldLabel(
-              'Nom / désignation',
+              'vehicle_doc_field_name'.tr(),
               TextBox(
                 controller: _nameController,
                 enabled: !_saving,
@@ -667,7 +665,7 @@ class DocumentFormState extends State<DocumentForm> {
             ),
             const SizedBox(height: 14),
             _fieldLabel(
-              'Date d’émission',
+              'vehicle_doc_field_issue_date'.tr(),
               DatePicker(
                 selected: _issueDate,
                 onChanged: _saving
@@ -680,7 +678,7 @@ class DocumentFormState extends State<DocumentForm> {
             ),
             const SizedBox(height: 14),
             _fieldLabel(
-              'Date d’expiration',
+              'vehicle_doc_field_expiry_date'.tr(),
               DatePicker(
                 selected: _expiryDate,
                 onChanged: _saving
@@ -692,14 +690,14 @@ class DocumentFormState extends State<DocumentForm> {
               ),
             ),
             const SizedBox(height: 14),
-            _fieldLabel('Pièce jointe', _attachmentField(appTheme)),
+            _fieldLabel('vehicle_doc_field_attachment'.tr(), _attachmentField(appTheme)),
             const SizedBox(height: 14),
             _fieldLabel(
-              'Notes internes',
+              'vehicle_doc_field_notes'.tr(),
               TextBox(
                 controller: _notesController,
                 enabled: !_saving,
-                placeholder: 'Informations complémentaires…',
+                placeholder: 'vehicle_doc_field_notes'.tr(),
                 maxLines: 3,
                 onChanged: (_) => _refreshChanges(),
               ),
