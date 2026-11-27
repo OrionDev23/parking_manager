@@ -54,6 +54,7 @@ class FicheReceptionTableState extends State<FicheReceptionTable> {
         searchKey: filterDocument.value,
       );
       filterDocument.value = null;
+        filterNow = false;
     } else {
       startedWithFiltersOn = false;
 
@@ -192,7 +193,7 @@ class FicheReceptionTableState extends State<FicheReceptionTable> {
     return ValueListenableBuilder(
       valueListenable: filterDocument,
       builder: (context, v, _) {
-        if (!startedWithFiltersOn && v != null && filterNow) {
+        if (v != null && filterNow) {
           searchController.text = v;
           ficheReceptionDatasource.search(v);
           notEmpty = true;
@@ -200,70 +201,7 @@ class FicheReceptionTableState extends State<FicheReceptionTable> {
           filterNow = false;
         }
         return DataTableParc(
-          header: LayoutBuilder(
-            builder: (context, constraints) {
-              final searchWidth = (constraints.maxWidth - 20)
-                  .clamp(140.0, 350.0)
-                  .toDouble();
-
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 5.0,
-                  horizontal: 10,
-                ),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: SizedBox(
-                    width: searchWidth,
-                    height: 45.px,
-                    child: ParcotoTextBox(
-                      onChanged: (s) {
-                        if (s.isEmpty) {
-                          notEmpty = false;
-                          ficheReceptionDatasource.search('');
-                        } else {
-                          notEmpty = true;
-                        }
-                        setState(() {});
-                      },
-                      controller: searchController,
-                      placeholder: 'search'.tr(),
-                      style: appTheme.writingStyle,
-                      cursorColor: appTheme.color.darker,
-                      placeholderStyle: placeStyle,
-                      onSubmitted: (s) {
-                        if (s.isNotEmpty) {
-                          ficheReceptionDatasource.search(s);
-                          if (!notEmpty) {
-                            setState(() {
-                              notEmpty = true;
-                            });
-                          }
-                        } else {
-                          if (notEmpty) {
-                            setState(() {
-                              notEmpty = false;
-                            });
-                          }
-                        }
-                      },
-                      suffix: notEmpty
-                          ? IconButton(
-                              icon: const Icon(FluentIcons.cancel),
-                              onPressed: () {
-                                searchController.text = "";
-                                notEmpty = false;
-                                setState(() {});
-                                ficheReceptionDatasource.search('');
-                              },
-                            )
-                          : null,
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
+          header: null,
           sortAscending: assending,
           sortColumnIndex: sortColumn,
           columns: columns,
