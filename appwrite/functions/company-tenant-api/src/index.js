@@ -2194,15 +2194,25 @@ async function resolveVehicleImage({ userId, input, log }) {
   const criteria = { make, model, year, color };
   const freeResult = await searchFreeVehicleImageSources(criteria, log);
   if (freeResult) {
+    const colorState = vehicleImageColorMatchState(freeResult.candidate, color);
+    const colorFallback =
+      freeResult.candidate.colorFallback === true || colorState.fallback;
+    const actualColor = freeResult.candidate.actualColor ||
+      (colorFallback ? 'original' : color);
     const saved = await persistVehicleImage({
-      rowId, cacheKey, make, model, year, color,
+      rowId, cacheKey, make, model, year, color: actualColor,
       candidate: freeResult.candidate,
       bytes: freeResult.downloaded.bytes,
       mimeType: freeResult.downloaded.mimeType,
       extension: freeResult.downloaded.extension,
       userId,
     });
-    return { ...saved, replacementFound: forceRefresh };
+    return {
+      ...saved,
+      requestedColor: color,
+      colorFallback,
+      replacementFound: forceRefresh,
+    };
   }
 
   // CarImagesAPI is deliberately the last provider. Its free plan adds a
