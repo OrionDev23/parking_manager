@@ -1052,7 +1052,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       case 1:
         return _section(
           'vehicle_details_identification'.tr(),
-          'vehicle_identification_description'.tr(),
+          'vehicle_algerian_homologation_description'.tr(),
           [
             _group('vehicle_identification_group'.tr(), [
               _field('vehicle_field_primary_registration'.tr(), v.matricule),
@@ -1084,6 +1084,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               _field(
                 'vehicle_field_administrative_genre'.tr(),
                 VehicleDetailFormatters.genreLabel(v.genre)?.tr(),
+              ),
+              _field(
+                'vehicle_field_fiscal_power'.tr(),
+                v.puissance == null ? null : '${v.puissance} CV',
               ),
             ]),
             _group('vehicle_administrative_address_group'.tr(), [
@@ -1131,10 +1135,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 v.engineDisplacement == null
                     ? null
                     : '${VehicleDetailFormatters.formatNumber(v.engineDisplacement!)} cm³',
-              ),
-              _field(
-                'vehicle_field_fiscal_power'.tr(),
-                v.puissance == null ? null : '${v.puissance} CV',
               ),
               _field(
                 'vehicle_field_engine_power_hp'.tr(),
