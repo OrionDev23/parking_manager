@@ -912,5 +912,7 @@
   "vehicle_field_transmission": "Transmission",
   "vehicle_field_usage_type": "Type d’usage",
   "vehicle_details_unavailable": "Indisponible",
-  "vehicle_details_loading": "Chargement…"
+  "vehicle_details_loading": "Chargement…",
+  "vehicle_algerian_homologation_group": "Données administratives et d’homologation algérienne",
+  "vehicle_algerian_homologation_description": "Informations de la carte grise algérienne, séparées des caractéristiques constructeur."
 }
