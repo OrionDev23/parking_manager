@@ -11,7 +11,6 @@ class VehicleOverviewDashboard extends StatelessWidget {
   final String statusLabel;
   final String? driverName;
   final int? documentsCount;
-  final int? documentsWithDeadline;
   final String? latestActivityLabel;
   final String? latestActivityDate;
   final String? latestActivityNote;
@@ -34,7 +33,6 @@ class VehicleOverviewDashboard extends StatelessWidget {
     required this.statusLabel,
     required this.driverName,
     required this.documentsCount,
-    required this.documentsWithDeadline,
     required this.latestActivityLabel,
     required this.latestActivityDate,
     required this.latestActivityNote,
@@ -111,7 +109,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
                 Expanded(child: summary),
                 const SizedBox(width: 12),
                 SizedBox(
-                  width: (constraints.maxWidth * .34).clamp(230.0, 280.0),
+                  width: (constraints.maxWidth * .34).clamp(230.0, 280.0).toDouble(),
                   child: status,
                 ),
               ],
@@ -144,7 +142,6 @@ class VehicleOverviewDashboard extends StatelessWidget {
           },
         ),
         const SizedBox(height: 14),
-        _quickAccess(context, accent),
       ],
     );
   }
@@ -320,7 +317,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
           _pill(statusLabel, statusColor, expanded: true),
           const SizedBox(height: 7),
           _infoLine(
-            FluentIcons.history,
+            FluentIcons.document,
             'Dernière activité',
             latestEvent,
           ),
@@ -373,7 +370,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
               final activity = entry.value;
               return Padding(
                 padding: EdgeInsets.only(
-                  bottom: entry.key == visibleActivities.length - 1 ? 0 : 14,
+                  bottom: entry.key == visibleActivities.length - 1 ? 0 : 8,
                 ),
                 child: _timelineItem(
                   accent,
@@ -425,7 +422,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
                     ? (document.expired ? Colors.red : Colors.orange)
                     : Colors.green,
                 document.expired
-                    ? FluentIcons.error
+                    ? FluentIcons.blocked
                     : document.warning
                         ? FluentIcons.warning
                         : FluentIcons.check_mark,
@@ -468,33 +465,6 @@ class VehicleOverviewDashboard extends StatelessWidget {
       default:
         return fallback;
     }
-  }
-
-  Widget _quickAccess(BuildContext context, Color accent) {
-    final items = <(String, IconData, VoidCallback)>[
-      ('Identification', FluentIcons.info, onOpenIdentification),
-      ('Affectation', FluentIcons.people, onOpenAssignment),
-      ('Localisation', FluentIcons.car, onOpenLocation),
-      ('Maintenance', FluentIcons.repair, onOpenMaintenance),
-      ('Acquisition', FluentIcons.shopping_cart, onOpenAcquisition),
-    ];
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: items
-          .map((item) => Button(
-                onPressed: item.$3,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(item.$2, size: 13, color: accent),
-                    const SizedBox(width: 7),
-                    Text(item.$1),
-                  ],
-                ),
-              ))
-          .toList(),
-    );
   }
 
   Widget _panel(
