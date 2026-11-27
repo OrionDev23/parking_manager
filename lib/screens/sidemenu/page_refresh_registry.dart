@@ -22,15 +22,24 @@ class PageRefreshRegistry extends ChangeNotifier {
   bool isRefreshing(String? pageKey) =>
       pageKey != null && _refreshingKeys.contains(pageKey);
 
+  void _notifyAfterFrame() {
+    // Page registrations happen from initState/dispose. Notifying a topbar
+    // listener synchronously here can mark a sibling dirty while Flutter is
+    // still building the active screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (hasListeners) notifyListeners();
+    });
+  }
+
   void register(String pageKey, PageRefreshCallback callback) {
     _handlers[pageKey] = callback;
-    notifyListeners();
+    _notifyAfterFrame();
   }
 
   void unregister(String pageKey, PageRefreshCallback callback) {
     if (!identical(_handlers[pageKey], callback)) return;
     _handlers.remove(pageKey);
-    notifyListeners();
+    _notifyAfterFrame();
   }
 
   Future<void> refresh(String? pageKey) async {
