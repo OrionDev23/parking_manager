@@ -57,7 +57,6 @@ class StateTableState extends State<StateTable> {
   void _applyAppBarSearchRequest() {
     final query = appBarSearchRequest.value;
     if (query == null) return;
-    searchController.text = query;
     notEmpty = query.isNotEmpty;
     vehicleStateDatasource.search(query);
     appBarSearchRequest.value = null;
