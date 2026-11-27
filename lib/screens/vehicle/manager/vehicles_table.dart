@@ -415,7 +415,7 @@ class VehicleTableState extends State<VehicleTable> {
     return ValueListenableBuilder(
       valueListenable: filterMarque,
       builder: (context, v, _) {
-        if (!startedWithFiltersOn && filterNow && v != null) {
+        if (filterNow && v != null) {
           marque = v;
           filters['marque'] = v.toString();
           filtered = true;
@@ -425,7 +425,7 @@ class VehicleTableState extends State<VehicleTable> {
         return ValueListenableBuilder(
           valueListenable: filterVehicule,
           builder: (context, v, _) {
-            if (!startedWithFiltersOn && filterNow && v != null) {
+            if (filterNow && v != null) {
               vehicleDataSource.search(v);
 
               filtered = true;
