@@ -214,7 +214,7 @@ class DriverProvider extends ChangeNotifier {
     DateTime expiration,
   ) async {
     List<DocumentChauffeur> result = [];
-    removedCondDocs = prefs.getStringList('removedCondDocs') ?? [];
+    removedCondDocs = prefs.getStringList(userScopedPreferenceKey('removedCondDocs')) ?? [];
     while (downloadingDocuments) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
