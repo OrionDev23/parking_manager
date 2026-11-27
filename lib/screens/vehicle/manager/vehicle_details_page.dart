@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import '../../../widgets/vehicle_image_view.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -634,7 +635,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   }
 
   Widget _vehicleAvatar(Color accent, {required bool compact}) {
-    final imageUrl = v.imageUrl?.trim();
     // Match the reference layout: a clear vehicle thumbnail beside the identity.
     final width = compact ? double.infinity : 198.0;
     final height = compact ? 160.0 : 150.0;
@@ -649,14 +649,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           border: Border.all(color: accent.withValues(alpha: .12)),
           borderRadius: BorderRadius.circular(14),
         ),
-        child: imageUrl != null && imageUrl.isNotEmpty
-            ? Image.network(
-                imageUrl,
-                fit: BoxFit.contain,
-                errorBuilder: (_, _, _) =>
-                    Icon(FluentIcons.car, size: 36, color: accent),
-              )
-            : Icon(FluentIcons.car, size: 36, color: accent),
+        child: VehicleImageView(
+          fileId: v.imageFileId,
+          imageUrl: v.imageUrl,
+          fit: BoxFit.contain,
+          width: width,
+          height: height,
+          placeholder: Icon(FluentIcons.car, size: 36, color: accent),
+        ),
       ),
     );
   }
