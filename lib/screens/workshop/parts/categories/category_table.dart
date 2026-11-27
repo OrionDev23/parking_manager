@@ -63,6 +63,7 @@ class CategoryTableState extends State<CategoryTable> {
         );
         filterDocument.value = null;
         filterNow = false;
+        filterNow = false;
       } else {
         startedWithFiltersOn = false;
 
