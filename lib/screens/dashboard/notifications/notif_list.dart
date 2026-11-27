@@ -9,16 +9,17 @@ import 'package:parc_oto/serializables/planning.dart';
 import 'package:parc_oto/serializables/vehicle/document_vehicle.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/services/notification_dismissal_service.dart';
+
 import '../../../serializables/notification.dart';
 import '../../../theme.dart';
 import 'notification_list_tile.dart';
 
 /// Company-scoped operational alerts derived from documents and planning.
 ///
-/// Read/unread state is deliberately not inferred from the badge count:
-/// the current legacy source only provides actionable alerts, not persisted
-/// per-user read receipts. A user-scoped Appwrite notification-state store
-/// is required before we can accurately show shared unread counts.
+/// Dismissed alert IDs are synchronized through the authenticated Appwrite
+/// account preferences, with device-local preferences retained for offline use.
+/// The badge is an actionable-alert count, not an unread-message count.
 class NotifList extends StatefulWidget {
   final String? companyId;
   final String? userId;
@@ -73,8 +74,8 @@ class NotifListState extends State<NotifList>
     }
   }
 
-  static void remove(String id) {
-    tiles.removeWhere((item) => item.id == id);
+  static void remove(String id, {required int type}) {
+    tiles.removeWhere((item) => item.id == id && item.type == type);
   }
 
   Future<void> getNotifs({bool force = false}) async {
@@ -109,6 +110,19 @@ class NotifListState extends State<NotifList>
     changes.value++;
 
     try {
+      await NotificationDismissalService.restoreFromCloud(
+        companyId: companyId,
+        userId: userId,
+      );
+
+      if (!mounted ||
+          generation != _loadGeneration ||
+          widget.companyId != companyId ||
+          widget.userId != userId ||
+          DatabaseGetter.activeCompanyId != companyId) {
+        return;
+      }
+
       final results = await Future.wait([
         VehicleProvider().getDocumentsBeforeTime(_throughDate),
         PlanningProvider().getPlanningBeforeTime(_throughDate),
@@ -303,7 +317,11 @@ class NotifListState extends State<NotifList>
                                     ),
                                     itemBuilder: (context, index) =>
                                         NotificationTile(
-                                      key: ValueKey(tiles[index].id),
+                                      key: ValueKey(
+                                        '${tiles[index].type}:${tiles[index].id}',
+                                      ),
+                                      companyId: companyId!,
+                                      userId: userId!,
                                       pNotification: tiles[index],
                                     ),
                                   ),

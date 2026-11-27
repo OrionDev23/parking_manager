@@ -7,16 +7,22 @@ import 'package:parc_oto/screens/dashboard/notifications/notif_list.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/services/notification_dismissal_service.dart';
+
 import '../../../main.dart';
 import '../../../providers/client_database.dart';
 import '../../../serializables/notification.dart';
 import '../../sidemenu/pane_items.dart';
 
 class NotificationTile extends StatefulWidget {
+  final String companyId;
+  final String userId;
   final PNotification pNotification;
 
   const NotificationTile({
     super.key,
+    required this.companyId,
+    required this.userId,
     required this.pNotification,
   });
 
@@ -134,7 +140,7 @@ class _NotificationTileState extends State<NotificationTile> {
           const SizedBox(width: 6),
           if (!confirmingDismiss)
             Tooltip(
-              message: 'Masquer cette alerte sur cet appareil',
+              message: 'Masquer cette alerte pour ce compte',
               child: IconButton(
                 icon: Icon(
                   FluentIcons.cancel,
@@ -154,7 +160,7 @@ class _NotificationTileState extends State<NotificationTile> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Masquer cette alerte sur cet appareil pour ce compte ?',
+          'Masquer cette alerte pour ce compte ? La synchronisation se fera dès que possible.'
           style: TextStyle(
             color: theme.textColor,
             fontSize: 11,
@@ -204,6 +210,12 @@ class _NotificationTileState extends State<NotificationTile> {
         storedData.add(widget.pNotification.id);
       }
       await prefs.setStringList(recordName, storedData);
+      await NotificationDismissalService.syncDismissal(
+        companyId: widget.companyId,
+        userId: widget.userId,
+        type: widget.pNotification.type,
+        id: widget.pNotification.id,
+      );
 
       if (!mounted) return;
       if (widget.pNotification.type == 0) {
@@ -214,7 +226,10 @@ class _NotificationTileState extends State<NotificationTile> {
         PlanningProvider.removedPlanDocs = storedData;
       }
 
-      NotifListState.remove(widget.pNotification.id);
+      NotifListState.remove(
+        widget.pNotification.id,
+        type: widget.pNotification.type,
+      );
       NotifListState.changes.value++;
     } catch (error) {
       if (!mounted) return;
