@@ -982,7 +982,7 @@ class VehicleManagementState extends State<VehicleManagement>
                 Divider(color: theme.borderColor),
                 Row(
                   children: [
-                    Icon(FluentIcons.lightbulb, size: 15, color: theme.mutedTextColor),
+                    Icon(FluentIcons.info, size: 15, color: theme.mutedTextColor),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
