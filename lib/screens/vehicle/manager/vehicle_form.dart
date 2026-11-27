@@ -799,7 +799,7 @@ class _VehicleFormState extends State<VehicleForm>
       _buildVehicleIdentitySection(appTheme),
       _sectionHeader(
         appTheme,
-        'Informations administratives algériennes',
+        'vehicle_form_administrative_identity_title'.tr(),
         'Immatriculation, carte grise, titulaire et localisation administrative',
       ),
       ...getWilayaCommuneWidget(appTheme),
@@ -878,7 +878,7 @@ class _VehicleFormState extends State<VehicleForm>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Identité et photo du véhicule',
+                            'vehicle_form_identity_photo_title'.tr(),
                             style: appTheme.writingStyle.copyWith(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
@@ -886,7 +886,7 @@ class _VehicleFormState extends State<VehicleForm>
                           ),
                           const SizedBox(height: 3),
                           Text(
-                            'Immatriculation algérienne et caractéristiques constructeur',
+                            'vehicle_form_identity_photo_description'.tr(),
                             style: appTheme.writingStyle.copyWith(
                               fontSize: 12,
                               color: appTheme.writingStyle.color
@@ -1213,7 +1213,7 @@ class _VehicleFormState extends State<VehicleForm>
                     _identitySubsectionTitle(
                       appTheme,
                       availableWidth,
-                      'Immatriculation algérienne',
+                      'vehicle_form_registration_section'.tr(),
                       'Numéro d’immatriculation et informations de la carte grise',
                     ),
                     _identityField(
@@ -1354,7 +1354,7 @@ class _VehicleFormState extends State<VehicleForm>
                     _identitySubsectionTitle(
                       appTheme,
                       availableWidth,
-                      'Caractéristiques constructeur',
+                      'vehicle_form_manufacturer_section'.tr(),
                       'Marque, modèle, finition, année modèle et numéro VIN',
                     ),
                     _identityField(
@@ -1592,7 +1592,7 @@ class _VehicleFormState extends State<VehicleForm>
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'Caractéristiques techniques et gestion du parc',
+                    'vehicle_form_technical_management_section'.tr(),
                     style: appTheme.writingStyle.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -1618,7 +1618,7 @@ class _VehicleFormState extends State<VehicleForm>
                   appTheme,
                   availableWidth,
                   'Caractéristiques constructeur',
-                  'Finition, année modèle, peinture, moteur, transmission et dimensions',
+                  'vehicle_form_technical_specs_subtitle'.tr(),
                 ),
                 field('Version / finition', trimController),
                 field('Année modèle', modelYearController,
@@ -1679,8 +1679,8 @@ class _VehicleFormState extends State<VehicleForm>
                 _identitySubsectionTitle(
                   appTheme,
                   availableWidth,
-                  'Acquisition et suivi du parc',
-                  'Données de gestion propres à l’entreprise',
+                  'vehicle_form_acquisition_section'.tr(),
+                  'vehicle_form_company_management_subtitle'.tr(),
                 ),
                 field('Type d’acquisition', acquisitionTypeController,
                     hint: 'Achat, leasing, location…'),
