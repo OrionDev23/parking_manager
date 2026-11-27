@@ -63,6 +63,7 @@ class BrandTableState extends State<BrandTable> {
         );
         filterDocument.value = null;
         filterNow = false;
+        filterNow = false;
       } else {
         startedWithFiltersOn = false;
 
