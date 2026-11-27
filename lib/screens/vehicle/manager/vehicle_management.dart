@@ -979,7 +979,7 @@ class VehicleManagementState extends State<VehicleManagement>
                   ),
                 ),
                 const Spacer(),
-                Divider(color: theme.borderColor),
+                Container(height: 1, color: theme.borderColor),
                 Row(
                   children: [
                     Icon(FluentIcons.info, size: 15, color: theme.mutedTextColor),
@@ -1026,11 +1026,27 @@ class VehicleManagementState extends State<VehicleManagement>
           const SizedBox(height: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: ratio,
-              minHeight: 5,
-              backgroundColor: theme.fillColor,
-              valueColor: AlwaysStoppedAnimation<Color>(item.color),
+            child: SizedBox(
+              height: 5,
+              child: LayoutBuilder(
+                builder: (context, constraints) => Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    DecoratedBox(
+                      decoration: BoxDecoration(color: theme.fillColor),
+                    ),
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: SizedBox(
+                        width: constraints.maxWidth * ratio,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(color: item.color),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 6),
@@ -1057,11 +1073,27 @@ class VehicleManagementState extends State<VehicleManagement>
           width: 100,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: ratio,
-              minHeight: 5,
-              backgroundColor: theme.fillColor,
-              valueColor: AlwaysStoppedAnimation<Color>(item.color),
+            child: SizedBox(
+              height: 5,
+              child: LayoutBuilder(
+                builder: (context, constraints) => Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    DecoratedBox(
+                      decoration: BoxDecoration(color: theme.fillColor),
+                    ),
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: SizedBox(
+                        width: constraints.maxWidth * ratio,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(color: item.color),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
