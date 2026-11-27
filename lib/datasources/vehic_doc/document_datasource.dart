@@ -46,6 +46,34 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
       ),
       DataCell(
         SelectableText(
+          element.value.documentType?.trim().isNotEmpty == true
+              ? ('vehicle_doc_type_' + element.value.documentType!).tr()
+              : '',
+          style: rowTextStyle,
+        ),
+      ),
+      DataCell(
+        Row(
+          children: [
+            if (element.value.fileId?.trim().isNotEmpty == true) ...[
+              const Icon(f.FluentIcons.attach, size: 12),
+              const SizedBox(width: 5),
+              Expanded(
+                child: SelectableText(
+                  element.value.fileName?.trim().isNotEmpty == true
+                      ? element.value.fileName!
+                      : 'vehicle_doc_attachment_available'.tr(),
+                  style: rowTextStyle,
+                  maxLines: 1,
+                ),
+              ),
+            ] else
+              SelectableText('vehicle_doc_no_attachment'.tr(), style: rowTextStyle),
+          ],
+        ),
+      ),
+      DataCell(
+        SelectableText(
           element.value.dateExpiration != null
               ? dateFormat2.format(element.value.dateExpiration!)
               : '',
