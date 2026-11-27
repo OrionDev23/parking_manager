@@ -55,6 +55,7 @@ class FicheReceptionTableState extends State<FicheReceptionTable> {
       );
       filterDocument.value = null;
         filterNow = false;
+        filterNow = false;
     } else {
       startedWithFiltersOn = false;
 
