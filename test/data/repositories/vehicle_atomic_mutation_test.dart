@@ -127,7 +127,7 @@ void main() {
             .select('SELECT MAX(version) AS version FROM schema_migrations')
             .single['version'];
 
-        expect(version, 16);
+        expect(version, 17);
         expect(row['id'], 'legacy-operation-001');
         expect(row['company_id'], companyId);
         expect(row['entity_id'], 'vehicle-legacy-001');
@@ -142,6 +142,11 @@ void main() {
         final localTables = legacyDatabase.select(
           "SELECT name FROM sqlite_master WHERE type='table'",
         ).map((item) => item['name'] as String).toSet();
+        final eventColumns = legacyDatabase
+            .select('PRAGMA table_info(parking_access_events)')
+            .map((row) => row['name'] as String)
+            .toSet();
+        expect(eventColumns, contains('assignment_id'));
         expect(
           localTables,
           containsAll({
@@ -161,7 +166,7 @@ void main() {
       }
     });
 
-    test('opens with the version 16 parking schema and ordered outbox', () async {
+    test('opens with the version 17 parking schema and ordered outbox', () async {
       final migrations = database.database.select(
         'SELECT version FROM schema_migrations ORDER BY version',
       );
@@ -171,7 +176,7 @@ void main() {
           .map((row) => row['name'] as String)
           .toSet();
 
-      expect(latestVersion, 16);
+      expect(latestVersion, 17);
       expect(
         columns,
         containsAll({
