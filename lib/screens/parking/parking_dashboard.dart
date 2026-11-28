@@ -371,9 +371,30 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
     ParkingCanvasDocument document;
     try {
       document = ParkingCanvasDocument.fromJsonString(layout.layersJson);
-      if (document.layers.isEmpty) {
-        document = ParkingCanvasDocument.withDefaultLayers();
+      final defaultLayers =
+          ParkingCanvasDocument.withDefaultLayers().layers;
+      final layers = [...document.layers];
+      for (final defaultLayer in defaultLayers) {
+        if (layers.any((layer) => layer.type == defaultLayer.type)) continue;
+        var layerId = defaultLayer.id;
+        var suffix = 1;
+        while (layers.any((layer) => layer.id == layerId)) {
+          layerId = '${defaultLayer.id}_$suffix';
+          suffix++;
+        }
+        layers.add(
+          defaultLayer.copyWith(
+            id: layerId,
+            sortOrder: layers.length,
+          ),
+        );
       }
+      document = document.copyWith(
+        layers: [
+          for (var index = 0; index < layers.length; index++)
+            layers[index].copyWith(sortOrder: index),
+        ],
+      );
     } catch (error) {
       displayInfoBar(
         context,
