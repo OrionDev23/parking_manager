@@ -127,7 +127,7 @@ void main() {
             .select('SELECT MAX(version) AS version FROM schema_migrations')
             .single['version'];
 
-        expect(version, 15);
+        expect(version, 16);
         expect(row['id'], 'legacy-operation-001');
         expect(row['company_id'], companyId);
         expect(row['entity_id'], 'vehicle-legacy-001');
@@ -161,7 +161,7 @@ void main() {
       }
     });
 
-    test('opens with the version 15 parking schema and ordered outbox', () async {
+    test('opens with the version 16 parking schema and ordered outbox', () async {
       final migrations = database.database.select(
         'SELECT version FROM schema_migrations ORDER BY version',
       );
@@ -171,7 +171,7 @@ void main() {
           .map((row) => row['name'] as String)
           .toSet();
 
-      expect(latestVersion, 15);
+      expect(latestVersion, 16);
       expect(
         columns,
         containsAll({
@@ -296,6 +296,18 @@ void main() {
             created_at, updated_at)
            VALUES ('assignment-a', ?, 'vehicle-a', 'space-a', 'active', ?, ?, ?)""",
         [companyId, now, now, now],
+      );
+
+      // A future reservation may share the current space/vehicle only
+      // when the interval policy confirms that the time windows do not overlap.
+      db.execute(
+        """INSERT INTO vehicle_parking_assignments
+           (id, company_id, vehicle_id, parking_space_id, assignment_type,
+            status, start_at, end_at, created_at, updated_at)
+           VALUES ('reservation-a', ?, 'vehicle-a', 'space-a', 'reserved',
+                   'active', '2026-11-23T10:00:00.000Z',
+                   '2026-11-23T12:00:00.000Z', ?, ?)""",
+        [companyId, now, now],
       );
 
       expect(
