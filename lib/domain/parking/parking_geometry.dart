@@ -135,7 +135,8 @@ class ParkingRowSpec {
         gap < 0) {
       throw ArgumentError('Row geometry must contain finite, valid dimensions.');
     }
-    if (spacePrefix.contains('/') || spacePrefix.contains(r'\\')) {
+    if (spacePrefix.contains('/') ||
+        spacePrefix.contains(String.fromCharCode(92))) {
       throw ArgumentError('Space prefix cannot contain path separators.');
     }
   }
