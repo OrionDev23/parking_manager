@@ -296,7 +296,7 @@ class DocumentTableState extends State<DocumentTable> {
                                                               BoxConstraints.tight(
                                                                 _responsiveDocumentDialogSize(context),
                                                               ),
-                                                          title: const Text(
+                                                          title: Text(
                                                             'selectvehicle',
                                                           ).tr(),
                                                           style: ContentDialogThemeData(
@@ -327,6 +327,7 @@ class DocumentTableState extends State<DocumentTable> {
                                                         );
                                                       },
                                                     );
+                                                    if (!mounted) return;
                                                     setState(() {});
                                                     setS(() {});
                                                   },
