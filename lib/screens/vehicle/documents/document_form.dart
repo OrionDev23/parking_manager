@@ -312,7 +312,7 @@ class DocumentFormState extends State<DocumentForm> {
       );
     } catch (error) {
       if (mounted) {
-        _showMessage('vehicle_doc_download_failed'.tr() + ': $error', isError: true);
+        _showMessage('${'vehicle_doc_download_failed'.tr()}: $error', isError: true);
       }
     }
   }
