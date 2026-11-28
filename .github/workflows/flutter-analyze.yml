@@ -3,9 +3,11 @@ name: Flutter analysis
 on:
   push:
     branches:
+      - master
       - refactor/foundation-v1
   pull_request:
     branches:
+      - master
       - refactor/foundation-v1
   workflow_dispatch:
 
