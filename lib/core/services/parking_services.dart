@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../core/database/local_database.dart';
 import '../../data/local/parking/local_parking_source.dart';
+import '../../data/local/parking/parking_file_store.dart';
 import '../../data/local/parking/sqlite_parking_source.dart';
 
 /// Current tenant-scoped Parking runtime.
@@ -15,11 +16,13 @@ class ParkingServices {
 
   final LocalDatabase localDatabase;
   final LocalParkingSource local;
+  final ParkingFileStore files;
   final String companyId;
 
   ParkingServices._({
     required this.localDatabase,
     required this.local,
+    required this.files,
     required this.companyId,
   });
 
@@ -36,6 +39,7 @@ class ParkingServices {
         localDatabase,
         companyId: companyId,
       ),
+      files: ParkingFileStore(companyId: companyId),
       companyId: companyId,
     );
   }
