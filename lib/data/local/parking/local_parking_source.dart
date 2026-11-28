@@ -6,6 +6,16 @@ import '../../../domain/parking/parking_models.dart';
 /// Until the remote Parking schema and server-side mutation handlers are
 /// provisioned, records remain local drafts and are never sent to the outbox.
 abstract interface class LocalParkingSource {
+  /// Creates an entire first-use parking setup in one SQLite transaction.
+  /// A validation or uniqueness failure leaves no partial site or parking rows.
+  Future<void> createParkingSetup({
+    required ParkingSite site,
+    required ParkingLot parkingLot,
+    required ParkingLayout layout,
+    required List<ParkingZone> zones,
+    required List<ParkingSpace> spaces,
+  });
+
   Future<List<ParkingSite>> getSites();
   Future<ParkingSite?> getSite(String id);
   Future<void> upsertSite(ParkingSite site);
