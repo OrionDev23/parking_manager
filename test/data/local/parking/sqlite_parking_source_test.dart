@@ -237,8 +237,8 @@ void main() {
 
       expect(await parking.getSites(), hasLength(1));
       expect(await otherTenant.getSites(), hasLength(1));
-      expect(
-        () => otherTenant.upsertParkingLot(
+      await expectLater(
+        otherTenant.upsertParkingLot(
           lot(
             id: 'lot-other',
             tenant: otherCompanyId,
@@ -247,8 +247,8 @@ void main() {
         ),
         throwsA(isA<StateError>()),
       );
-      expect(
-        () => otherTenant.upsertSite(
+      await expectLater(
+        otherTenant.upsertSite(
           site(id: 'site-001', tenant: otherCompanyId, code: 'TRANSFER'),
         ),
         throwsA(isA<StateError>()),
@@ -262,8 +262,8 @@ void main() {
       await vehicles.upsertVehicle(vehicle());
       await parking.createAssignment(assignment());
 
-      expect(
-        () => parking.upsertSpace(
+      await expectLater(
+        parking.upsertSpace(
           space(status: ParkingSpaceStatus.blocked),
         ),
         throwsA(isA<StateError>()),
@@ -338,7 +338,7 @@ void main() {
             assignmentId: 'another-assignment',
           ),
         ),
-        throwsA(isA<ArgumentError>()),
+        throwsA(isA<StateError>()),
       );
 
       expect(await parking.getAssignment(created.id), isNull);
