@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:sqlite3/sqlite3.dart';
 
 import '../../../core/database/local_database.dart';
+import '../../../domain/parking/parking_geometry.dart';
 import '../../../domain/parking/parking_models.dart';
 import 'local_parking_source.dart';
 
@@ -61,6 +63,297 @@ class SqliteParkingSource implements LocalParkingSource {
       throw const FormatException('Stored Parking payload is not an object.');
     }
     return Map<String, dynamic>.from(decoded);
+  }
+
+
+  List<ParkingPoint> _spaceFootprint(ParkingSpace space) {
+    if (space.polygon != null) return space.polygon!.points;
+    final geometry = space.rectangle!;
+    final angle = geometry.rotationDegrees * math.pi / 180;
+    final cosine = math.cos(angle);
+    final sine = math.sin(angle);
+    return [
+      for (final dx in [-geometry.width / 2, geometry.width / 2])
+        for (final dy in [-geometry.length / 2, geometry.length / 2])
+          ParkingPoint(
+            x: geometry.centerX + dx * cosine - dy * sine,
+            y: geometry.centerY + dx * sine + dy * cosine,
+          ),
+    ];
+  }
+
+  bool _insidePolygon(ParkingPoint point, ParkingPolygon polygon) {
+    const epsilon = 1e-8;
+    var inside = false;
+    final points = polygon.points;
+    for (var i = 0, j = points.length - 1; i < points.length; j = i++) {
+      final a = points[j];
+      final b = points[i];
+      final cross = (b.x - a.x) * (point.y - a.y) -
+          (b.y - a.y) * (point.x - a.x);
+      if (cross.abs() <= epsilon &&
+          point.x >= math.min(a.x, b.x) - epsilon &&
+          point.x <= math.max(a.x, b.x) + epsilon &&
+          point.y >= math.min(a.y, b.y) - epsilon &&
+          point.y <= math.max(a.y, b.y) + epsilon) {
+        return true;
+      }
+      final crossesY = (a.y > point.y) != (b.y > point.y);
+      if (crossesY) {
+        final intersectionX =
+            (b.x - a.x) * (point.y - a.y) / (b.y - a.y) + a.x;
+        if (point.x < intersectionX) inside = !inside;
+      }
+    }
+    return inside;
+  }
+
+  void _validateSetupGeometry({
+    required ParkingLayout layout,
+    required List<ParkingZone> zones,
+    required List<ParkingSpace> spaces,
+  }) {
+    const epsilon = 1e-7;
+    bool inPlan(ParkingPoint point) =>
+        point.isFinite &&
+        point.x >= -epsilon &&
+        point.y >= -epsilon &&
+        point.x <= layout.widthM + epsilon &&
+        point.y <= layout.heightM + epsilon;
+
+    for (final zone in zones) {
+      final boundary = zone.boundary;
+      if (boundary == null) continue;
+      if (boundary.points.any((point) => !inPlan(point))) {
+        throw ArgumentError(
+          'Zone "' + zone.code + '" extends outside the plan.',
+        );
+      }
+    }
+
+    final zonesById = {for (final zone in zones) zone.id: zone};
+    for (final space in spaces) {
+      final footprint = _spaceFootprint(space);
+      if (footprint.any((point) => !inPlan(point))) {
+        throw ArgumentError(
+          'Space "' + space.code + '" extends outside the plan.',
+        );
+      }
+      final zone = zonesById[space.parkingZoneId]!;
+      final boundary = zone.boundary;
+      if (boundary != null &&
+          footprint.any((point) => !_insidePolygon(point, boundary))) {
+        throw ArgumentError(
+          'Space "' + space.code + '" extends outside zone "' +
+              zone.code + '".',
+        );
+      }
+    }
+  }
+
+  void _insertNewSite(ParkingSite site) {
+    final json = site.toJson();
+    _db.execute(
+      '''INSERT INTO sites
+        (id, company_id, code, name, status, created_at, updated_at, payload)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+      [
+        site.id,
+        companyId,
+        site.code,
+        site.name,
+        json['status'],
+        site.createdAt.toUtc().toIso8601String(),
+        site.updatedAt.toUtc().toIso8601String(),
+        jsonEncode(json),
+      ],
+    );
+  }
+
+  void _insertNewLot(ParkingLot parkingLot) {
+    final json = parkingLot.toJson();
+    _db.execute(
+      '''INSERT INTO parking_lots
+        (id, company_id, site_id, code, name, address, status,
+         created_at, updated_at, payload)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+      [
+        parkingLot.id,
+        companyId,
+        parkingLot.siteId,
+        parkingLot.code,
+        parkingLot.name,
+        parkingLot.address,
+        json['status'],
+        parkingLot.createdAt.toUtc().toIso8601String(),
+        parkingLot.updatedAt.toUtc().toIso8601String(),
+        jsonEncode(json),
+      ],
+    );
+  }
+
+  void _insertNewLayout(ParkingLayout layout) {
+    final json = layout.toJson();
+    _db.execute(
+      '''INSERT INTO parking_layouts
+        (id, company_id, parking_lot_id, name, version, status,
+         width_m, height_m, unit, grid_step_m, background_file_id,
+         background_transform_json, layers_json, created_at, updated_at,
+         payload)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'm', ?, ?, ?, ?, ?, ?, ?)''',
+      [
+        layout.id,
+        companyId,
+        layout.parkingLotId,
+        layout.name,
+        layout.version,
+        json['status'],
+        layout.widthM,
+        layout.heightM,
+        layout.gridStepM,
+        layout.backgroundFileId,
+        json['backgroundTransformJson'],
+        layout.layersJson,
+        layout.createdAt.toUtc().toIso8601String(),
+        layout.updatedAt.toUtc().toIso8601String(),
+        jsonEncode(json),
+      ],
+    );
+  }
+
+  void _insertNewZone(ParkingZone zone) {
+    final json = zone.toJson();
+    _db.execute(
+      '''INSERT INTO parking_zones
+        (id, company_id, parking_lot_id, code, name, zone_type, status,
+         geometry_json, sort_order, color_token, created_at, updated_at,
+         payload)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+      [
+        zone.id,
+        companyId,
+        zone.parkingLotId,
+        zone.code,
+        zone.name,
+        json['zoneType'],
+        json['status'],
+        json['geometryJson'],
+        zone.sortOrder,
+        zone.colorToken,
+        zone.createdAt.toUtc().toIso8601String(),
+        zone.updatedAt.toUtc().toIso8601String(),
+        jsonEncode(json),
+      ],
+    );
+  }
+
+  void _insertNewSpace(ParkingSpace space) {
+    final json = space.toJson();
+    final geometry = space.rectangle;
+    _db.execute(
+      '''INSERT INTO parking_spaces
+        (id, company_id, parking_zone_id, code, space_type, status,
+         x_m, y_m, width_m, length_m, rotation_deg, shape_type,
+         geometry_json, row_code, sort_order, max_length_mm, max_width_mm,
+         max_height_mm, max_weight_kg, created_at, updated_at, payload)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+      [
+        space.id,
+        companyId,
+        space.parkingZoneId,
+        space.code,
+        json['spaceType'],
+        json['status'],
+        geometry?.centerX,
+        geometry?.centerY,
+        geometry?.width,
+        geometry?.length,
+        geometry?.rotationDegrees ?? 0,
+        json['shapeType'],
+        json['geometryJson'],
+        space.rowCode,
+        space.sortOrder,
+        space.maxLengthMm,
+        space.maxWidthMm,
+        space.maxHeightMm,
+        space.maxWeightKg,
+        space.createdAt.toUtc().toIso8601String(),
+        space.updatedAt.toUtc().toIso8601String(),
+        jsonEncode(json),
+      ],
+    );
+  }
+
+  @override
+  Future<void> createParkingSetup({
+    required ParkingSite site,
+    required ParkingLot parkingLot,
+    required ParkingLayout layout,
+    required List<ParkingZone> zones,
+    required List<ParkingSpace> spaces,
+  }) async {
+    site.validate();
+    parkingLot.validate();
+    layout.validate();
+    if (zones.isEmpty || spaces.isEmpty) {
+      throw ArgumentError(
+        'A new parking setup requires at least one zone and one space.',
+      );
+    }
+    if (site.companyId != companyId ||
+        parkingLot.companyId != companyId ||
+        layout.companyId != companyId) {
+      throw StateError(
+        'Every parking setup entity must belong to the active company.',
+      );
+    }
+    if (parkingLot.siteId != site.id || layout.parkingLotId != parkingLot.id) {
+      throw ArgumentError('Parking setup parent references are inconsistent.');
+    }
+
+    final zoneIds = <String>{};
+    for (final zone in zones) {
+      zone.validate();
+      if (zone.companyId != companyId || zone.parkingLotId != parkingLot.id) {
+        throw ArgumentError('Every zone must belong to the new parking.');
+      }
+      if (!zoneIds.add(zone.id)) {
+        throw ArgumentError('Duplicate zone ID: ' + zone.id + '.');
+      }
+    }
+    final spaceIds = <String>{};
+    for (final space in spaces) {
+      space.validate();
+      if (space.companyId != companyId ||
+          !zoneIds.contains(space.parkingZoneId)) {
+        throw ArgumentError('Every space must belong to a zone in this parking.');
+      }
+      if (!spaceIds.add(space.id)) {
+        throw ArgumentError('Duplicate space ID: ' + space.id + '.');
+      }
+    }
+    _validateSetupGeometry(layout: layout, zones: zones, spaces: spaces);
+
+    _transaction(() {
+      _assertTenantOwnership('sites', site.id);
+      _assertTenantOwnership('parking_lots', parkingLot.id);
+      _assertTenantOwnership('parking_layouts', layout.id);
+      for (final zone in zones) {
+        _assertTenantOwnership('parking_zones', zone.id);
+      }
+      for (final space in spaces) {
+        _assertTenantOwnership('parking_spaces', space.id);
+      }
+      _insertNewSite(site);
+      _insertNewLot(parkingLot);
+      _insertNewLayout(layout);
+      for (final zone in zones) {
+        _insertNewZone(zone);
+      }
+      for (final space in spaces) {
+        _insertNewSpace(space);
+      }
+    });
   }
 
   @override
