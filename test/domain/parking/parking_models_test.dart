@@ -188,6 +188,33 @@ void main() {
       expect(world.y, closeTo(198, 1e-10));
     });
 
+    test('rotates raster pixel axes into the selected plan orientation', () {
+      const horizontal = ParkingBackgroundTransform(
+        metersPerPixel: 0.1,
+      );
+      const vertical = ParkingBackgroundTransform(
+        metersPerPixel: 0.1,
+        rotationDegrees: 90,
+      );
+
+      final horizontalPoint = horizontal.imageToWorld(
+        const ParkingPoint(x: 10, y: 0),
+      );
+      final verticalPoint = vertical.imageToWorld(
+        const ParkingPoint(x: 10, y: 0),
+      );
+      final verticalDownPoint = vertical.imageToWorld(
+        const ParkingPoint(x: 0, y: 10),
+      );
+
+      expect(horizontalPoint.x, closeTo(1, 1e-10));
+      expect(horizontalPoint.y, closeTo(0, 1e-10));
+      expect(verticalPoint.x, closeTo(0, 1e-10));
+      expect(verticalPoint.y, closeTo(1, 1e-10));
+      expect(verticalDownPoint.x, closeTo(1, 1e-10));
+      expect(verticalDownPoint.y, closeTo(0, 1e-10));
+    });
+
     test('rejects invalid scale, dimensions and non-array layer JSON', () {
       expect(
         () => ParkingBackgroundTransform(metersPerPixel: 0).validate(),
