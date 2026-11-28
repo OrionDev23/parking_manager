@@ -35,6 +35,7 @@ import '../user_management/user_management.dart';
 import '../platform/platform_companies_screen.dart';
 import '../access/access_management.dart';
 import '../vehicle/vehicle_dashboard.dart';
+import '../parking/parking_dashboard.dart';
 import '../workshop/inventory/fournisseurs/fournisseur_tabs.dart';
 import '../workshop/parts/brands/brand_tabs.dart';
 import '../workshop/parts/categories/category_tabs.dart';
@@ -54,6 +55,7 @@ class PaneItemsAndFooters {
   static late PaneItem accessManagement;
   static late PaneItemExpander userAccessManagement;
   static late PaneItem vehicles;
+  static late PaneItem parking;
   static late PaneItemExpander reparations;
   static late PaneItemExpander chauffeurs;
   static late PaneItem evenements;
@@ -107,6 +109,12 @@ class PaneItemsAndFooters {
       ),
       title: Text('thevehicles', style: paneTextStyle).tr(),
       body: const VehicleDashboard(),
+    );
+    parking = PaneItem(
+      key: const ValueKey('parking'),
+      icon: Icon(FluentIcons.car, color: appTheme.color.lightest),
+      title: const Text('Parking'),
+      body: const ParkingDashboard(),
     );
     chauffeurs = PaneItemExpander(
       key: Key("chauffeurs"),
@@ -365,6 +373,7 @@ class PaneItemsAndFooters {
           dashboard,
           PaneItemHeader(header: const Text('EXPLOITATION')),
           vehicles,
+          parking,
           chauffeurs,
           if (authService.session?.hasPermission('planning.manage') == true)
             planner,
