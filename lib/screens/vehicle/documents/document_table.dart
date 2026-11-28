@@ -371,14 +371,14 @@ class DocumentTableState extends State<DocumentTable> {
                                                               .filter(filters);
                                                         }
                                                       : null,
-                                                  child: const Text('clear')
+                                                  child: Text('clear')
                                                       .tr(),
                                                 ),
                                                 Button(
                                                   onPressed: () {
                                                     Navigator.of(context).pop();
                                                   },
-                                                  child: const Text('annuler')
+                                                  child: Text('annuler')
                                                       .tr(),
                                                 ),
                                                 smallSpace,
@@ -394,7 +394,7 @@ class DocumentTableState extends State<DocumentTable> {
                                                               .lighter,
                                                         ),
                                                   ),
-                                                  child: const Text('confirmer')
+                                                  child: Text('confirmer')
                                                       .tr(),
                                                   onPressed: () {
                                                     Navigator.of(context).pop();
