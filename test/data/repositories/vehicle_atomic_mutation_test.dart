@@ -127,7 +127,7 @@ void main() {
             .select('SELECT MAX(version) AS version FROM schema_migrations')
             .single['version'];
 
-        expect(version, 17);
+        expect(version, 18);
         expect(row['id'], 'legacy-operation-001');
         expect(row['company_id'], companyId);
         expect(row['entity_id'], 'vehicle-legacy-001');
@@ -147,6 +147,19 @@ void main() {
             .map((row) => row['name'] as String)
             .toSet();
         expect(eventColumns, contains('assignment_id'));
+        final assignmentIndexes = legacyDatabase
+            .select("PRAGMA index_list('vehicle_parking_assignments')")
+            .map((row) => row['name'] as String)
+            .toSet();
+        expect(
+          assignmentIndexes,
+          containsAll({
+            'idx_parking_assignment_space_window',
+            'idx_parking_assignment_vehicle_window',
+          }),
+        );
+        expect(assignmentIndexes, isNot(contains('ux_parking_active_space')));
+        expect(assignmentIndexes, isNot(contains('ux_parking_active_vehicle')));
         expect(
           localTables,
           containsAll({
@@ -166,7 +179,7 @@ void main() {
       }
     });
 
-    test('opens with the version 17 parking schema and ordered outbox', () async {
+    test('opens with the version 18 parking schema and ordered outbox', () async {
       final migrations = database.database.select(
         'SELECT version FROM schema_migrations ORDER BY version',
       );
@@ -176,7 +189,7 @@ void main() {
           .map((row) => row['name'] as String)
           .toSet();
 
-      expect(latestVersion, 17);
+      expect(latestVersion, 18);
       expect(
         columns,
         containsAll({
