@@ -200,21 +200,29 @@ class AppwriteSyncEngine implements SyncEngine {
         final recordKey =
             '${operation.companyId}:${operation.entity}:${operation.entityId}';
         if (blockedRecords.contains(recordKey)) continue;
+        final conflictReason = operation.conflictReason ?? '';
         final isRecoveredUnknownAction =
             operation.status == SyncOperationStatus.conflict &&
             operation.entity == 'vehicle' &&
             operation.type == SyncOperationType.create &&
-            (operation.conflictReason ?? '').contains('Unknown action');
-        if (isRecoveredUnknownAction) {
-          // This exact permanent rejection was caused by the old tenant API
-          // deployment not recognizing the create action. The server hotfix
-          // is now active; retry this existing idempotent vehicle create
-          // instead of leaving it blocked forever in SQLite.
+            conflictReason.contains('Unknown action');
+        final isRecoveredLegacyUserCreationSchemaConflict =
+            operation.status == SyncOperationStatus.conflict &&
+            operation.entity == 'vehicle' &&
+            operation.type == SyncOperationType.create &&
+            conflictReason.contains(
+              'Attribute "user_creation" has invalid type',
+            );
+        if (isRecoveredUnknownAction ||
+            isRecoveredLegacyUserCreationSchemaConflict) {
+          // These exact permanent rejections have known client-side fixes.
+          // Retry the original idempotent create after deploying the matching
+          // serializer fix; never retry arbitrary 4xx conflicts automatically.
           await queue.retryConflict(operation.id);
           debugPrint(
-            '[ParcOto Sync] retrying legacy unknown-action vehicle create '
-            'after tenant API deployment fix: operationId=${operation.id} '
-            'entityId=${operation.entityId}',
+            '[ParcOto Sync] retrying recovered vehicle create conflict '
+            'reason=${isRecoveredUnknownAction ? 'legacy_unknown_action' : 'legacy_user_creation_schema'} '
+            'operationId=${operation.id} entityId=${operation.entityId}',
           );
         } else if (operation.status == SyncOperationStatus.conflict) {
           blockedRecords.add(recordKey);
