@@ -707,8 +707,6 @@ class LocalDatabase {
       }
     }
 
-  }
-
 
     if (version < 17) {
       db.execute('BEGIN IMMEDIATE');
