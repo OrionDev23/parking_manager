@@ -61,7 +61,6 @@ class GuidedFormShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = context.watch<AppTheme>();
-    final accent = appTheme.color;
     final safeStep = currentStep.clamp(0, steps.length - 1).toInt();
     final progress = (safeStep + 1) / steps.length;
 
@@ -327,7 +326,6 @@ class GuidedFormShell extends StatelessWidget {
 
   Widget _buildFooter(BuildContext context, AppTheme appTheme) {
     final compact = MediaQuery.sizeOf(context).width < 640;
-    final accent = appTheme.color;
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: compact ? 12 : 24,
@@ -440,6 +438,7 @@ class GuidedFormProgressTrack extends StatelessWidget {
   final Color color;
 
   const GuidedFormProgressTrack({
+    super.key,
     required this.progress,
     required this.color,
   });
