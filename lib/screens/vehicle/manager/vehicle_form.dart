@@ -157,7 +157,7 @@ class _VehicleFormState extends State<VehicleForm>
   TextEditingController wilayaCont = TextEditingController();
   TextEditingController dairaCont = TextEditingController();
   TextEditingController communeCont = TextEditingController();
-  TextEditingController quittance = TextEditingController(text: '800');
+  TextEditingController quittance = TextEditingController();
   TextEditingController numero = TextEditingController();
 
   TextEditingController matempl = TextEditingController();
@@ -197,7 +197,7 @@ class _VehicleFormState extends State<VehicleForm>
   final fleetNumberController = TextEditingController();
   final mileageController = TextEditingController();
   final nextServiceMileageController = TextEditingController();
-  DateTime? selectedAnnee = DateTime(2023);
+  DateTime? selectedAnnee;
 
   String? _resolvedImageUrl;
   String? _resolvedImageFileId;
@@ -236,9 +236,9 @@ class _VehicleFormState extends State<VehicleForm>
   // shrink when the virtual keyboard opens and must not change form geometry.
   bool get _isCompactViewport => MediaQuery.sizeOf(context).width < 640;
 
-  String wilaya = "16";
+  String wilaya = '';
 
-  DateTime selectedDate = DateTime.now();
+  DateTime? selectedDate;
 
   bool lourd = false;
   bool service = false;
@@ -295,7 +295,7 @@ class _VehicleFormState extends State<VehicleForm>
       wilaya = widget.vehicle!.wilaya?.toString() ?? '';
       communeCont.text = widget.vehicle!.commune ?? '';
       dairaCont.text = widget.vehicle!.daira ?? '';
-      selectedDate = widget.vehicle!.date ?? DateTime.now();
+      selectedDate = widget.vehicle!.date;
       quittance.text = widget.vehicle!.quittance?.toString() ?? '';
       numero.text = widget.vehicle!.numero ?? '';
       lname.text = widget.vehicle!.nom ?? '';
@@ -333,9 +333,9 @@ class _VehicleFormState extends State<VehicleForm>
       selectedDirection.text = VehiclesUtilities.getDirection(
         widget.vehicle!.direction,
       );
-      selectedAnnee = DateTime(
-        widget.vehicle!.anneeUtil ?? DateTime.now().year,
-      );
+      selectedAnnee = widget.vehicle!.anneeUtil == null
+          ? null
+          : DateTime(widget.vehicle!.anneeUtil!);
       trimController.text = widget.vehicle!.trim ?? '';
       modelYearController.text = widget.vehicle!.modelYear?.toString() ?? '';
       colorController.text = _normalizeVehiclePaint(widget.vehicle!.color);
@@ -3372,12 +3372,9 @@ class _VehicleFormState extends State<VehicleForm>
       selectedAppartenanceEmploye.text = VehiclesUtilities.getAppartenance(
         conducteur.filliale,
       );
-      adresse.text = conducteur.adresse ?? '';
-      fname.text = conducteur.prenom;
+      // A driver is an operational assignment, not the registered owner.
+      // Only update driver-specific fields; preserve card-holder and vehicle data.
       matempl.text = conducteur.matricule;
-      lname.text = conducteur.name;
-      service = conducteur.service;
-      profession.text = conducteur.profession ?? '';
       setState(() {});
     }
   }
@@ -4181,6 +4178,60 @@ class _VehicleFormState extends State<VehicleForm>
         docName: vehicle.matricule,
       );
     }
+  }
+
+  @override
+  void dispose() {
+    matriculeEtr.dispose();
+    matr1.dispose();
+    matr2.dispose();
+    matr3.dispose();
+    wilayaCont.dispose();
+    dairaCont.dispose();
+    communeCont.dispose();
+    quittance.dispose();
+    numero.dispose();
+    matempl.dispose();
+    lname.dispose();
+    fname.dispose();
+    profession.dispose();
+    adresse.dispose();
+    type.dispose();
+    numSer.dispose();
+    caross.dispose();
+    energie.dispose();
+    puissance.dispose();
+    places.dispose();
+    poidsT.dispose();
+    charg.dispose();
+    trimController.dispose();
+    modelYearController.dispose();
+    colorController.dispose();
+    engineDisplacementController.dispose();
+    enginePowerHpController.dispose();
+    enginePowerKwController.dispose();
+    engineCodeController.dispose();
+    transmissionController.dispose();
+    gearboxController.dispose();
+    driveTypeController.dispose();
+    doorsController.dispose();
+    lengthController.dispose();
+    widthController.dispose();
+    heightController.dispose();
+    acquisitionTypeController.dispose();
+    acquisitionDateController.dispose();
+    purchasePriceController.dispose();
+    supplierController.dispose();
+    warrantyEndDateController.dispose();
+    fleetNumberController.dispose();
+    mileageController.dispose();
+    nextServiceMileageController.dispose();
+    selectedAppartenance.dispose();
+    selectedAppartenanceEmploye.dispose();
+    selectedDepartment.dispose();
+    selectedDirection.dispose();
+    selectedFiliale.dispose();
+    super.dispose();
   }
 
   @override
