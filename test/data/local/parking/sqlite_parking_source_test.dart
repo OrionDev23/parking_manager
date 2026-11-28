@@ -202,6 +202,130 @@ void main() {
   }
 
   group('SqliteParkingSource configuration', () {
+    test('creates a complete parking setup as a single transaction', () async {
+      final newSite = site(id: 'site-atomic');
+      final newLot = lot(id: 'lot-atomic', parentSiteId: newSite.id);
+      final newLayout = ParkingLayout(
+        id: 'layout-atomic',
+        companyId: companyId,
+        parkingLotId: newLot.id,
+        name: 'Plan atomic',
+        version: 1,
+        widthM: 80,
+        heightM: 45,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      final newZone = ParkingZone(
+        id: 'zone-atomic',
+        companyId: companyId,
+        parkingLotId: newLot.id,
+        code: 'A',
+        name: 'Zone A',
+        boundary: ParkingPolygon(
+          points: const [
+            ParkingPoint(x: 0, y: 0),
+            ParkingPoint(x: 80, y: 0),
+            ParkingPoint(x: 80, y: 45),
+            ParkingPoint(x: 0, y: 45),
+          ],
+        ),
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      final newSpace = ParkingSpace(
+        id: 'space-atomic',
+        companyId: companyId,
+        parkingZoneId: newZone.id,
+        code: 'A1-001',
+        rectangle: const ParkingSpaceGeometry(
+          centerX: 5,
+          centerY: 5,
+          width: 2.5,
+          length: 5,
+        ),
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+
+      await parking.createParkingSetup(
+        site: newSite,
+        parkingLot: newLot,
+        layout: newLayout,
+        zones: [newZone],
+        spaces: [newSpace],
+      );
+
+      expect((await parking.getSites()).single.id, newSite.id);
+      expect((await parking.getParkingLots()).single.id, newLot.id);
+      expect((await parking.getLayouts(newLot.id)).single.id, newLayout.id);
+      expect((await parking.getZones(newLot.id)).single.id, newZone.id);
+      expect((await parking.getSpaces(newZone.id)).single.id, newSpace.id);
+    });
+
+    test('rolls back a new setup when generated geometry exceeds the plan',
+        () async {
+      final newSite = site(id: 'site-invalid');
+      final newLot = lot(id: 'lot-invalid', parentSiteId: newSite.id);
+      final newLayout = ParkingLayout(
+        id: 'layout-invalid',
+        companyId: companyId,
+        parkingLotId: newLot.id,
+        name: 'Plan invalide',
+        version: 1,
+        widthM: 20,
+        heightM: 20,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      final newZone = ParkingZone(
+        id: 'zone-invalid',
+        companyId: companyId,
+        parkingLotId: newLot.id,
+        code: 'A',
+        name: 'Zone A',
+        boundary: ParkingPolygon(
+          points: const [
+            ParkingPoint(x: 0, y: 0),
+            ParkingPoint(x: 20, y: 0),
+            ParkingPoint(x: 20, y: 20),
+            ParkingPoint(x: 0, y: 20),
+          ],
+        ),
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      final outsideSpace = ParkingSpace(
+        id: 'space-invalid',
+        companyId: companyId,
+        parkingZoneId: newZone.id,
+        code: 'A1-001',
+        rectangle: const ParkingSpaceGeometry(
+          centerX: 19,
+          centerY: 19,
+          width: 4,
+          length: 5,
+          rotationDegrees: 45,
+        ),
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+
+      await expectLater(
+        parking.createParkingSetup(
+          site: newSite,
+          parkingLot: newLot,
+          layout: newLayout,
+          zones: [newZone],
+          spaces: [outsideSpace],
+        ),
+        throwsA(isA<ArgumentError>()),
+      );
+
+      expect(await parking.getSites(), isEmpty);
+      expect(await parking.getParkingLots(), isEmpty);
+    });
+
     test('persists site, parking, calibrated plan, zone and spaces', () async {
       await seedConfiguration(withSecondSpace: true);
 
