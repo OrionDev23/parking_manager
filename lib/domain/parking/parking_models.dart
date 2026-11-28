@@ -288,7 +288,7 @@ class ParkingPolygon {
       };
 
   factory ParkingPolygon.fromJson(Map<String, dynamic> json) {
-    if ((json['version'] as num?)?.toInt() != 1 ||
+    if (_requiredInt(json, 'version') != 1 ||
         json['type'] != 'polygon' ||
         (json['unit'] != null && json['unit'] != 'm') ||
         json['points'] is! List) {
@@ -1024,7 +1024,7 @@ class ParkingSpace {
           ? null
           : ParkingPolygon.fromJson(polygonJson),
       rowCode: _optionalString(json, 'rowCode', maxLength: 40),
-      sortOrder: (json['sortOrder'] as num?)?.toInt() ?? 0,
+      sortOrder: _optionalInt(json, 'sortOrder') ?? 0,
       maxLengthMm: _optionalInt(json, 'maxLengthMm'),
       maxWidthMm: _optionalInt(json, 'maxWidthMm'),
       maxHeightMm: _optionalInt(json, 'maxHeightMm'),
@@ -1176,6 +1176,7 @@ enum ParkingAssignmentConflictReason {
   vehicleAlreadyAssigned,
   parkingSpaceUnavailable,
   tenantMismatch,
+  spaceReferenceMismatch,
 }
 
 class ParkingAssignmentConflict implements Exception {
@@ -1189,8 +1190,9 @@ class ParkingAssignmentConflict implements Exception {
 
   @override
   String toString() =>
-      'Parking assignment conflict: \${reason.name}'
-      '\${conflictingAssignmentId == null ? '' : ' (\$conflictingAssignmentId)'}';
+      'Parking assignment conflict: ' +
+      reason.name +
+      (conflictingAssignmentId == null ? '' : ' ($conflictingAssignmentId)');
 }
 
 /// Enforces time-window conflicts before an assignment is written.
@@ -1207,6 +1209,7 @@ class ParkingAssignmentPolicy {
     required Iterable<VehicleParkingAssignment> existing,
   }) {
     candidate.validate();
+    if (candidate.status != ParkingAssignmentStatus.active) return;
     space.validate();
 
     if (candidate.companyId != space.companyId) {
@@ -1216,7 +1219,7 @@ class ParkingAssignmentPolicy {
     }
     if (candidate.parkingSpaceId != space.id) {
       throw const ParkingAssignmentConflict(
-        ParkingAssignmentConflictReason.tenantMismatch,
+        ParkingAssignmentConflictReason.spaceReferenceMismatch,
       );
     }
     if (!space.canReceiveAssignment) {
@@ -1224,8 +1227,6 @@ class ParkingAssignmentPolicy {
         ParkingAssignmentConflictReason.parkingSpaceUnavailable,
       );
     }
-    if (candidate.status != ParkingAssignmentStatus.active) return;
-
     for (final current in existing) {
       if (current.id == candidate.id ||
           current.companyId != candidate.companyId ||
