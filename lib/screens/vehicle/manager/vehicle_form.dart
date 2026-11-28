@@ -1832,7 +1832,7 @@ class _VehicleFormState extends State<VehicleForm>
           : result.providers.join(' + ');
       final warningText = result.warnings.isEmpty
           ? ''
-          : ' ' + result.warnings.join(' ');
+          : ' ${result.warnings.join(' ')}';
 
       setState(() {
         _vinDecodeMetadata = {
@@ -1844,22 +1844,14 @@ class _VehicleFormState extends State<VehicleForm>
           'warnings': result.warnings,
         };
         _vinDecodeMessage = result.status == 'decoded'
-            ? 'Décodage terminé via ' +
-                providerLabel +
-                ' : ' +
-                populated.toString() +
-                ' champ(s) renseigné(s).' +
-                warningText
-            : 'Décodage partiel via ' +
-                providerLabel +
-                '. Vérifiez les données manquantes.' +
-                warningText;
+            ? 'Décodage terminé via $providerLabel : $populated champ(s) renseigné(s).$warningText'
+            : 'Décodage partiel via $providerLabel. Vérifiez les données manquantes.$warningText';
       });
     } catch (error) {
       if (!mounted) return;
       setState(() {
         _vinDecodeMetadata = null;
-        _vinDecodeMessage = 'Échec du décodage VIN : ' + error.toString();
+        _vinDecodeMessage = 'Échec du décodage VIN : $error';
       });
     } finally {
       if (mounted) {
