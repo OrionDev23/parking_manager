@@ -127,7 +127,7 @@ void main() {
             .select('SELECT MAX(version) AS version FROM schema_migrations')
             .single['version'];
 
-        expect(version, 18);
+        expect(version, 19);
         expect(row['id'], 'legacy-operation-001');
         expect(row['company_id'], companyId);
         expect(row['entity_id'], 'vehicle-legacy-001');
@@ -160,6 +160,14 @@ void main() {
         );
         expect(assignmentIndexes, isNot(contains('ux_parking_active_space')));
         expect(assignmentIndexes, isNot(contains('ux_parking_active_vehicle')));
+        final mediaColumns = legacyDatabase
+            .select('PRAGMA table_info(parking_media)')
+            .map((row) => row['name'] as String)
+            .toSet();
+        expect(
+          mediaColumns,
+          containsAll({'pixel_width', 'pixel_height'}),
+        );
         expect(
           localTables,
           containsAll({
@@ -179,7 +187,7 @@ void main() {
       }
     });
 
-    test('opens with the version 18 parking schema and ordered outbox', () async {
+    test('opens with the version 19 parking schema and ordered outbox', () async {
       final migrations = database.database.select(
         'SELECT version FROM schema_migrations ORDER BY version',
       );
@@ -189,7 +197,7 @@ void main() {
           .map((row) => row['name'] as String)
           .toSet();
 
-      expect(latestVersion, 18);
+      expect(latestVersion, 19);
       expect(
         columns,
         containsAll({
