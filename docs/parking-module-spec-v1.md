@@ -140,7 +140,10 @@ Colonnes communes tenant-scoped + :
 ### 5.5 `vehicle_parking_assignments`
 - `vehicleId`, `parkingSpaceId`, `assignmentType` (reserved/assigned/temporary), `status` (active/ended/cancelled), `startAt`, `endAt`, `assignedBy`, `notes`.
 - Ajouter `sourceType` (manual/connect_scan/import/system), `entryEventId` facultatif, `exitEventId` facultatif, `endedBy` facultatif.
-- Une seule affectation active incompatible par place et une seule place principale active par véhicule.
+- Les affectations physiques (`assigned` / `temporary`) ne peuvent pas se chevaucher pour une même place ni pour un même véhicule.
+- Une réservation (`reserved`) est une fenêtre temporelle, jamais une occupation physique immédiate ; elle exige une date de fin.
+- Les intervalles sont semi-ouverts `[startAt, endAt)` : une affectation qui se termine à 12:00 ne chevauche pas une nouvelle affectation qui commence à 12:00.
+- Les réservations peuvent coexister avec l'affectation physique en cours uniquement si leurs fenêtres ne se chevauchent pas. Cette règle est vérifiée dans une transaction par la politique métier locale et côté serveur ; les index uniques SQLite protègent les seules affectations physiques instantanées.
 - Validation de compatibilité dimensions/catégorie/capacité côté serveur.
 - Transaction atomique : clôture de l'affectation active + création de la suivante + événement métier/receipt.
 
@@ -180,6 +183,7 @@ Créer `parking_access_events` append-only :
 - Occupation : free / occupied / reserved.
 - Une place en maintenance ou bloquée n'est jamais considérée libre pour une affectation.
 - Une réservation est une affectation planifiée ou un état dérivé ; elle ne doit pas être confondue avec l'occupation physique constatée.
+- Le statut « réservée » est calculé à partir d'une réservation dont la fenêtre inclut l'instant considéré ; en dehors de cette fenêtre, la place n'est ni occupée ni réservée par cette ligne.
 
 ## 7. Intégration véhicule
 
