@@ -576,6 +576,44 @@ void main() {
           hasLength(2));
     });
 
+    test('allows adjacent physical assignments on the same space', () async {
+      await seedConfiguration();
+      await vehicles.upsertVehicle(vehicle());
+
+      final first = assignment(
+        id: 'assignment-morning',
+        startAt: DateTime.utc(2026, 11, 28, 8),
+        endAt: DateTime.utc(2026, 11, 28, 10),
+      );
+      final next = assignment(
+        id: 'assignment-later',
+        startAt: DateTime.utc(2026, 11, 28, 10),
+        endAt: DateTime.utc(2026, 11, 28, 12),
+      );
+
+      await parking.createAssignment(first);
+      await parking.createAssignment(next);
+
+      final history = await parking.getAssignments(
+        parkingSpaceId: 'space-001',
+      );
+      expect(history, hasLength(2));
+      expect(
+        (await parking.getCurrentAssignment(
+          'vehicle-001',
+          at: DateTime.utc(2026, 11, 28, 9),
+        ))!.id,
+        first.id,
+      );
+      expect(
+        (await parking.getCurrentAssignment(
+          'vehicle-001',
+          at: DateTime.utc(2026, 11, 28, 10),
+        ))!.id,
+        next.id,
+      );
+    });
+
     test('does not allow a vehicle to occupy two spaces in overlapping windows',
         () async {
       await seedConfiguration(withSecondSpace: true);
