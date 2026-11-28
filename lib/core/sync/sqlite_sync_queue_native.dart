@@ -23,6 +23,9 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
     id: row['id'] as String,
     idempotencyKey: row['idempotency_key'] as String? ?? row['id'] as String,
     payloadVersion: row['payload_version'] as int? ?? 1,
+    dependsOnOperationId: row['depends_on_operation_id'] as String?,
+    sequenceNo: row['sequence_no'] as int? ?? 0,
+    baseRevision: row['base_revision'] as int?,
     companyId: row['company_id'] as String,
     deviceId: row['device_id'] as String,
     entity: row['entity'] as String,
@@ -112,12 +115,16 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
       if (mergedType != null) {
         _db.execute(
           '''UPDATE sync_operations
-             SET operation = ?, payload = ?, device_id = ?
+             SET operation = ?, payload = ?, device_id = ?,
+                 depends_on_operation_id = COALESCE(depends_on_operation_id, ?),
+                 base_revision = COALESCE(?, base_revision)
              WHERE id = ?''',
           [
             _type(mergedType),
             jsonEncode(operation.payload),
             operation.deviceId,
+            operation.dependsOnOperationId,
+            operation.baseRevision,
             previous.id,
           ],
         );
@@ -125,11 +132,22 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
       }
     }
 
+    final sequenceRows = _db.select(
+      'SELECT COALESCE(MAX(sequence_no), 0) AS sequence_no '
+      'FROM sync_operations WHERE company_id = ?',
+      [operation.companyId],
+    );
+    final nextSequence = (sequenceRows.single['sequence_no'] as int) + 1;
+    final sequenceNo = operation.sequenceNo > 0
+        ? operation.sequenceNo
+        : nextSequence;
+
     _db.execute(
       '''INSERT INTO sync_operations
         (id, company_id, device_id, entity, entity_id, operation,
-         payload, created_at, status, attempts, idempotency_key, payload_version)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         payload, created_at, status, attempts, idempotency_key, payload_version,
+         depends_on_operation_id, sequence_no, base_revision)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO NOTHING''',
       [
         operation.id,
@@ -144,6 +162,9 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
         operation.attempts,
         operation.idempotencyKey,
         operation.payloadVersion,
+        operation.dependsOnOperationId,
+        sequenceNo,
+        operation.baseRevision,
       ],
     );
   }
@@ -153,14 +174,45 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
     int limit = 50,
     String? companyId,
   }) async {
+    final conflictedParents = companyId == null
+        ? _db.select(
+            "SELECT id, company_id FROM sync_operations WHERE status='conflict'",
+          )
+        : _db.select(
+            "SELECT id, company_id FROM sync_operations WHERE company_id=? AND status='conflict'",
+            [companyId],
+          );
+    for (final parent in conflictedParents) {
+      _db.execute(
+        """UPDATE sync_operations
+           SET status='conflict', conflict_reason='dependency_blocked',
+               conflicted_at=COALESCE(conflicted_at, ?)
+           WHERE company_id=? AND depends_on_operation_id=? AND status='pending'""",
+        [
+          DateTime.now().toUtc().toIso8601String(),
+          parent['company_id'],
+          parent['id'],
+        ],
+      );
+    }
     final now = DateTime.now().toUtc().toIso8601String();
     final rows = companyId == null
         ? _db.select(
             """SELECT * FROM sync_operations
-               WHERE status IN ('pending','conflict')
-                  OR (status='failed' AND
-                      (next_attempt_at IS NULL OR next_attempt_at <= ?))
-               ORDER BY created_at, rowid LIMIT ?""",
+               WHERE (
+                 status IN ('pending','conflict')
+                 OR (status='failed' AND
+                     (next_attempt_at IS NULL OR next_attempt_at <= ?))
+               )
+               AND (
+                 depends_on_operation_id IS NULL OR EXISTS (
+                   SELECT 1 FROM sync_operations parent
+                   WHERE parent.id = sync_operations.depends_on_operation_id
+                     AND parent.company_id = sync_operations.company_id
+                     AND parent.status = 'completed'
+                 )
+               )
+               ORDER BY sequence_no, created_at, rowid LIMIT ?""",
             [now, limit],
           )
         : _db.select(
@@ -170,7 +222,15 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
                  OR (status='failed' AND
                      (next_attempt_at IS NULL OR next_attempt_at <= ?))
                )
-               ORDER BY created_at, rowid LIMIT ?""",
+               AND (
+                 depends_on_operation_id IS NULL OR EXISTS (
+                   SELECT 1 FROM sync_operations parent
+                   WHERE parent.id = sync_operations.depends_on_operation_id
+                     AND parent.company_id = sync_operations.company_id
+                     AND parent.status = 'completed'
+                 )
+               )
+               ORDER BY sequence_no, created_at, rowid LIMIT ?""",
             [companyId, now, limit],
           );
     return rows.map(_fromRow).toList(growable: false);
@@ -354,6 +414,15 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
            SET status='pending', conflict_reason=NULL, conflicted_at=NULL, next_attempt_at=NULL, last_error_code=NULL, last_error_message=NULL
            WHERE id=? AND status='conflict'""",
         [operationId],
+      );
+      _db.execute(
+        """UPDATE sync_operations
+           SET status='pending', conflict_reason=NULL, conflicted_at=NULL,
+               next_attempt_at=NULL
+           WHERE company_id=? AND depends_on_operation_id=?
+             AND status='conflict'
+             AND conflict_reason='dependency_blocked'""",
+        [row['company_id'], operationId],
       );
       _db.execute(
         """INSERT INTO sync_conflict_resolutions
