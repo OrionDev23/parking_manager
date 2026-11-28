@@ -825,6 +825,7 @@ class SqliteParkingSource implements LocalParkingSource {
     VehicleParkingAssignment current, {
     required DateTime endedAt,
     String? endedBy,
+    String? exitEventId,
   }) {
     final utcEnd = endedAt.toUtc();
     if (!utcEnd.isAfter(current.startAt.toUtc())) {
@@ -842,7 +843,7 @@ class SqliteParkingSource implements LocalParkingSource {
       startAt: current.startAt,
       endAt: utcEnd,
       entryEventId: current.entryEventId,
-      exitEventId: current.exitEventId,
+      exitEventId: exitEventId ?? current.exitEventId,
       assignedBy: current.assignedBy,
       endedBy: endedBy,
       notes: current.notes,
@@ -1050,7 +1051,12 @@ class SqliteParkingSource implements LocalParkingSource {
       if (assignment.status != ParkingAssignmentStatus.active) {
         throw StateError('Assignment is already closed.');
       }
-      _endAssignment(assignment, endedAt: endedAt, endedBy: endedBy);
+      _endAssignment(
+        assignment,
+        endedAt: endedAt,
+        endedBy: endedBy,
+        exitEventId: event?.id,
+      );
       if (event != null) {
         if (event.assignmentId != assignment.id ||
             event.vehicleId != assignment.vehicleId) {
