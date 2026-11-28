@@ -1107,6 +1107,9 @@ class VehicleParkingAssignment {
     if (endAt != null && !endAt!.isAfter(startAt)) {
       throw ArgumentError('endAt must be later than startAt.');
     }
+    if (type == ParkingAssignmentType.reserved && endAt == null) {
+      throw ArgumentError('Reservations require a defined endAt.');
+    }
     if (status == ParkingAssignmentStatus.ended && endAt == null) {
       throw ArgumentError('Ended assignments require endAt.');
     }
@@ -1166,6 +1169,100 @@ class VehicleParkingAssignment {
         createdAt: _requiredDate(json, 'createdAt'),
         updatedAt: _requiredDate(json, 'updatedAt'),
       )..validate();
+}
+
+enum ParkingAssignmentConflictReason {
+  parkingSpaceAlreadyAssigned,
+  vehicleAlreadyAssigned,
+  parkingSpaceUnavailable,
+  tenantMismatch,
+}
+
+class ParkingAssignmentConflict implements Exception {
+  final ParkingAssignmentConflictReason reason;
+  final String? conflictingAssignmentId;
+
+  const ParkingAssignmentConflict(
+    this.reason, {
+    this.conflictingAssignmentId,
+  });
+
+  @override
+  String toString() =>
+      'Parking assignment conflict: \${reason.name}'
+      '\${conflictingAssignmentId == null ? '' : ' (\$conflictingAssignmentId)'}';
+}
+
+/// Enforces time-window conflicts before an assignment is written.
+///
+/// Intervals are half-open [startAt, endAt): an assignment ending at 10:00
+/// does not conflict with another one starting at 10:00. The repository must
+/// call this policy inside the same SQLite transaction as its write.
+class ParkingAssignmentPolicy {
+  const ParkingAssignmentPolicy();
+
+  void ensureAllowed({
+    required VehicleParkingAssignment candidate,
+    required ParkingSpace space,
+    required Iterable<VehicleParkingAssignment> existing,
+  }) {
+    candidate.validate();
+    space.validate();
+
+    if (candidate.companyId != space.companyId) {
+      throw const ParkingAssignmentConflict(
+        ParkingAssignmentConflictReason.tenantMismatch,
+      );
+    }
+    if (candidate.parkingSpaceId != space.id) {
+      throw const ParkingAssignmentConflict(
+        ParkingAssignmentConflictReason.tenantMismatch,
+      );
+    }
+    if (!space.canReceiveAssignment) {
+      throw const ParkingAssignmentConflict(
+        ParkingAssignmentConflictReason.parkingSpaceUnavailable,
+      );
+    }
+    if (candidate.status != ParkingAssignmentStatus.active) return;
+
+    for (final current in existing) {
+      if (current.id == candidate.id ||
+          current.companyId != candidate.companyId ||
+          current.status != ParkingAssignmentStatus.active ||
+          !_overlaps(candidate, current)) {
+        continue;
+      }
+      if (current.parkingSpaceId == candidate.parkingSpaceId) {
+        throw ParkingAssignmentConflict(
+          ParkingAssignmentConflictReason.parkingSpaceAlreadyAssigned,
+          conflictingAssignmentId: current.id,
+        );
+      }
+      if (current.vehicleId == candidate.vehicleId) {
+        throw ParkingAssignmentConflict(
+          ParkingAssignmentConflictReason.vehicleAlreadyAssigned,
+          conflictingAssignmentId: current.id,
+        );
+      }
+    }
+  }
+
+  bool _overlaps(
+    VehicleParkingAssignment left,
+    VehicleParkingAssignment right,
+  ) {
+    final leftStart = left.startAt.toUtc();
+    final rightStart = right.startAt.toUtc();
+    final leftEnd = left.endAt?.toUtc();
+    final rightEnd = right.endAt?.toUtc();
+
+    final leftEndsAfterRightStarts =
+        leftEnd == null || rightStart.isBefore(leftEnd);
+    final rightEndsAfterLeftStarts =
+        rightEnd == null || leftStart.isBefore(rightEnd);
+    return leftEndsAfterRightStarts && rightEndsAfterLeftStarts;
+  }
 }
 
 class ParkingAccessEvent {
