@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:image_picker/image_picker.dart';
@@ -30,6 +31,7 @@ import '../../../theme.dart';
 import '../../../utilities/algeria_lists.dart';
 import '../../../widgets/select_dialog/select_dialog.dart';
 import '../../../widgets/forms/parcoto_form_field.dart';
+import '../../../widgets/forms/guided_form_shell.dart';
 import '../../../widgets/vehicle_image_view.dart';
 import 'widgets/vehicle_make_picker_dialog.dart';
 
@@ -250,10 +252,42 @@ class _VehicleFormState extends State<VehicleForm>
   TextEditingController selectedFiliale = TextEditingController();
   List<String> matriculesPrec = [];
 
+  static const List<GuidedFormStep> _guidedSteps = [
+    GuidedFormStep(title: 'Identification', icon: FluentIcons.car),
+    GuidedFormStep(title: 'Carte grise', icon: FluentIcons.document),
+    GuidedFormStep(title: 'Caractéristiques', icon: FluentIcons.settings),
+    GuidedFormStep(title: 'Affectation', icon: FluentIcons.people),
+    GuidedFormStep(title: 'Acquisition', icon: FluentIcons.shopping_cart),
+    GuidedFormStep(title: 'Documents', icon: FluentIcons.check_mark),
+  ];
+
+  static const List<String> _stepHeadings = [
+    'Identité du véhicule',
+    'Carte grise et titulaire',
+    'Caractéristiques techniques',
+    'Affectation et usage',
+    'Acquisition et exploitation',
+    'Documents et vérification',
+  ];
+
+  static const List<String> _stepDescriptions = [
+    'Commencez par identifier le véhicule. Les informations reconnues par le VIN restent modifiables.',
+    'Renseignez le document d’immatriculation et le titulaire tel qu’il apparaît sur la carte grise.',
+    'Complétez les données constructeur, la motorisation, la transmission et les capacités.',
+    'Définissez le conducteur et le rattachement organisationnel du véhicule.',
+    'Ajoutez les informations d’acquisition, le numéro de parc et les données de compteur disponibles.',
+    'Vérifiez les informations saisies. Les pièces jointes pourront être ajoutées depuis la fiche après création.',
+  ];
+
+  int _currentStep = 0;
+  final ScrollController _formScrollController = ScrollController();
+  String? _stepValidationMessage;
+
   @override
   void initState() {
     super.initState();
     initValues();
+    unawaited(_restoreGuidedDraft());
     unawaited(
       VehicleMakeService.load().then((_) {
         if (!mounted) return;
@@ -288,9 +322,7 @@ class _VehicleFormState extends State<VehicleForm>
       }
       pays = widget.vehicle!.pays ?? 'DZ';
       wilayaCont.text =
-          AlgeriaList().getWilayaByNum(
-            widget.vehicle!.wilaya?.toString() ?? '16',
-          ) ??
+          AlgeriaList().getWilayaByNum(widget.vehicle!.wilaya?.toString() ?? '') ??
           '';
       wilaya = widget.vehicle!.wilaya?.toString() ?? '';
       communeCont.text = widget.vehicle!.commune ?? '';
@@ -313,7 +345,7 @@ class _VehicleFormState extends State<VehicleForm>
       poidsT.text = widget.vehicle!.poidsTotal?.toString() ?? '';
       charg.text = widget.vehicle!.charegeUtile?.toString() ?? '';
       matriculesPrec.addAll(widget.vehicle!.matriculePrec ?? []);
-      selectedDate = widget.vehicle!.date ?? DateTime.now();
+      selectedDate = widget.vehicle!.date;
       lourd = widget.vehicle!.lourd;
       matempl.text = widget.vehicle!.matriculeConducteur ?? '';
       service = widget.vehicle!.service;
@@ -381,139 +413,1050 @@ class _VehicleFormState extends State<VehicleForm>
   Widget build(BuildContext context) {
     super.build(context);
     final appTheme = context.watch<AppTheme>();
+    final isLastStep = _currentStep == _guidedSteps.length - 1;
 
-    return ScaffoldPage(
-      padding: EdgeInsets.zero,
-      content: LayoutBuilder(
-        builder: (context, constraints) {
-          final compact = constraints.maxWidth < 720;
-          final showSummary = constraints.maxWidth >= 1220;
+    return GuidedFormShell(
+      title: widget.vehicle == null ? 'Ajouter un véhicule' : 'Modifier un véhicule',
+      subtitle: 'Création guidée · Enregistrement progressif',
+      steps: _guidedSteps,
+      currentStep: _currentStep,
+      scrollController: _formScrollController,
+      sidePanel: _buildGuidedSidePanel(appTheme),
+      readOnly: widget.readOnly,
+      saving: uploading,
+      canGoBack: _currentStep > 0,
+      canContinue: !uploading,
+      continueLabel: isLastStep ? 'Enregistrer le véhicule' : 'Continuer',
+      onCancel: widget.onCancel,
+      onSaveDraft: _saveGuidedDraft,
+      onPrevious: _goToPreviousStep,
+      onContinue: _continueGuidedStep,
+      onSelectStep: _selectGuidedStep,
+      child: _buildGuidedStepBody(appTheme),
+    );
+  }
 
-          final formContent = Container(
-            padding: EdgeInsets.all(compact ? 12 : 20),
-            decoration: BoxDecoration(
-              color: FluentTheme.of(context).micaBackgroundColor,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey[30]),
+  void _scrollGuidedFormToTop() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_formScrollController.hasClients) return;
+      _formScrollController.jumpTo(0);
+    });
+  }
+
+  void _selectGuidedStep(int index) {
+    if (index < 0 || index >= _guidedSteps.length || index >= _currentStep) {
+      return;
+    }
+    setState(() {
+      _currentStep = index;
+      _stepValidationMessage = null;
+    });
+    _scrollGuidedFormToTop();
+  }
+
+  void _goToPreviousStep() {
+    if (_currentStep <= 0) return;
+    setState(() {
+      _currentStep--;
+      _stepValidationMessage = null;
+    });
+    _scrollGuidedFormToTop();
+  }
+
+  void _continueGuidedStep() {
+    if (!_validateGuidedStep(_currentStep)) return;
+    if (_currentStep == _guidedSteps.length - 1) {
+      confirmAndUpload();
+      return;
+    }
+    setState(() {
+      _currentStep++;
+      _stepValidationMessage = null;
+    });
+    _scrollGuidedFormToTop();
+  }
+
+  bool _validateGuidedStep(int step) {
+    String? message;
+    if (step == 0) {
+      final registrationIsValid = autreMat
+          ? matriculeEtr.text.trim().length >= 4
+          : matr1.text.trim().isNotEmpty &&
+              matr2.text.trim().length >= 3 &&
+              matr3.text.trim().length >= 2;
+      final chassisIsValid = !chassisKey || numSer.text.trim().isNotEmpty;
+      setState(() {
+        erreurMatricule = !registrationIsValid;
+        errorChassis = !chassisIsValid;
+      });
+      if (!registrationIsValid) {
+        message = 'Veuillez renseigner une immatriculation valide avant de continuer.';
+      } else if (!chassisIsValid) {
+        message = 'Le numéro de châssis est obligatoire pour cette catégorie.';
+      }
+    } else if (step == 2) {
+      final integerFields = <(String, TextEditingController)>[
+        ('Année modèle', modelYearController),
+        ('Cylindrée', engineDisplacementController),
+        ('Nombre de portes', doorsController),
+        ('Longueur', lengthController),
+        ('Largeur', widthController),
+        ('Hauteur', heightController),
+        ('Puissance fiscale', puissance),
+        ('Nombre de places', places),
+        ('Poids total', poidsT),
+        ('Charge utile', charg),
+      ];
+      final invalid = integerFields
+          .where((field) =>
+              field.$2.text.trim().isNotEmpty &&
+              int.tryParse(field.$2.text.trim()) == null)
+          .map((field) => field.$1)
+          .toList(growable: false);
+      final decimalFields = <(String, TextEditingController)>[
+        ('Puissance moteur (ch)', enginePowerHpController),
+        ('Puissance moteur (kW)', enginePowerKwController),
+      ];
+      final invalidDecimals = decimalFields
+          .where((field) =>
+              field.$2.text.trim().isNotEmpty &&
+              double.tryParse(field.$2.text.trim().replaceAll(',', '.')) == null)
+          .map((field) => field.$1)
+          .toList(growable: false);
+      final allInvalid = [...invalid, ...invalidDecimals];
+      if (allInvalid.isNotEmpty) {
+        message = 'Vérifiez les valeurs numériques : ${allInvalid.join(', ')}.';
+      }
+    } else if (step == 4) {
+      final acquisition = acquisitionDateController.text.trim();
+      final warranty = warrantyEndDateController.text.trim();
+      final price = purchasePriceController.text.trim();
+      if ((acquisition.isNotEmpty && DateTime.tryParse(acquisition) == null) ||
+          (warranty.isNotEmpty && DateTime.tryParse(warranty) == null)) {
+        message = 'Une date d’acquisition ou de garantie est invalide.';
+      } else if (price.isNotEmpty &&
+          double.tryParse(price.replaceAll(',', '.')) == null) {
+        message = 'Le prix d’acquisition doit être un montant numérique.';
+      }
+    }
+
+    setState(() => _stepValidationMessage = message);
+    if (message == null) return true;
+
+    displayInfoBar(
+      context,
+      builder: (context, close) => InfoBar(
+        title: Text(message!),
+        severity: InfoBarSeverity.error,
+      ),
+      duration: snackbarShortDuration,
+    );
+    return false;
+  }
+
+  List<Widget> _guidedStepChildren(AppTheme appTheme) {
+    switch (_currentStep) {
+      case 0:
+        return [_buildVehicleIdentitySection(appTheme)];
+      case 1:
+        return [
+          _sectionHeader(
+            appTheme,
+            'Carte grise et titulaire',
+            'Immatriculation, document administratif et identité du titulaire.',
+          ),
+          ...getWilayaCommuneWidget(appTheme),
+          ...secondLine(appTheme),
+          _buildRegisteredOwnerStep(appTheme),
+        ];
+      case 2:
+        return [
+          _sectionHeader(
+            appTheme,
+            'Caractéristiques du véhicule',
+            'Les unités sont conservées séparément : puissance fiscale, puissance moteur et capacités.',
+          ),
+          ...seventhLine(appTheme),
+          ...eightLine(appTheme),
+          _buildProfessionalDetailsSection(
+            appTheme,
+            includeTechnical: true,
+            includeAcquisition: false,
+          ),
+        ];
+      case 3:
+        return [_buildDriverAssignmentStep(appTheme)];
+      case 4:
+        return [
+          _buildProfessionalDetailsSection(
+            appTheme,
+            includeTechnical: false,
+            includeAcquisition: true,
+          ),
+        ];
+      case 5:
+        return [_buildDocumentsReviewStep(appTheme)];
+      default:
+        return const [];
+    }
+  }
+
+  Widget _buildGuidedStepBody(AppTheme appTheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: appTheme.color.withValues(alpha: .11),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(_guidedSteps[_currentStep].icon, color: appTheme.color),
             ),
-            child: StaggeredGrid.count(
-              crossAxisCount: 12,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              children: gridChildren(appTheme),
-            ),
-          );
-
-          return Container(
-            color: appTheme.backGroundColor,
-            child: Column(
-              children: [
-                _buildEditorHeader(appTheme),
-                Expanded(
-                  child: SingleChildScrollView(
-                    keyboardDismissBehavior:
-                        ScrollViewKeyboardDismissBehavior.onDrag,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: compact ? 12 : 24,
-                      vertical: compact ? 14 : 22,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _stepHeadings[_currentStep],
+                    style: appTheme.writingStyle.copyWith(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
                     ),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 1380),
-                        child: showSummary
-                            ? Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(flex: 7, child: formContent),
-                                  const SizedBox(width: 20),
-                                  SizedBox(
-                                    width: 300,
-                                    child: _buildEditorSummary(appTheme),
-                                  ),
-                                ],
-                              )
-                            : Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [formContent],
-                              ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _stepDescriptions[_currentStep],
+                    style: appTheme.writingStyle.copyWith(
+                      fontSize: 12,
+                      color: appTheme.mutedTextColor,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 18),
+        if (_stepValidationMessage?.isNotEmpty == true) ...[
+          InfoBar(
+            title: Text(_stepValidationMessage!),
+            severity: InfoBarSeverity.error,
+          ),
+          const SizedBox(height: 12),
+        ],
+        StaggeredGrid.count(
+          crossAxisCount: 12,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          children: _guidedStepChildren(appTheme),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRegisteredOwnerStep(AppTheme appTheme) {
+    return StaggeredGridTile.fit(
+      crossAxisCellCount: 12,
+      child: Container(
+        margin: const EdgeInsets.only(top: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: appTheme.backGroundColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: appTheme.borderColor),
+        ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final columns = constraints.maxWidth >= 700 ? 2 : 1;
+            final fieldWidth =
+                (constraints.maxWidth - (columns - 1) * 12) / columns;
+            Widget textField(
+              String label,
+              TextEditingController controller, {
+              String? hint,
+              int maxLength = 80,
+            }) {
+              return _identityField(
+                appTheme,
+                width: fieldWidth,
+                label: label,
+                child: ParcotoTextBox(
+                  enabled: !widget.readOnly,
+                  controller: controller,
+                  maxLength: maxLength,
+                  placeholder: hint ?? label,
+                  style: appTheme.writingStyle,
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color,
+                  onChanged: (_) => setState(() {}),
+                ),
+              );
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _identitySubsectionTitle(
+                  appTheme,
+                  constraints.maxWidth,
+                  'Titulaire de la carte grise',
+                  'Ces informations décrivent le titulaire enregistré, pas le conducteur affecté.',
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 14,
+                  children: [
+                    textField('Nom du titulaire', lname),
+                    textField('Prénom du titulaire', fname),
+                    textField('Profession', profession, maxLength: 100),
+                    textField(
+                      'Adresse administrative',
+                      adresse,
+                      maxLength: 180,
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDriverAssignmentStep(AppTheme appTheme) {
+    final company = MyEntrepriseState.p;
+    final filiales = company?.filiales ?? const <String>[];
+    final directions = company?.directions ?? const <String>[];
+    final departments = company?.departments ?? const <String>[];
+
+    return StaggeredGridTile.fit(
+      crossAxisCellCount: 12,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: appTheme.backGroundColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: appTheme.borderColor),
+        ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final columns = constraints.maxWidth >= 700 ? 2 : 1;
+            final fieldWidth =
+                (constraints.maxWidth - (columns - 1) * 12) / columns;
+
+            Widget suggestionField(
+              String label,
+              TextEditingController controller,
+              List<String> values,
+            ) {
+              return _identityField(
+                appTheme,
+                width: fieldWidth,
+                label: label,
+                child: ParcotoFieldSurface(
+                  child: AutoSuggestBox<String>(
+                    enabled: !widget.readOnly,
+                    controller: controller,
+                    placeholder: label,
+                    placeholderStyle: placeStyle,
+                    items: values
+                        .map(
+                          (value) => AutoSuggestBoxItem<String>(
+                            value: value,
+                            label: value.toUpperCase(),
+                          ),
+                        )
+                        .toList(growable: false),
+                  ),
+                ),
+              );
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _identitySubsectionTitle(
+                  appTheme,
+                  constraints.maxWidth,
+                  'Conducteur',
+                  'Sélectionnez un conducteur de cette entreprise ou saisissez son matricule.',
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 14,
+                  children: [
+                    _identityField(
+                      appTheme,
+                      width: fieldWidth,
+                      label: 'Conducteur affecté',
+                      child: SizedBox(
+                        height: 44,
+                        child: Button(
+                          onPressed: widget.readOnly
+                              ? null
+                              : () => selectConducteur(appTheme),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(FluentIcons.people, size: 14),
+                              SizedBox(width: 8),
+                              Text('Choisir dans les conducteurs'),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
+                    _identityField(
+                      appTheme,
+                      width: fieldWidth,
+                      label: 'Matricule du conducteur',
+                      child: ParcotoTextBox(
+                        enabled: !widget.readOnly,
+                        controller: matempl,
+                        maxLength: 30,
+                        placeholder: 'Matricule du conducteur',
+                        style: appTheme.writingStyle,
+                        placeholderStyle: placeStyle,
+                        cursorColor: appTheme.color,
+                        onChanged: (_) => setState(() {}),
+                      ),
+                    ),
+                    suggestionField(
+                      'Appartenance du conducteur',
+                      selectedAppartenanceEmploye,
+                      filiales,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                _identitySubsectionTitle(
+                  appTheme,
+                  constraints.maxWidth,
+                  'Organisation et rattachement',
+                  'Les listes sont alimentées par les paramètres de l’entreprise active.',
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 14,
+                  children: [
+                    suggestionField(
+                      'Appartenance du véhicule',
+                      selectedAppartenance,
+                      filiales,
+                    ),
+                    suggestionField(
+                      'Filiale d’exploitation',
+                      selectedFiliale,
+                      filiales,
+                    ),
+                    suggestionField(
+                      'Direction',
+                      selectedDirection,
+                      directions,
+                    ),
+                    suggestionField(
+                      'Département',
+                      selectedDepartment,
+                      departments,
+                    ),
+                    _identityField(
+                      appTheme,
+                      width: fieldWidth,
+                      label: 'Type d’usage',
+                      child: ParcotoFieldSurface(
+                        child: Checkbox(
+                          checked: service,
+                          onChanged: widget.readOnly
+                              ? null
+                              : (value) => setState(() {
+                                    service = value ?? false;
+                                  }),
+                          content: const Text('Véhicule de service'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'La sélection d’un conducteur ne modifie jamais le titulaire de la carte grise.',
+                  style: TextStyle(
+                    color: appTheme.mutedTextColor,
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDocumentsReviewStep(AppTheme appTheme) {
+    final registration = autreMat
+        ? matriculeEtr.text.trim()
+        : [matr1.text, matr2.text, matr3.text]
+            .where((part) => part.trim().isNotEmpty)
+            .join('-');
+    final make = VehicleMakeService.nameFor(marque);
+    final missing = <String>[
+      if (registration.isEmpty) 'Immatriculation',
+      if (make.trim().isEmpty) 'Marque',
+      if (type.text.trim().isEmpty) 'Modèle',
+      if (modelYearController.text.trim().isEmpty) 'Année modèle',
+      if (chassisKey && numSer.text.trim().isEmpty) 'Numéro de châssis',
+    ];
+
+    Widget checklistRow(String title, String description) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(FluentIcons.document, size: 17, color: appTheme.color),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: appTheme.writingStyle.copyWith(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 10,
+                      height: 1.3,
+                      color: appTheme.mutedTextColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Après création',
+              style: TextStyle(
+                fontSize: 9,
+                color: appTheme.mutedTextColor,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return StaggeredGridTile.fit(
+      crossAxisCellCount: 12,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: appTheme.backGroundColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: appTheme.borderColor),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(FluentIcons.document_set, color: appTheme.color, size: 18),
+                const SizedBox(width: 9),
+                const Expanded(
+                  child: Text(
+                    'Documents à préparer',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
                   ),
                 ),
               ],
             ),
-          );
-        },
-      ),
-      bottomBar: widget.readOnly
-          ? null
-          : LayoutBuilder(
-              builder: (context, constraints) {
-                final compact = constraints.maxWidth < 680;
-                final message = errorUploading
-                    ? Text(
-                        'errupld',
-                        style: TextStyle(color: Colors.red),
-                      ).tr()
-                    : const Text(
-                        'Les modifications ne sont enregistrées qu’après confirmation.',
-                        style: TextStyle(fontSize: 11),
-                      );
-                final actions = <Widget>[
-                  if (widget.onCancel != null)
-                    Button(
-                      onPressed: uploading ? null : widget.onCancel,
-                      child: const Text('Annuler'),
-                    ),
-                  FilledButton(
-                    onPressed: uploading ? null : confirmAndUpload,
-                    child: uploading
-                        ? const ProgressRing()
-                        : const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(FluentIcons.save, size: 14),
-                              SizedBox(width: 8),
-                              Text('Enregistrer le véhicule'),
-                            ],
-                          ),
-                  ),
-                ];
-
-                return Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 9,
-                    horizontal: compact ? 12 : 18,
-                  ),
-                  child: compact
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            message,
-                            const SizedBox(height: 9),
-                            Wrap(
-                              alignment: WrapAlignment.end,
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: actions,
-                            ),
-                          ],
-                        )
-                      : Row(
-                          children: [
-                            Expanded(child: message),
-                            ...actions.expand((action) => [
-                                  if (action != actions.first)
-                                    const SizedBox(width: 10),
-                                  action,
-                                ]),
-                          ],
-                        ),
-                );
-              },
+            const SizedBox(height: 14),
+            checklistRow(
+              'Carte grise',
+              'Joindre une copie lisible du document et vérifier ses références.',
             ),
+            checklistRow(
+              'Assurance',
+              'Ajouter le justificatif et sa date d’expiration.',
+            ),
+            checklistRow(
+              'Contrôle technique',
+              'Ajouter le procès-verbal et l’échéance correspondante.',
+            ),
+            checklistRow(
+              'Acquisition et garantie',
+              'Joindre les factures ou justificatifs utiles.',
+            ),
+            InfoBar(
+              title: const Text('Les fichiers ne sont pas téléversés par cette étape.'),
+              content: const Text(
+                'Après l’enregistrement, ouvrez la rubrique Documents de la fiche véhicule pour joindre les fichiers réels.',
+              ),
+              severity: InfoBarSeverity.info,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Vérification avant enregistrement',
+              style: appTheme.writingStyle.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 10),
+            if (missing.isEmpty)
+              const InfoBar(
+                title: Text('Les informations essentielles sont renseignées.'),
+                severity: InfoBarSeverity.success,
+              )
+            else
+              InfoBar(
+                title: Text('${missing.length} information(s) à compléter ou à confirmer'),
+                content: Text(missing.join(' · ')),
+                severity: InfoBarSeverity.warning,
+              ),
+            const SizedBox(height: 8),
+            Text(
+              'Les informations facultatives peuvent rester vides. Les données proposées par le VIN ou les autres automatismes doivent être vérifiées avant enregistrement.',
+              style: TextStyle(
+                color: appTheme.mutedTextColor,
+                fontSize: 11,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  Widget _buildFormCompletenessCard(AppTheme appTheme) {
+    final listenable = Listenable.merge([
+      matriculeEtr,
+      matr1,
+      matr2,
+      matr3,
+      numSer,
+      type,
+      modelYearController,
+      fleetNumberController,
+    ]);
+    return AnimatedBuilder(
+      animation: listenable,
+      builder: (context, _) {
+        final hasRegistration = autreMat
+            ? matriculeEtr.text.trim().isNotEmpty
+            : matr1.text.trim().isNotEmpty &&
+                matr2.text.trim().isNotEmpty &&
+                matr3.text.trim().isNotEmpty;
+        final checks = [
+          hasRegistration,
+          (marque ?? '').trim().isNotEmpty,
+          type.text.trim().isNotEmpty,
+          modelYearController.text.trim().isNotEmpty,
+          numSer.text.trim().isNotEmpty,
+          fleetNumberController.text.trim().isNotEmpty,
+        ];
+        final complete = checks.where((value) => value).length;
+        final remainingRequired = (hasRegistration ? 0 : 1) +
+            (chassisKey && numSer.text.trim().isEmpty ? 1 : 0);
+
+        return Container(
+          margin: const EdgeInsets.only(top: 12),
+          padding: const EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            color: FluentTheme.of(context).micaBackgroundColor,
+            border: Border.all(color: appTheme.borderColor),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(FluentIcons.chart, color: appTheme.color, size: 17),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      'Complétude du véhicule',
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  Text(
+                    '$complete / 6',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              _ProgressTrack(progress: complete / 6, color: appTheme.color),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Champs obligatoires',
+                      style: TextStyle(
+                        color: appTheme.mutedTextColor,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: remainingRequired == 0
+                          ? Colors.green.withValues(alpha: .10)
+                          : Colors.orange.withValues(alpha: .12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      remainingRequired == 0
+                          ? 'OK'
+                          : '$remainingRequired restant(s)',
+                      style: TextStyle(
+                        color: remainingRequired == 0 ? Colors.green : Colors.orange,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 7),
+              Text(
+                'Immatriculation et VIN lorsque celui-ci est exigé. Les autres éléments améliorent la qualité de la fiche.',
+                style: TextStyle(
+                  color: appTheme.mutedTextColor,
+                  fontSize: 10,
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAutomationPanel(AppTheme appTheme) {
+    final vinDecoded = _vinDecodeMetadata != null;
+    final imageSelected = _resolvedImageUrl?.isNotEmpty == true ||
+        _resolvedImageFileId?.isNotEmpty == true;
+    final wilayaDetected = matr3.text.trim().isNotEmpty && wilaya.isNotEmpty;
+
+    Widget automationRow(
+      IconData icon,
+      String title,
+      String description, {
+      String? status,
+      bool ready = false,
+      bool upcoming = false,
+    }) {
+      final statusColor = upcoming
+          ? appTheme.mutedTextColor
+          : ready
+              ? Colors.green
+              : appTheme.color;
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: appTheme.color.withValues(alpha: .09),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: appTheme.color, size: 17),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 9.5,
+                      height: 1.3,
+                      color: appTheme.mutedTextColor,
+                    ),
+                  ),
+                  if (status != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      status,
+                      style: TextStyle(
+                        color: statusColor,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(width: 6),
+            Icon(
+              upcoming
+                  ? FluentIcons.clock
+                  : ready
+                      ? FluentIcons.check_mark
+                      : FluentIcons.sparkle,
+              color: statusColor,
+              size: 14,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: FluentTheme.of(context).micaBackgroundColor,
+        border: Border.all(color: appTheme.borderColor),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(FluentIcons.sparkle, color: appTheme.color, size: 18),
+              const SizedBox(width: 8),
+              const Text(
+                'Automatisations',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          automationRow(
+            FluentIcons.barcode_scanner,
+            'Décodage VIN',
+            'Propose la marque, le modèle, l’année et des caractéristiques.',
+            status: vinDecoded ? 'Décodage effectué · à vérifier' : 'Disponible',
+            ready: vinDecoded,
+          ),
+          automationRow(
+            FluentIcons.car,
+            'Suggestion d’image',
+            'Recherche des images selon la marque, le modèle, l’année et la couleur.',
+            status: imageSelected
+                ? 'Image sélectionnée'
+                : _vehicleImageLookupCompleted
+                    ? 'Recherche terminée'
+                    : 'Disponible',
+            ready: imageSelected,
+          ),
+          automationRow(
+            FluentIcons.map_pin,
+            'Lecture de l’immatriculation',
+            'Déduit les informations administratives disponibles depuis la plaque nationale.',
+            status: wilayaDetected ? 'Wilaya détectée' : 'À la saisie de la plaque',
+            ready: wilayaDetected,
+          ),
+          automationRow(
+            FluentIcons.document,
+            'Lecture de carte grise',
+            'Extraction OCR des champs depuis une photo ou un scan.',
+            status: 'Évolution prévue',
+            upcoming: true,
+          ),
+          InfoBar(
+            title: const Text('Les suggestions ne sont jamais enregistrées sans validation.'),
+            severity: InfoBarSeverity.info,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGuidedSidePanel(AppTheme appTheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildEditorSummary(appTheme),
+        _buildFormCompletenessCard(appTheme),
+        _buildAutomationPanel(appTheme),
+      ],
+    );
+  }
+
+  Map<String, TextEditingController> get _draftControllers => {
+        'matriculeEtr': matriculeEtr,
+        'matr1': matr1,
+        'matr2': matr2,
+        'matr3': matr3,
+        'wilayaCont': wilayaCont,
+        'dairaCont': dairaCont,
+        'communeCont': communeCont,
+        'quittance': quittance,
+        'numero': numero,
+        'matempl': matempl,
+        'lname': lname,
+        'fname': fname,
+        'profession': profession,
+        'adresse': adresse,
+        'type': type,
+        'numSer': numSer,
+        'caross': caross,
+        'energie': energie,
+        'puissance': puissance,
+        'places': places,
+        'poidsT': poidsT,
+        'charg': charg,
+        'trim': trimController,
+        'modelYear': modelYearController,
+        'color': colorController,
+        'engineDisplacement': engineDisplacementController,
+        'enginePowerHp': enginePowerHpController,
+        'enginePowerKw': enginePowerKwController,
+        'engineCode': engineCodeController,
+        'transmission': transmissionController,
+        'gearbox': gearboxController,
+        'driveType': driveTypeController,
+        'doors': doorsController,
+        'length': lengthController,
+        'width': widthController,
+        'height': heightController,
+        'acquisitionType': acquisitionTypeController,
+        'acquisitionDate': acquisitionDateController,
+        'purchasePrice': purchasePriceController,
+        'supplier': supplierController,
+        'warrantyEndDate': warrantyEndDateController,
+        'fleetNumber': fleetNumberController,
+        'mileage': mileageController,
+        'nextServiceMileage': nextServiceMileageController,
+        'selectedAppartenance': selectedAppartenance,
+        'selectedAppartenanceEmploye': selectedAppartenanceEmploye,
+        'selectedDepartment': selectedDepartment,
+        'selectedDirection': selectedDirection,
+        'selectedFiliale': selectedFiliale,
+      };
+
+  String get _guidedDraftKey =>
+      'parcoto_vehicle_form_draft_${DatabaseGetter.activeCompanyId ?? 'company'}_${DatabaseGetter.me.value?.id ?? 'user'}_${widget.vehicle?.id ?? 'new'}';
+
+  Future<void> _saveGuidedDraft() async {
+    try {
+      final controllerValues = _draftControllers.map(
+        (key, controller) => MapEntry(key, controller.text),
+      );
+      final snapshot = <String, dynamic>{
+        'version': 1,
+        'savedAt': DateTime.now().toUtc().toIso8601String(),
+        'controllers': controllerValues,
+        'autreMat': autreMat,
+        'marque': marque,
+        'genre': genre,
+        'pays': pays,
+        'wilaya': wilaya,
+        'selectedDate': selectedDate?.toIso8601String(),
+        'selectedAnnee': selectedAnnee?.year,
+        'lourd': lourd,
+        'service': service,
+        'matriculesPrec': matriculesPrec,
+        'resolvedImageUrl': _resolvedImageUrl,
+        'resolvedImageFileId': _resolvedImageFileId,
+        'resolvedImageSource': _resolvedImageSource,
+        'vinDecodeMetadata': _vinDecodeMetadata,
+      };
+      await prefs.setString(_guidedDraftKey, jsonEncode(snapshot));
+      if (!mounted) return;
+      displayInfoBar(
+        context,
+        builder: (context, close) => const InfoBar(
+          title: Text('Brouillon enregistré sur cet appareil.'),
+          severity: InfoBarSeverity.success,
+        ),
+        duration: snackbarShortDuration,
+      );
+    } catch (error) {
+      if (!mounted) return;
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Impossible d’enregistrer le brouillon.'),
+          content: Text(error.toString()),
+          severity: InfoBarSeverity.error,
+        ),
+        duration: snackbarShortDuration,
+      );
+    }
+  }
+
+  Future<void> _restoreGuidedDraft() async {
+    try {
+      final raw = prefs.getString(_guidedDraftKey);
+      if (raw == null || raw.trim().isEmpty) return;
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map) return;
+      final controllerValues = decoded['controllers'];
+      if (controllerValues is Map) {
+        for (final entry in controllerValues.entries) {
+          final controller = _draftControllers[entry.key.toString()];
+          if (controller != null) {
+            controller.text = entry.value?.toString() ?? '';
+          }
+        }
+      }
+      setState(() {
+        autreMat = decoded['autreMat'] as bool? ?? autreMat;
+        marque = decoded['marque']?.toString();
+        genre = (decoded['genre'] as num?)?.toInt();
+        pays = decoded['pays']?.toString() ?? pays;
+        wilaya = decoded['wilaya']?.toString() ?? wilaya;
+        final rawDate = decoded['selectedDate']?.toString();
+        selectedDate = rawDate == null ? selectedDate : DateTime.tryParse(rawDate);
+        final rawYear = (decoded['selectedAnnee'] as num?)?.toInt();
+        selectedAnnee = rawYear == null ? null : DateTime(rawYear);
+        lourd = decoded['lourd'] as bool? ?? lourd;
+        service = decoded['service'] as bool? ?? service;
+        matriculesPrec = List<String>.from(
+          decoded['matriculesPrec'] as List? ?? matriculesPrec,
+        );
+        _resolvedImageUrl = decoded['resolvedImageUrl']?.toString();
+        _resolvedImageFileId = decoded['resolvedImageFileId']?.toString();
+        _resolvedImageSource = decoded['resolvedImageSource']?.toString();
+        final metadata = decoded['vinDecodeMetadata'];
+        _vinDecodeMetadata = metadata is Map
+            ? Map<String, dynamic>.from(metadata)
+            : null;
+      });
+    } catch (error) {
+      debugPrint('[Vehicle form] draft restore failed: $error');
+    }
   }
 
   Widget _buildEditorHeader(AppTheme appTheme) {
@@ -1393,6 +2336,26 @@ class _VehicleFormState extends State<VehicleForm>
                         style: appTheme.writingStyle,
                         placeholderStyle: placeStyle,
                         cursorColor: appTheme.color,
+                        onChanged: (_) => setState(() {}),
+                      ),
+                    ),
+                    _identityField(
+                      appTheme,
+                      width: fieldWidth,
+                      label: 'Année modèle',
+                      child: ParcotoTextBox(
+                        enabled: !widget.readOnly,
+                        controller: modelYearController,
+                        maxLength: 4,
+                        keyboardType: TextInputType.number,
+                        placeholder: 'Ex. 2022',
+                        style: appTheme.writingStyle,
+                        placeholderStyle: placeStyle,
+                        cursorColor: appTheme.color,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        onChanged: (_) => setState(() {}),
                       ),
                     ),
                     if (chassisKey)
@@ -1512,18 +2475,27 @@ class _VehicleFormState extends State<VehicleForm>
     );
   }
 
-  Widget _buildProfessionalDetailsSection(AppTheme appTheme) {
-    final screenWidth = MediaQuery.of(context).size.width;
+  Widget _buildProfessionalDetailsSection(
+    AppTheme appTheme, {
+    bool includeTechnical = true,
+    bool includeAcquisition = false,
+  }) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final columns = screenWidth >= 1200 ? 4 : screenWidth >= 700 ? 2 : 1;
-    final availableWidth = (screenWidth - 100)
-        .clamp(240.0, 1008.0)
-        .toDouble();
-    final fieldWidth = ((availableWidth - (columns - 1) * 12) / columns)
-        .clamp(150.0, 420.0)
-        .toDouble();
+    final availableWidth =
+        (screenWidth - 100).clamp(240.0, 1008.0).toDouble();
+    final fieldWidth =
+        ((availableWidth - (columns - 1) * 12) / columns)
+            .clamp(150.0, 420.0)
+            .toDouble();
 
-    Widget field(String label, TextEditingController controller,
-        {String? hint, bool numeric = false, bool decimal = false}) {
+    Widget field(
+      String label,
+      TextEditingController controller, {
+      String? hint,
+      bool numeric = false,
+      bool decimal = false,
+    }) {
       return _identityField(
         appTheme,
         width: fieldWidth,
@@ -1535,6 +2507,7 @@ class _VehicleFormState extends State<VehicleForm>
           style: appTheme.writingStyle,
           placeholderStyle: placeStyle,
           cursorColor: appTheme.color,
+          onChanged: (_) => setState(() {}),
           inputFormatters: numeric
               ? [FilteringTextInputFormatter.digitsOnly]
               : decimal
@@ -1574,26 +2547,155 @@ class _VehicleFormState extends State<VehicleForm>
       );
     }
 
+    final fields = <Widget>[];
+    if (includeTechnical) {
+      fields.addAll([
+        _identitySubsectionTitle(
+          appTheme,
+          availableWidth,
+          'Caractéristiques constructeur',
+          'Finition, couleur, motorisation et transmission.',
+        ),
+        field('Version / finition', trimController),
+        _identityField(
+          appTheme,
+          width: fieldWidth,
+          label: 'Couleur',
+          child: ParcotoFieldSurface(
+            child: ComboBox<String>(
+              value: _normalizeVehiclePaint(colorController.text),
+              isExpanded: true,
+              items: _vehiclePaintOptions.map((option) {
+                final value = option['value']!;
+                return ComboBoxItem<String>(
+                  value: value,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 13,
+                        height: 13,
+                        decoration: BoxDecoration(
+                          color: _vehiclePaintSwatches[value],
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.grey[100],
+                            width: value == 'white' ? 1 : 0.5,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 9),
+                      Text(option['label']!),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: widget.readOnly
+                  ? null
+                  : (value) {
+                      if (value == null) return;
+                      setState(() => colorController.text = value);
+                    },
+            ),
+          ),
+        ),
+        field(
+          'Cylindrée (cm³)',
+          engineDisplacementController,
+          numeric: true,
+        ),
+        field('Code moteur', engineCodeController),
+        field(
+          'Transmission',
+          transmissionController,
+          hint: 'Ex. traction, propulsion, intégrale',
+        ),
+        field(
+          'Boîte de vitesses',
+          gearboxController,
+          hint: 'Ex. manuelle, automatique',
+        ),
+        field('Nombre de portes', doorsController, numeric: true),
+        field('Longueur (mm)', lengthController, numeric: true),
+        field('Largeur (mm)', widthController, numeric: true),
+        field('Hauteur (mm)', heightController, numeric: true),
+        field(
+          'Type de motricité',
+          driveTypeController,
+          hint: 'Ex. 4x2, 4x4',
+        ),
+      ]);
+    }
+
+    if (includeAcquisition) {
+      fields.addAll([
+        _identitySubsectionTitle(
+          appTheme,
+          availableWidth,
+          'Acquisition',
+          'Informations financières et administratives connues.',
+        ),
+        field(
+          'Type d’acquisition',
+          acquisitionTypeController,
+          hint: 'Achat, leasing, location…',
+        ),
+        dateField('Date d’acquisition', acquisitionDateController),
+        field(
+          'Prix d’acquisition (DA)',
+          purchasePriceController,
+          hint: 'Montant en DA',
+          decimal: true,
+        ),
+        field('Fournisseur / vendeur', supplierController),
+        dateField('Fin de garantie', warrantyEndDateController),
+        _identitySubsectionTitle(
+          appTheme,
+          availableWidth,
+          'Exploitation',
+          'Identifiant interne et relevés de compteur disponibles.',
+        ),
+        field('Numéro de parc', fleetNumberController),
+        field('Kilométrage actuel (km)', mileageController, numeric: true),
+        field(
+          'Prochaine révision (km)',
+          nextServiceMileageController,
+          numeric: true,
+        ),
+      ]);
+    }
+
+    final sectionTitle = includeAcquisition
+        ? 'Acquisition et exploitation'
+        : 'Données techniques complémentaires';
+    final sectionDescription = includeAcquisition
+        ? 'Les dates et montants restent facultatifs lorsqu’ils ne sont pas documentés.'
+        : 'Les caractéristiques restent modifiables et ne remplacent pas les données réglementaires.';
+
     return StaggeredGridTile.fit(
-      crossAxisCellCount: _isCompactViewport ? 12 : 12,
+      crossAxisCellCount: 12,
       child: Container(
-        margin: const EdgeInsets.only(top: 14, bottom: 8),
+        margin: const EdgeInsets.only(top: 12, bottom: 8),
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: appTheme.backGroundColor,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: appTheme.color.withValues(alpha: 0.22)),
+          border: Border.all(color: appTheme.borderColor),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(FluentIcons.car, color: appTheme.color, size: 20),
+                Icon(
+                  includeAcquisition ? FluentIcons.money : FluentIcons.car,
+                  color: appTheme.color,
+                  size: 20,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'vehicle_form_technical_management_section'.tr(),
+                    sectionTitle,
                     style: appTheme.writingStyle.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -1604,100 +2706,17 @@ class _VehicleFormState extends State<VehicleForm>
             ),
             const SizedBox(height: 5),
             Text(
-              'Informations complémentaires, facultatives et modifiables.',
+              sectionDescription,
               style: appTheme.writingStyle.copyWith(
                 fontSize: 12,
-                color: appTheme.writingStyle.color?.withValues(alpha: 0.68),
+                color: appTheme.mutedTextColor,
               ),
             ),
             const SizedBox(height: 18),
             Wrap(
               spacing: 12,
               runSpacing: 14,
-              children: [
-                _identitySubsectionTitle(
-                  appTheme,
-                  availableWidth,
-                  'Caractéristiques constructeur',
-                  'vehicle_form_technical_specs_subtitle'.tr(),
-                ),
-                field('Version / finition', trimController),
-                field('Année modèle', modelYearController,
-                    hint: 'Ex. 2022', numeric: true),
-                _identityField(
-                  appTheme,
-                  width: fieldWidth,
-                  label: 'Couleur',
-                  child: ParcotoFieldSurface(
-                    child: ComboBox<String>(
-                      value: _normalizeVehiclePaint(colorController.text),
-                      isExpanded: true,
-                      items: _vehiclePaintOptions.map((option) {
-                        final value = option['value']!;
-                        return ComboBoxItem<String>(
-                          value: value,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 13,
-                                height: 13,
-                                decoration: BoxDecoration(
-                                  color: _vehiclePaintSwatches[value],
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.grey[100],
-                                    width: value == 'white' ? 1 : 0.5,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 9),
-                              Text(option['label']!),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: widget.readOnly
-                          ? null
-                          : (value) {
-                              if (value == null) return;
-                              setState(() => colorController.text = value);
-                            },
-                    ),
-                  ),
-                ),
-                field('Cylindrée (cm³)', engineDisplacementController,
-                    numeric: true),
-                field('Code moteur', engineCodeController),
-                field('Transmission', transmissionController,
-                    hint: 'Ex. traction, propulsion, 4x4'),
-                field('Boîte de vitesses', gearboxController,
-                    hint: 'Ex. manuelle, automatique'),
-                field('Nombre de portes', doorsController, numeric: true),
-                field('Longueur (mm)', lengthController, numeric: true),
-                field('Largeur (mm)', widthController, numeric: true),
-                field('Hauteur (mm)', heightController, numeric: true),
-                field('Type de motricité', driveTypeController,
-                    hint: 'Ex. 4x2, 4x4'),
-                _identitySubsectionTitle(
-                  appTheme,
-                  availableWidth,
-                  'vehicle_form_acquisition_section'.tr(),
-                  'vehicle_form_company_management_subtitle'.tr(),
-                ),
-                field('Type d’acquisition', acquisitionTypeController,
-                    hint: 'Achat, leasing, location…'),
-                dateField('Date d’acquisition', acquisitionDateController),
-                field('Prix d’acquisition (DA)', purchasePriceController,
-                    hint: 'Montant en DA', decimal: true),
-                field('Fournisseur / vendeur', supplierController),
-                dateField('Fin de garantie', warrantyEndDateController),
-                field('Numéro de parc', fleetNumberController),
-                field('Kilométrage actuel (km)', mileageController,
-                    numeric: true),
-                field('Prochaine révision (km)', nextServiceMileageController,
-                    numeric: true),
-              ],
+              children: fields,
             ),
           ],
         ),
@@ -3369,11 +4388,11 @@ class _VehicleFormState extends State<VehicleForm>
       },
     );
     if (conducteur != null) {
+      // A driver is an operational assignment, not the registered owner.
+      // Only update driver-specific fields; preserve card-holder and vehicle data.
       selectedAppartenanceEmploye.text = VehiclesUtilities.getAppartenance(
         conducteur.filliale,
       );
-      // A driver is an operational assignment, not the registered owner.
-      // Only update driver-specific fields; preserve card-holder and vehicle data.
       matempl.text = conducteur.matricule;
       setState(() {});
     }
@@ -4104,6 +5123,7 @@ class _VehicleFormState extends State<VehicleForm>
           await createVehicle(vehicle);
         }
 
+        await prefs.remove(_guidedDraftKey);
         if (mounted) {
           displayInfoBar(
             context,
@@ -4182,6 +5202,7 @@ class _VehicleFormState extends State<VehicleForm>
 
   @override
   void dispose() {
+    _formScrollController.dispose();
     matriculeEtr.dispose();
     matr1.dispose();
     matr2.dispose();
