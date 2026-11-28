@@ -185,7 +185,7 @@ void main() {
       );
 
       expect(world.x, closeTo(101, 1e-10));
-      expect(world.y, closeTo(202, 1e-10));
+      expect(world.y, closeTo(198, 1e-10));
     });
 
     test('rejects invalid scale, dimensions and non-array layer JSON', () {
