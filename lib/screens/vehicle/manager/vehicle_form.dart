@@ -3359,7 +3359,7 @@ class _VehicleFormState extends State<VehicleForm>
           content: const ChauffeurTable(selectD: true),
           actions: [
             Button(
-              child: const Text('fermer').tr(),
+              child: Text('fermer').tr(),
               onPressed: () {
                 Navigator.of(context).pop();
               },
