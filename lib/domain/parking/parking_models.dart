@@ -1209,7 +1209,6 @@ class ParkingAssignmentPolicy {
     required Iterable<VehicleParkingAssignment> existing,
   }) {
     candidate.validate();
-    if (candidate.status != ParkingAssignmentStatus.active) return;
     space.validate();
 
     if (candidate.companyId != space.companyId) {
@@ -1222,6 +1221,7 @@ class ParkingAssignmentPolicy {
         ParkingAssignmentConflictReason.spaceReferenceMismatch,
       );
     }
+    if (candidate.status != ParkingAssignmentStatus.active) return;
     if (!space.canReceiveAssignment) {
       throw const ParkingAssignmentConflict(
         ParkingAssignmentConflictReason.parkingSpaceUnavailable,
