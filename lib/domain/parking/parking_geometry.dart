@@ -40,8 +40,8 @@ class ParkingSpaceGeometry {
   }
 
   Map<String, Object> toJson() => {
-        'centerX': centerX,
-        'centerY': centerY,
+        'xM': centerX,
+        'yM': centerY,
         'width': width,
         'length': length,
         'rotationDegrees': rotationDegrees,
@@ -55,8 +55,8 @@ class ParkingSpaceGeometry {
     }
 
     final geometry = ParkingSpaceGeometry(
-      centerX: readNumber('centerX'),
-      centerY: readNumber('centerY'),
+      centerX: readNumber('xM'),
+      centerY: readNumber('yM'),
       width: readNumber('width'),
       length: readNumber('length'),
       rotationDegrees: json['rotationDegrees'] == null
@@ -167,7 +167,9 @@ class ParkingRowGenerator {
   List<GeneratedParkingSpace> generate(ParkingRowSpec spec) {
     spec.validate();
 
-    final radians = spec.angleDegrees * math.pi / 180;
+    final effectiveAngle = spec.angleDegrees +
+        (spec.orientation == ParkingRowOrientation.vertical ? 90 : 0);
+    final radians = effectiveAngle * math.pi / 180;
     final basePitch = spec.orientation == ParkingRowOrientation.horizontal
         ? spec.spaceWidth + spec.gap
         : spec.spaceLength + spec.gap;
@@ -190,7 +192,7 @@ class ParkingRowGenerator {
           centerY: spec.anchorY + dy * index,
           width: width,
           length: length,
-          rotationDegrees: spec.angleDegrees,
+          rotationDegrees: effectiveAngle,
         ),
       );
     }, growable: false);
