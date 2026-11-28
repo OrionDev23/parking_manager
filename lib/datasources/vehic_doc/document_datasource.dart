@@ -47,7 +47,7 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
       DataCell(
         SelectableText(
           element.value.documentType?.trim().isNotEmpty == true
-              ? ('vehicle_doc_type_' + element.value.documentType!).tr()
+              ? 'vehicle_doc_type_${element.value.documentType!}'.tr()
               : '',
           style: rowTextStyle,
         ),
