@@ -1087,7 +1087,7 @@ class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
       final frame = await codec.getNextFrame();
       decodedImage = frame.image;
     } catch (_) {
-      decodedImage.dispose();
+      decodedImage?.dispose();
       return;
     } finally {
       codec?.dispose();
@@ -1096,7 +1096,7 @@ class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
     }
 
     if (!mounted || generation != _decodeGeneration) {
-      decodedImage?.dispose();
+      decodedImage.dispose();
       return;
     }
     final previous = _backgroundImage;
