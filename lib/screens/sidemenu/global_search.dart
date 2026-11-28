@@ -337,7 +337,7 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
         content: TextBox(
           controller: dialogController,
           // A 16 px input avoids mobile browsers auto-zooming on focus.
-          style: FluentTheme.of(dialogContext).typography.body.copyWith(fontSize: 16),
+          style: FluentTheme.of(dialogContext).typography.body?.copyWith(fontSize: 16) ?? const TextStyle(fontSize: 16),
           autofocus: true,
           placeholder: _placeholder,
           onChanged: (value) {
@@ -388,7 +388,7 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
         child: TextBox(
           controller: _controller,
           placeholder: _placeholder,
-          style: FluentTheme.of(context).typography.body.copyWith(fontSize: 16),
+          style: FluentTheme.of(context).typography.body?.copyWith(fontSize: 16) ?? const TextStyle(fontSize: 16),
           onChanged: _dispatchLocalSearch,
           onSubmitted: _dispatchLocalSearch,
           prefix: const Padding(
@@ -459,7 +459,7 @@ class _GlobalSearchLauncherState extends State<GlobalSearchLauncher> {
         child: TextBox(
           controller: _controller,
           placeholder: 'Rechercher un module, un véhicule, un conducteur…',
-          style: FluentTheme.of(context).typography.body.copyWith(fontSize: 16),
+          style: FluentTheme.of(context).typography.body?.copyWith(fontSize: 16) ?? const TextStyle(fontSize: 16),
           onSubmitted: (_) => _submitSearch(),
           prefix: const Padding(
             padding: EdgeInsets.only(left: 10),
@@ -681,7 +681,7 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
               controller: _controller,
               autofocus: true,
               placeholder: 'Interface, véhicule, conducteur, référence ou pièce…',
-              style: FluentTheme.of(context).typography.body.copyWith(fontSize: 16),
+              style: FluentTheme.of(context).typography.body?.copyWith(fontSize: 16) ?? const TextStyle(fontSize: 16),
               prefix: const Padding(
                 padding: EdgeInsets.only(left: 10),
                 child: Icon(FluentIcons.search, size: 16),
