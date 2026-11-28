@@ -87,7 +87,7 @@ Le concepteur propose deux niveaux d'usage sur le même modèle de données. Il 
 6. Confirmer la génération ; chaque place obtient son propre ID et sa géométrie.
 7. Ajuster une place, une rangée ou la sélection sans casser les autres objets.
 
-Le générateur doit gérer les rangées horizontales/verticales, les orientations inversées, les places en bataille/épi/parallèle, l'espacement et les limites de zone. Le calcul géométrique se fait en mètres dans le repère local du plan, pas en pixels écran.
+Le générateur doit gérer les rangées horizontales/verticales, les orientations inversées, les places en bataille/épi/parallèle, l'espacement et les limites de zone. La largeur de place définit le pas entre les places ; l'orientation verticale tourne la rangée et les emprises de 90° dans le repère du plan. Le calcul géométrique se fait en mètres dans le repère local du plan, pas en pixels écran.
 
 ### 4.2 Éditeur vectoriel libre
 Outils v1 : sélection/déplacement, pan, zoom, sélection multiple, rectangle, polygone, ligne, place, rangée, zone, voie, mur, entrée, sortie, portail, obstacle, texte/cote, mesure, annuler/rétablir, aligner, dupliquer, supprimer.
