@@ -36,16 +36,21 @@ abstract interface class LocalParkingSource {
     String vehicleId, {
     DateTime? at,
   });
-  Future<void> createAssignment(VehicleParkingAssignment assignment);
+  Future<void> createAssignment(
+    VehicleParkingAssignment assignment, {
+    ParkingAccessEvent? event,
+  });
   Future<void> moveVehicleToSpace({
     required VehicleParkingAssignment nextAssignment,
     required DateTime closePreviousAt,
     String? endedBy,
+    ParkingAccessEvent? event,
   });
   Future<void> endAssignment({
     required String assignmentId,
     required DateTime endedAt,
     String? endedBy,
+    ParkingAccessEvent? event,
   });
 
   Future<void> appendAccessEvent(ParkingAccessEvent event);
