@@ -104,6 +104,24 @@ void main() {
       expect(spaces[1].geometry.rotationDegrees, 90);
     });
 
+    test('rejects a row prefix containing a single backslash', () {
+      expect(
+        () => generator.generate(
+          const ParkingRowSpec(
+            zoneCode: 'A',
+            rowCode: 'A1',
+            spacePrefix: r'BAD\',
+            count: 1,
+            anchorX: 0,
+            anchorY: 0,
+            spaceWidth: 2.5,
+            spaceLength: 5,
+          ),
+        ),
+        throwsArgumentError,
+      );
+    });
+
     test('rejects invalid counts and dimensions before generating', () {
       expect(
         () => generator.generate(
