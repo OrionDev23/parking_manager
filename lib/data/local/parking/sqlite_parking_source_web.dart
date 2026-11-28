@@ -14,6 +14,15 @@ class SqliteParkingSource implements LocalParkingSource {
       );
 
   @override
+  Future<void> createParkingSetup({
+    required ParkingSite site,
+    required ParkingLot parkingLot,
+    required ParkingLayout layout,
+    required List<ParkingZone> zones,
+    required List<ParkingSpace> spaces,
+  }) async => throw _unsupported();
+
+  @override
   Future<List<ParkingSite>> getSites() async => throw _unsupported();
   @override
   Future<ParkingSite?> getSite(String id) async => throw _unsupported();
