@@ -1408,6 +1408,8 @@ class ParkingMedia {
   final String fileName;
   final String mimeType;
   final int fileSize;
+  final int? pixelWidth;
+  final int? pixelHeight;
   final String? sha256;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -1422,6 +1424,8 @@ class ParkingMedia {
     required this.fileName,
     required this.mimeType,
     required this.fileSize,
+    this.pixelWidth,
+    this.pixelHeight,
     this.sha256,
     required this.createdAt,
     required this.updatedAt,
@@ -1440,6 +1444,13 @@ class ParkingMedia {
       throw ArgumentError.value(mimeType, 'mimeType');
     }
     if (fileSize <= 0) throw ArgumentError.value(fileSize, 'fileSize');
+    if ((pixelWidth == null) != (pixelHeight == null)) {
+      throw ArgumentError('Pixel width and height must be provided together.');
+    }
+    if ((pixelWidth != null && pixelWidth! <= 0) ||
+        (pixelHeight != null && pixelHeight! <= 0)) {
+      throw ArgumentError('Image pixel dimensions must be positive.');
+    }
     if (sha256 != null && !RegExp(r'^[a-fA-F0-9]{64}$').hasMatch(sha256!)) {
       throw ArgumentError.value(sha256, 'sha256');
     }
@@ -1456,6 +1467,8 @@ class ParkingMedia {
         'fileName': fileName,
         'mimeType': mimeType,
         'fileSize': fileSize,
+        'pixelWidth': pixelWidth,
+        'pixelHeight': pixelHeight,
         'sha256': sha256,
         'createdAt': createdAt.toUtc().toIso8601String(),
         'updatedAt': updatedAt.toUtc().toIso8601String(),
@@ -1476,6 +1489,8 @@ class ParkingMedia {
         fileName: _requiredString(json, 'fileName', maxLength: 255),
         mimeType: _requiredString(json, 'mimeType', maxLength: 120),
         fileSize: _requiredInt(json, 'fileSize'),
+        pixelWidth: _optionalInt(json, 'pixelWidth'),
+        pixelHeight: _optionalInt(json, 'pixelHeight'),
         sha256: _optionalString(json, 'sha256', maxLength: 64),
         createdAt: _requiredDate(json, 'createdAt'),
         updatedAt: _requiredDate(json, 'updatedAt'),
