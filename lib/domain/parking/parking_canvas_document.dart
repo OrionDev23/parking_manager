@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:math' as math;
-
 import 'parking_geometry.dart';
 
 enum ParkingCanvasLayerType {
@@ -393,10 +391,10 @@ class ParkingCanvasObject {
     final xs = points.map((point) => point.x);
     final ys = points.map((point) => point.y);
     return ParkingCanvasBounds(
-      minX: xs.reduce(math.min),
-      minY: ys.reduce(math.min),
-      maxX: xs.reduce(math.max),
-      maxY: ys.reduce(math.max),
+      minX: xs.reduce((left, right) => left < right ? left : right),
+      minY: ys.reduce((left, right) => left < right ? left : right),
+      maxX: xs.reduce((left, right) => left > right ? left : right),
+      maxY: ys.reduce((left, right) => left > right ? left : right),
     );
   }
 
@@ -485,9 +483,10 @@ class ParkingCanvasObject {
         strokeWidthM > 10) {
       throw ArgumentError('Canvas object style values must be finite and positive.');
     }
-    if (textHeightM != null &&
-        (!textHeightM!.isFinite || textHeightM! <= 0 || textHeightM! > 20)) {
-      throw ArgumentError.value(textHeightM, 'textHeightM');
+    final textHeight = textHeightM;
+    if (textHeight != null &&
+        (!textHeight.isFinite || textHeight <= 0 || textHeight > 20)) {
+      throw ArgumentError.value(textHeight, 'textHeightM');
     }
     if ((label?.length ?? 0) > 300) {
       throw ArgumentError.value(label, 'label', 'Maximum 300 characters.');
