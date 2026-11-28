@@ -6,6 +6,9 @@ class SyncOperation {
   final String id;
   final String idempotencyKey;
   final int payloadVersion;
+  final String? dependsOnOperationId;
+  final int sequenceNo;
+  final int? baseRevision;
   final String companyId;
   final String deviceId;
   final String entity;
@@ -22,6 +25,9 @@ class SyncOperation {
     required this.id,
     String? idempotencyKey,
     this.payloadVersion = 1,
+    this.dependsOnOperationId,
+    this.sequenceNo = 0,
+    this.baseRevision,
     required this.companyId,
     required this.deviceId,
     required this.entity,
