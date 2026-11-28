@@ -62,7 +62,7 @@ class GuidedFormShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = context.watch<AppTheme>();
     final accent = appTheme.color;
-    final safeStep = currentStep.clamp(0, steps.length - 1);
+    final safeStep = currentStep.clamp(0, steps.length - 1).toInt();
     final progress = (safeStep + 1) / steps.length;
 
     return ScaffoldPage(
@@ -422,7 +422,7 @@ class GuidedFormShell extends StatelessWidget {
                               Icon(
                                 continueLabel == 'Enregistrer le véhicule'
                                     ? FluentIcons.save
-                                    : FluentIcons.forward,
+                                    : FluentIcons.chevron_right,
                                 size: 14,
                               ),
                             ],
@@ -458,7 +458,7 @@ class _ProgressTrack extends StatelessWidget {
             Align(
               alignment: AlignmentDirectional.centerStart,
               child: FractionallySizedBox(
-                widthFactor: progress.clamp(0.0, 1.0),
+                widthFactor: progress.clamp(0.0, 1.0).toDouble(),
                 child: ColoredBox(color: color),
               ),
             ),
