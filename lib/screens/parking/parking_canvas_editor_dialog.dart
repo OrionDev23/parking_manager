@@ -208,6 +208,7 @@ class _ParkingCanvasEditorDialogState extends State<ParkingCanvasEditorDialog> {
     final camera = _cameraFor(size);
     final tool = _editor.activeTool;
     final screen = details.localFocalPoint;
+    _lastScale = 1;
 
     setState(() {
       _lastScreenPosition = screen;
@@ -221,6 +222,7 @@ class _ParkingCanvasEditorDialogState extends State<ParkingCanvasEditorDialog> {
           _editor.clearSelection();
         } else {
           _editor.selectObjects([hit]);
+          _editor.beginTransaction();
           _draggingSelection = true;
         }
         _syncSelectedLabel();
@@ -285,6 +287,7 @@ class _ParkingCanvasEditorDialogState extends State<ParkingCanvasEditorDialog> {
         );
         setState(() => _lastScreenPosition = screen);
       } catch (error) {
+        _editor.rollbackTransaction();
         setState(() {
           _error = error.toString();
           _draggingSelection = false;
@@ -294,6 +297,7 @@ class _ParkingCanvasEditorDialogState extends State<ParkingCanvasEditorDialog> {
   }
 
   void _onScaleEnd(ScaleEndDetails details) {
+    _editor.commitTransaction();
     if (_draftStart != null && _draftEnd != null) {
       _commitDraft(_draftStart!, _draftEnd!);
     }
