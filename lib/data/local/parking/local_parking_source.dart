@@ -70,6 +70,13 @@ abstract interface class LocalParkingSource {
     int? limit,
   });
 
+  /// Attaches an already-written local raster file to a layout.
+  /// The media row and layout background reference are committed atomically.
+  Future<void> attachLayoutBackground({
+    required ParkingLayout layout,
+    required ParkingMedia media,
+  });
+
   Future<void> upsertMedia(ParkingMedia media);
   Future<List<ParkingMedia>> getMedia(String parkingLotId);
 }
