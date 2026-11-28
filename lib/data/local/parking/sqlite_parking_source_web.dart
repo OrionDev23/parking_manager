@@ -108,6 +108,12 @@ class SqliteParkingSource implements LocalParkingSource {
   }) async => throw _unsupported();
 
   @override
+  Future<void> attachLayoutBackground({
+    required ParkingLayout layout,
+    required ParkingMedia media,
+  }) async => throw _unsupported();
+
+  @override
   Future<void> upsertMedia(ParkingMedia media) async => throw _unsupported();
   @override
   Future<List<ParkingMedia>> getMedia(String parkingLotId) async =>
