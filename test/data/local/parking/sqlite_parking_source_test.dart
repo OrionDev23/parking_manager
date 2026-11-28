@@ -550,14 +550,28 @@ void main() {
         createdAt: current.createdAt,
         updatedAt: updatedAt,
       );
-      final inconsistentMedia = ParkingMedia(
-        id: 'media-background-wrong',
+      await parking.upsertMedia(
+        ParkingMedia(
+          id: 'media-file-id-collision',
+          companyId: companyId,
+          parkingLotId: 'lot-001',
+          fileId: 'background-correct',
+          purpose: ParkingMediaPurpose.attachment,
+          fileName: 'existing.bin',
+          mimeType: 'application/octet-stream',
+          fileSize: 512,
+          createdAt: createdAt,
+          updatedAt: updatedAt,
+        ),
+      );
+      final duplicateFileMedia = ParkingMedia(
+        id: 'media-background-collision',
         companyId: companyId,
         parkingLotId: 'lot-001',
         layoutId: current.id,
-        fileId: 'background-wrong',
+        fileId: 'background-correct',
         purpose: ParkingMediaPurpose.layoutBackground,
-        fileName: 'wrong.png',
+        fileName: 'plan.png',
         mimeType: 'image/png',
         fileSize: 1024,
         pixelWidth: 400,
@@ -569,15 +583,18 @@ void main() {
       await expectLater(
         parking.attachLayoutBackground(
           layout: updated,
-          media: inconsistentMedia,
+          media: duplicateFileMedia,
         ),
-        throwsA(isA<ArgumentError>()),
+        throwsA(isA<SqliteException>()),
       );
       expect(
         (await parking.getLayouts('lot-001')).single.backgroundFileId,
         isNull,
       );
-      expect(await parking.getMedia('lot-001'), isEmpty);
+      expect(
+        (await parking.getMedia('lot-001')).map((media) => media.id),
+        ['media-file-id-collision'],
+      );
     });
 
     test('stores media metadata without putting file bytes in SQLite payload',
