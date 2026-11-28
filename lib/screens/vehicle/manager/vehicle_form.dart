@@ -2416,7 +2416,7 @@ class _VehicleFormState extends State<VehicleForm>
                 width: double.infinity,
                 child: Button(
                   onPressed: () => selectConducteur(appTheme),
-                  child: const Text('select').tr(),
+                  child: Text('select').tr(),
                 ),
               ),
             ],
@@ -2595,7 +2595,7 @@ class _VehicleFormState extends State<VehicleForm>
                 height: 44,
                 child: Row(
                   children: [
-                    const Text('fonction').tr(),
+                    Text('fonction').tr(),
                     smallSpace,
                     ToggleSwitch(
                       checked: service,
@@ -2606,7 +2606,7 @@ class _VehicleFormState extends State<VehicleForm>
                       },
                     ),
                     smallSpace,
-                    const Text('service').tr(),
+                    Text('service').tr(),
                   ],
                 ),
               ),
@@ -3350,7 +3350,7 @@ class _VehicleFormState extends State<VehicleForm>
               maxHeight: 550,
             ).biggest,
           ),
-          title: const Text('selectchauffeur').tr(),
+          title: Text('selectchauffeur').tr(),
           style: ContentDialogThemeData(
             titleStyle: appTheme.writingStyle.copyWith(
               fontWeight: FontWeight.bold,
@@ -4111,7 +4111,7 @@ class _VehicleFormState extends State<VehicleForm>
           displayInfoBar(
             context,
             builder: (BuildContext context, void Function() close) => InfoBar(
-              title: const Text('done').tr(),
+              title: Text('done').tr(),
               severity: InfoBarSeverity.success,
             ),
             duration: snackbarShortDuration,
@@ -4133,7 +4133,7 @@ class _VehicleFormState extends State<VehicleForm>
           displayInfoBar(
             context,
             builder: (BuildContext context, void Function() close) => InfoBar(
-              title: const Text('echec').tr(),
+              title: Text('echec').tr(),
               severity: InfoBarSeverity.error,
             ),
             duration: snackbarShortDuration,
