@@ -491,12 +491,16 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
       if (space.id == _selectedSpaceId) selectedSpace = space;
     }
     selectedSpace ??= data.spaces.isEmpty ? null : data.spaces.first;
-    final selectedAssignment = selectedSpace == null
-        ? null
-        : data.assignments.where((assignment) {
-            return assignment.parkingSpaceId == selectedSpace!.id &&
-                assignment.isEffectiveAt(now);
-          }).firstOrNull;
+    VehicleParkingAssignment? selectedAssignment;
+    if (selectedSpace != null) {
+      for (final assignment in data.assignments) {
+        if (assignment.parkingSpaceId == selectedSpace.id &&
+            assignment.isEffectiveAt(now)) {
+          selectedAssignment = assignment;
+          break;
+        }
+      }
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
