@@ -239,10 +239,25 @@ Les autorisations doivent être appliquées dans l'API serveur, pas seulement en
 - Générateur de rangées déterministe et testé.
 - Canvas vectoriel utilisant coordonnées monde en mètres et transformation caméra séparée.
 - Repositories séparés local/remote, API tenant dédiée, mapping explicite.
-- SQLite natif : migration versionnée suivante (version 12 si aucune migration antérieure n'a été ajoutée depuis le contrat), cache tenant-scoped et outbox atomique.
-- Web : Appwrite online-only jusqu'à une architecture IndexedDB dédiée.
+- SQLite natif : migrations locales additives v13 à v17, stockage tenant-scoped et transactions atomiques pour la configuration et les affectations Parking.
+- Web : aucun faux cache Parking ; l'accès est fermé tant que les tables Appwrite et handlers distants ne sont pas provisionnés. Le reste de Parcoto Web conserve son mode online-only.
 - Les médias de fond sont dans Storage ; les métadonnées seules sont dans TablesDB.
 - Les opérations multi-lignes utilisent transaction Appwrite, idempotency key et validation des invariants côté serveur.
+
+## 12. État de l'implémentation sur master
+
+La première tranche locale du module est enregistrée sur `master` :
+
+- Modèles métier typés et sérialisation pour sites, parkings, plans, zones, places, affectations, événements d'accès et médias.
+- Stockage SQLite natif tenant-scoped, avec vérification des références parentales et transactions atomiques.
+- Assistant initial de création : site + parking + plan métrique + zone + rangées/places générées.
+- Validation de l'emprise du plan et des zones pour les géométries de places, y compris rectangles tournés.
+- Déplacements et clôtures d'affectation transactionnels ; les événements d'entrée/sortie peuvent être enregistrés dans la même transaction.
+- Vue d'exploitation alimentée par SQLite, sans jeu de données de démonstration.
+
+**Limite volontaire :** le module Parking n'est pas synchronisé avec Appwrite à ce stade. Le projet Appwrite actif n'a pas été modifié ; aucune table distante ni fonction Parking n'a été déployée. Le stockage Web échoue explicitement tant que le backend distant n'est pas disponible. Les données locales natives restent sur l'appareil et ne sont pas partagées entre appareils.
+
+L'interface actuelle livre le premier assistant guidé et l'inspection des places. L'éditeur vectoriel complet, l'import calibré opérationnel, la gestion des entrées/sorties depuis Parcoto Connect, les permissions serveur et la synchronisation distante restent des lots suivants.
 
 ## 12. Plan de réalisation et critères de sortie
 
