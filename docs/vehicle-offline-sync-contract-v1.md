@@ -368,7 +368,7 @@ Le schéma local était à la version 11 au début de l'implémentation de phase
 | 13 | **Codée sur master** — ajouter base_revision, depends_on_operation_id, sequence_no ; séquencer les opérations historiques et bloquer les enfants jusqu'à l'ACK parent |
 | 14 | **Codée sur master** — ajouter server_revision aux tables véhicules/chauffeurs et créer les tables locales typed sites/vehicle_assignments |
 | 15 | **Codée sur master** — créer les tables locales typed parking_lots, parking_layouts, parking_zones, parking_spaces, vehicle_parking_assignments, parking_access_events et parking_media |
-| 16 | **Codée sur master** — index de recherche initiaux pour affectations physiques et réservations |
+| 16 | **Codée sur master** — introduction des index uniques partiels pour affectations physiques actives ; ils sont remplacés par des index temporels en v18 |
 | 17 | **Codée sur master** — ajouter assignment_id aux événements d'accès Parking et son index local |
 | 18 | **Codée sur master** — remplacer les index uniques trop stricts par des index de recherche temporelle ; les conflits sont arbitrés dans une transaction par la politique d'affectation |
 | 19 | À implémenter — ajouter meter readings et maintenance |
