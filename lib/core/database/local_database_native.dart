@@ -735,6 +735,7 @@ class LocalDatabase {
         rethrow;
       }
     }
+  }
 
   bool isStartupMigrationComplete({
     required String companyId,
