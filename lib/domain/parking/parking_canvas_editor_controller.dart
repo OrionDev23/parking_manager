@@ -260,6 +260,7 @@ class ParkingCanvasEditorController {
     if (!deltaX.isFinite || !deltaY.isFinite) {
       throw ArgumentError('Canvas movement must contain finite values.');
     }
+    if (deltaX == 0 && deltaY == 0 && !snapToGrid) return;
     var effectiveX = deltaX;
     var effectiveY = deltaY;
 
