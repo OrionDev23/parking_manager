@@ -6,7 +6,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 
 import '../../domain/parking/parking_canvas_document.dart';
 import '../../domain/parking/parking_canvas_editor_controller.dart';
-import '../../domain/parking/parking_geometry.dart';
 import '../../domain/parking/parking_models.dart';
 
 class ParkingCanvasEditorDialog extends StatefulWidget {
@@ -827,7 +826,9 @@ class _ParkingCanvasEditorDialogState extends State<ParkingCanvasEditorDialog> {
                         left: BorderSide(color: widget.borderColor),
                       ),
                     ),
-                    child: _inspector(),
+                    child: SingleChildScrollView(
+                      child: _inspector(),
+                    ),
                   );
                   return Container(
                     decoration: BoxDecoration(
