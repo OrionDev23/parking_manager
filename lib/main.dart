@@ -118,8 +118,10 @@ Future<void> stopSessionRuntime() async {
   _backgroundInitializationRetryCount = 0;
   if (!_runtimeReady) return;
   await syncEngine.stop();
-  // A later login, including one in the same project, must start the engine
-  // again. Migration markers make the backfill idempotent.
+  _runtimeReady = false;
+  _runtimeCompanyId = null;
+  // A later login, including one in the same project, must create a fresh
+  // tenant runtime and reinstall the local Parking source.
   _backgroundInitialization = null;
 }
 
