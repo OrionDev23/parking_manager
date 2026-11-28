@@ -72,13 +72,20 @@ class SqliteParkingSource implements LocalParkingSource {
     final angle = geometry.rotationDegrees * math.pi / 180;
     final cosine = math.cos(angle);
     final sine = math.sin(angle);
+    final halfWidth = geometry.width / 2;
+    final halfLength = geometry.length / 2;
+    final corners = [
+      ParkingPoint(x: -halfWidth, y: -halfLength),
+      ParkingPoint(x: halfWidth, y: -halfLength),
+      ParkingPoint(x: halfWidth, y: halfLength),
+      ParkingPoint(x: -halfWidth, y: halfLength),
+    ];
     return [
-      for (final dx in [-geometry.width / 2, geometry.width / 2])
-        for (final dy in [-geometry.length / 2, geometry.length / 2])
-          ParkingPoint(
-            x: geometry.centerX + dx * cosine - dy * sine,
-            y: geometry.centerY + dx * sine + dy * cosine,
-          ),
+      for (final point in corners)
+        ParkingPoint(
+          x: geometry.centerX + point.x * cosine - point.y * sine,
+          y: geometry.centerY + point.x * sine + point.y * cosine,
+        ),
     ];
   }
 
@@ -106,6 +113,74 @@ class SqliteParkingSource implements LocalParkingSource {
       }
     }
     return inside;
+  }
+
+  bool _segmentWithinPolygon(
+    ParkingPoint start,
+    ParkingPoint end,
+    ParkingPolygon polygon,
+  ) {
+    const epsilon = 1e-8;
+    if (!_insidePolygon(start, polygon) || !_insidePolygon(end, polygon)) {
+      return false;
+    }
+
+    final dx = end.x - start.x;
+    final dy = end.y - start.y;
+    final lengthSquared = dx * dx + dy * dy;
+    if (lengthSquared <= epsilon * epsilon) return true;
+
+    final cuts = <double>[0, 1];
+    final points = polygon.points;
+    for (var i = 0; i < points.length; i++) {
+      final edgeStart = points[i];
+      final edgeEnd = points[(i + 1) % points.length];
+      final edgeX = edgeEnd.x - edgeStart.x;
+      final edgeY = edgeEnd.y - edgeStart.y;
+      final offsetX = edgeStart.x - start.x;
+      final offsetY = edgeStart.y - start.y;
+      final denominator = dx * edgeY - dy * edgeX;
+
+      if (denominator.abs() <= epsilon) {
+        final collinear = offsetX * dy - offsetY * dx;
+        if (collinear.abs() > epsilon) continue;
+        final firstT = (offsetX * dx + offsetY * dy) / lengthSquared;
+        final secondOffsetX = edgeEnd.x - start.x;
+        final secondOffsetY = edgeEnd.y - start.y;
+        final secondT =
+            (secondOffsetX * dx + secondOffsetY * dy) / lengthSquared;
+        if (firstT > epsilon && firstT < 1 - epsilon) {
+          cuts.add(firstT);
+        }
+        if (secondT > epsilon && secondT < 1 - epsilon) {
+          cuts.add(secondT);
+        }
+        continue;
+      }
+
+      final t = (offsetX * edgeY - offsetY * edgeX) / denominator;
+      final u = (offsetX * dy - offsetY * dx) / denominator;
+      if (t >= -epsilon &&
+          t <= 1 + epsilon &&
+          u >= -epsilon &&
+          u <= 1 + epsilon) {
+        cuts.add(t.clamp(0.0, 1.0));
+      }
+    }
+
+    cuts.sort();
+    for (var i = 0; i < cuts.length - 1; i++) {
+      final lower = cuts[i];
+      final upper = cuts[i + 1];
+      if (upper - lower <= epsilon) continue;
+      final t = (lower + upper) / 2;
+      final probe = ParkingPoint(
+        x: start.x + dx * t,
+        y: start.y + dy * t,
+      );
+      if (!_insidePolygon(probe, polygon)) return false;
+    }
+    return true;
   }
 
   void _validateSetupGeometry({
@@ -141,12 +216,17 @@ class SqliteParkingSource implements LocalParkingSource {
       }
       final zone = zonesById[space.parkingZoneId]!;
       final boundary = zone.boundary;
-      if (boundary != null &&
-          footprint.any((point) => !_insidePolygon(point, boundary))) {
-        throw ArgumentError(
-          'Space "' + space.code + '" extends outside zone "' +
-              zone.code + '".',
-        );
+      if (boundary != null) {
+        for (var i = 0; i < footprint.length; i++) {
+          final start = footprint[i];
+          final end = footprint[(i + 1) % footprint.length];
+          if (!_segmentWithinPolygon(start, end, boundary)) {
+            throw ArgumentError(
+              'Space "' + space.code + '" extends outside zone "' +
+                  zone.code + '".',
+            );
+          }
+        }
       }
     }
   }
