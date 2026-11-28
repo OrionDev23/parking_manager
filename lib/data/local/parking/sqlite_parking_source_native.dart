@@ -4,7 +4,6 @@ import 'dart:math' as math;
 import 'package:sqlite3/sqlite3.dart';
 
 import '../../../core/database/local_database.dart';
-import '../../../domain/parking/parking_geometry.dart';
 import '../../../domain/parking/parking_models.dart';
 import 'local_parking_source.dart';
 
@@ -201,7 +200,7 @@ class SqliteParkingSource implements LocalParkingSource {
       if (boundary == null) continue;
       if (boundary.points.any((point) => !inPlan(point))) {
         throw ArgumentError(
-          'Zone "' + zone.code + '" extends outside the plan.',
+          'Zone "${zone.code}" extends outside the plan.',
         );
       }
     }
@@ -211,7 +210,7 @@ class SqliteParkingSource implements LocalParkingSource {
       final footprint = _spaceFootprint(space);
       if (footprint.any((point) => !inPlan(point))) {
         throw ArgumentError(
-          'Space "' + space.code + '" extends outside the plan.',
+          'Space "${space.code}" extends outside the plan.',
         );
       }
       final zone = zonesById[space.parkingZoneId]!;
@@ -222,8 +221,7 @@ class SqliteParkingSource implements LocalParkingSource {
           final end = footprint[(i + 1) % footprint.length];
           if (!_segmentWithinPolygon(start, end, boundary)) {
             throw ArgumentError(
-              'Space "' + space.code + '" extends outside zone "' +
-                  zone.code + '".',
+              'Space "${space.code}" extends outside zone "${zone.code}".',
             );
           }
         }
@@ -398,7 +396,7 @@ class SqliteParkingSource implements LocalParkingSource {
         throw ArgumentError('Every zone must belong to the new parking.');
       }
       if (!zoneIds.add(zone.id)) {
-        throw ArgumentError('Duplicate zone ID: ' + zone.id + '.');
+        throw ArgumentError('Duplicate zone ID: ${zone.id}.');
       }
     }
     final spaceIds = <String>{};
@@ -409,7 +407,7 @@ class SqliteParkingSource implements LocalParkingSource {
         throw ArgumentError('Every space must belong to a zone in this parking.');
       }
       if (!spaceIds.add(space.id)) {
-        throw ArgumentError('Duplicate space ID: ' + space.id + '.');
+        throw ArgumentError('Duplicate space ID: ${space.id}.');
       }
     }
     _validateSetupGeometry(layout: layout, zones: zones, spaces: spaces);
