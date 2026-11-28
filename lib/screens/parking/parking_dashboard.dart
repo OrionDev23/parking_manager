@@ -181,12 +181,20 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
       final zoneId = 'zone_$stamp';
 
       final margin = 2.0;
+      final horizontal =
+          input.orientation == ParkingRowOrientation.horizontal;
       final widthM = margin * 2 +
-          input.spacesPerRow * input.spaceWidthM +
-          (input.spacesPerRow - 1) * input.spaceGapM;
+          (horizontal
+              ? input.spacesPerRow * input.spaceWidthM +
+                  (input.spacesPerRow - 1) * input.spaceGapM
+              : input.rowCount * input.spaceLengthM +
+                  (input.rowCount - 1) * input.rowGapM);
       final heightM = margin * 2 +
-          input.rowCount * input.spaceLengthM +
-          (input.rowCount - 1) * input.rowGapM;
+          (horizontal
+              ? input.rowCount * input.spaceLengthM +
+                  (input.rowCount - 1) * input.rowGapM
+              : input.spacesPerRow * input.spaceWidthM +
+                  (input.spacesPerRow - 1) * input.spaceGapM);
 
       final site = ParkingSite(
         id: siteId,
@@ -223,8 +231,8 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
         id: zoneId,
         companyId: services.companyId,
         parkingLotId: parkingLotId,
-        code: 'A',
-        name: 'Zone A',
+        code: input.zoneCode,
+        name: 'Zone ' + input.zoneCode,
         type: ParkingZoneType.standard,
         boundary: ParkingPolygon(
           points: [
@@ -241,22 +249,26 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
       const rowGenerator = ParkingRowGenerator();
       final spaces = <ParkingSpace>[];
       for (var rowIndex = 0; rowIndex < input.rowCount; rowIndex++) {
-        final rowCode = 'A' + (rowIndex + 1).toString();
+        final rowCode = input.rowPrefix + (rowIndex + 1).toString();
         final generated = rowGenerator.generate(
           ParkingRowSpec(
-            zoneCode: 'A',
+            zoneCode: input.zoneCode,
             rowCode: rowCode,
             spacePrefix: rowCode + '-',
             count: input.spacesPerRow,
             numberPadding: 3,
-            anchorX: margin + input.spaceWidthM / 2,
-            anchorY: margin +
-                input.spaceLengthM / 2 +
-                rowIndex * (input.spaceLengthM + input.rowGapM),
+            anchorX: horizontal
+                ? margin + input.spaceWidthM / 2
+                : margin + input.spaceLengthM / 2 +
+                    rowIndex * (input.spaceLengthM + input.rowGapM),
+            anchorY: horizontal
+                ? margin + input.spaceLengthM / 2 +
+                    rowIndex * (input.spaceLengthM + input.rowGapM)
+                : margin + input.spaceWidthM / 2,
             spaceWidth: input.spaceWidthM,
             spaceLength: input.spaceLengthM,
             gap: input.spaceGapM,
-            orientation: ParkingRowOrientation.horizontal,
+            orientation: input.orientation,
           ),
         );
         for (final generatedSpace in generated) {
@@ -1091,6 +1103,9 @@ class _ParkingSetupInput {
   final double spaceLengthM;
   final double spaceGapM;
   final double rowGapM;
+  final String zoneCode;
+  final String rowPrefix;
+  final ParkingRowOrientation orientation;
 
   const _ParkingSetupInput({
     required this.siteName,
@@ -1103,6 +1118,9 @@ class _ParkingSetupInput {
     required this.spaceLengthM,
     required this.spaceGapM,
     required this.rowGapM,
+    required this.zoneCode,
+    required this.rowPrefix,
+    required this.orientation,
   });
 }
 
@@ -1124,6 +1142,9 @@ class _CreateParkingDialogState extends State<_CreateParkingDialog> {
   final _spaceLength = TextEditingController(text: '5.00');
   final _spaceGap = TextEditingController(text: '0.35');
   final _rowGap = TextEditingController(text: '6.00');
+  final _zoneCode = TextEditingController(text: 'A');
+  final _rowPrefix = TextEditingController(text: 'A');
+  ParkingRowOrientation _orientation = ParkingRowOrientation.horizontal;
   bool _advanced = false;
   String? _error;
 
@@ -1139,6 +1160,8 @@ class _CreateParkingDialogState extends State<_CreateParkingDialog> {
     _spaceLength.dispose();
     _spaceGap.dispose();
     _rowGap.dispose();
+    _zoneCode.dispose();
+    _rowPrefix.dispose();
     super.dispose();
   }
 
@@ -1147,6 +1170,8 @@ class _CreateParkingDialogState extends State<_CreateParkingDialog> {
     final siteCode = _siteCode.text.trim();
     final parkingName = _parkingName.text.trim();
     final parkingCode = _parkingCode.text.trim();
+    final zoneCode = _zoneCode.text.trim();
+    final rowPrefix = _rowPrefix.text.trim();
     final rows = int.tryParse(_rows.text.trim());
     final spaces = int.tryParse(_spacesPerRow.text.trim());
     final width = double.tryParse(_spaceWidth.text.trim().replaceAll(',', '.'));
@@ -1160,8 +1185,19 @@ class _CreateParkingDialogState extends State<_CreateParkingDialog> {
     if (siteName.isEmpty ||
         siteCode.isEmpty ||
         parkingName.isEmpty ||
-        parkingCode.isEmpty) {
+        parkingCode.isEmpty ||
+        zoneCode.isEmpty ||
+        rowPrefix.isEmpty) {
       setState(() => _error = 'Renseigne le site et le parking.');
+      return;
+    }
+    if (zoneCode.length > 40 ||
+        rowPrefix.length > 30 ||
+        zoneCode.contains('/') ||
+        rowPrefix.contains('/') ||
+        zoneCode.contains(String.fromCharCode(92)) ||
+        rowPrefix.contains(String.fromCharCode(92))) {
+      setState(() => _error = 'Vérifie le code de zone et le préfixe de rangée.');
       return;
     }
     if (rows == null || rows < 1 || rows > 40 ||
@@ -1202,6 +1238,11 @@ class _CreateParkingDialogState extends State<_CreateParkingDialog> {
         spaceLengthM: _advanced ? length : 5,
         spaceGapM: _advanced ? gap : 0.35,
         rowGapM: _advanced ? rowGap : 6,
+        zoneCode: _advanced ? zoneCode : 'A',
+        rowPrefix: _advanced ? rowPrefix : 'A',
+        orientation: _advanced
+            ? _orientation
+            : ParkingRowOrientation.horizontal,
       ),
     );
   }
@@ -1286,6 +1327,40 @@ class _CreateParkingDialogState extends State<_CreateParkingDialog> {
               ),
               if (_advanced) ...[
                 const SizedBox(height: 12),
+                const Text(
+                  'Géométrie et codification',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(child: _field('Code de zone', _zoneCode)),
+                    const SizedBox(width: 10),
+                    Expanded(child: _field('Préfixe des rangées', _rowPrefix)),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Text('Orientation des rangées'),
+                const SizedBox(height: 4),
+                ComboBox<ParkingRowOrientation>(
+                  value: _orientation,
+                  isExpanded: true,
+                  items: const [
+                    ComboBoxItem(
+                      value: ParkingRowOrientation.horizontal,
+                      child: Text('Horizontale'),
+                    ),
+                    ComboBoxItem(
+                      value: ParkingRowOrientation.vertical,
+                      child: Text('Verticale'),
+                    ),
+                  ],
+                  onChanged: (value) => setState(() {
+                    _orientation =
+                        value ?? ParkingRowOrientation.horizontal;
+                  }),
+                ),
+                const SizedBox(height: 14),
                 const Text(
                   'Dimensions et espacements — en mètres',
                   style: TextStyle(fontWeight: FontWeight.w700),
