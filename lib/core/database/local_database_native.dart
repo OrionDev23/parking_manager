@@ -709,6 +709,33 @@ class LocalDatabase {
 
   }
 
+
+    if (version < 17) {
+      db.execute('BEGIN IMMEDIATE');
+      try {
+        final eventColumns = db.select(
+          'PRAGMA table_info(parking_access_events)',
+        );
+        if (!eventColumns.any((row) => row['name'] == 'assignment_id')) {
+          db.execute(
+            'ALTER TABLE parking_access_events ADD COLUMN assignment_id TEXT',
+          );
+        }
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_parking_events_assignment '
+          'ON parking_access_events(company_id, assignment_id, occurred_at)',
+        );
+        db.execute(
+          "INSERT INTO schema_migrations(version, applied_at) "
+          "VALUES (17, datetime('now'))",
+        );
+        db.execute('COMMIT');
+      } catch (_) {
+        db.execute('ROLLBACK');
+        rethrow;
+      }
+    }
+
   bool isStartupMigrationComplete({
     required String companyId,
     required String migrationKey,
