@@ -303,7 +303,7 @@ class DocumentFormState extends State<DocumentForm> {
         bucketId: _vehicleDocumentBucketId,
         fileId: fileId,
       );
-      final fileName = widget.vd?.fileName ?? 'document-' + fileId;
+      final fileName = widget.vd?.fileName ?? 'document-$fileId';
       await FilePicker.saveFile(
         dialogTitle: 'vehicle_doc_download_title'.tr(),
         fileName: fileName,
@@ -312,7 +312,7 @@ class DocumentFormState extends State<DocumentForm> {
       );
     } catch (error) {
       if (mounted) {
-        _showMessage('vehicle_doc_download_failed'.tr() + ': ' + error.toString(), isError: true);
+        _showMessage('vehicle_doc_download_failed'.tr() + ': ${error.toString()}', isError: true);
       }
     }
   }
@@ -331,12 +331,12 @@ class DocumentFormState extends State<DocumentForm> {
         constraints: BoxConstraints.tight(
           _responsiveDocumentSelectorSize(dialogContext),
         ),
-        title: const Text('selectvehicle').tr(),
+        title: Text('selectvehicle').tr(),
         content: const VehicleTable(selectV: true),
         actions: [
           Button(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('fermer').tr(),
+            child: Text('fermer').tr(),
           ),
         ],
       ),
@@ -380,6 +380,7 @@ class DocumentFormState extends State<DocumentForm> {
     }
     if (!_changes && _pendingFile == null && !_removeExistingFile) return;
 
+    final vehicleProvider = context.read<VehicleProvider>();
     setState(() => _saving = true);
     String? newlyUploadedFileId;
     try {
@@ -450,7 +451,7 @@ class DocumentFormState extends State<DocumentForm> {
       }
 
       try {
-        await context.read<VehicleProvider>().refreshDocuments();
+        await vehicleProvider.refreshDocuments();
       } catch (error) {
         debugPrint('[Vehicle documents] refresh after save failed: $error');
       }
@@ -606,7 +607,7 @@ class DocumentFormState extends State<DocumentForm> {
           ),
           if (selected == null && hasExisting)
             IconButton(
-              icon: const Icon(FluentIcons.replace, size: 15),
+              icon: const Icon(FluentIcons.refresh, size: 15),
               onPressed: _saving ? null : _pickAttachment,
             ),
         ],
