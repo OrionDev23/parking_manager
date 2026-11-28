@@ -5,8 +5,6 @@ import 'dart:ui' as ui;
 import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter/painting.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/services/parking_services.dart';
@@ -30,6 +28,8 @@ class _ParkingSnapshot {
   final List<ParkingSpace> spaces;
   final List<VehicleParkingAssignment> assignments;
   final Uint8List? backgroundBytes;
+  final int? backgroundPixelWidth;
+  final int? backgroundPixelHeight;
 
   const _ParkingSnapshot({
     required this.sites,
@@ -40,6 +40,8 @@ class _ParkingSnapshot {
     required this.spaces,
     required this.assignments,
     this.backgroundBytes,
+    this.backgroundPixelWidth,
+    this.backgroundPixelHeight,
   });
 }
 
@@ -147,6 +149,8 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
       spaces: spaces,
       assignments: assignments,
       backgroundBytes: backgroundBytes,
+      backgroundPixelWidth: backgroundMedia?.pixelWidth,
+      backgroundPixelHeight: backgroundMedia?.pixelHeight,
     );
   }
 
@@ -328,10 +332,10 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
       _refresh(parkingLotId: parkingLotId);
       displayInfoBar(
         context,
-        builder: (context, close) => const InfoBar(
-          title: Text('Parking créé'),
+        builder: (context, close) => InfoBar(
+          title: const Text('Parking créé'),
           content: Text(
-            'Code du site : ' + site.code + '. Le plan et ses places sont '
+            'Code du site : ${site.code}. Le plan et ses places sont '
             'enregistrés sur cet appareil. La synchronisation Appwrite sera '
             'activée après le déploiement des services distants Parking.',
           ),
@@ -406,10 +410,6 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
         _ => throw FormatException('Format d’image non pris en charge.'),
       };
 
-      if (selectedFile.size <= 0 ||
-          selectedFile.size > 20 * 1024 * 1024) {
-        throw StateError('L’image doit peser entre 1 octet et 20 Mo.');
-      }
       final bytes = await selectedFile.readAsBytes();
       if (bytes.isEmpty || bytes.length > 20 * 1024 * 1024) {
         throw StateError('L’image doit peser au maximum 20 Mo.');
