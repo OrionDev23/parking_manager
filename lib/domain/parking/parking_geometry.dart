@@ -1,5 +1,29 @@
 import 'dart:math' as math;
 
+/// A point in plan coordinates. The unit is metres unless explicitly stated
+/// otherwise by the containing type (image calibration points use pixels).
+class ParkingPoint {
+  final double x;
+  final double y;
+
+  const ParkingPoint({required this.x, required this.y});
+
+  bool get isFinite => x.isFinite && y.isFinite;
+
+  Map<String, Object> toJson() => {'x': x, 'y': y};
+
+  factory ParkingPoint.fromJson(Map<String, dynamic> json) {
+    final x = json['x'];
+    final y = json['y'];
+    if (x is! num || y is! num || !x.isFinite || !y.isFinite) {
+      throw const FormatException(
+        'Parking point coordinates must be finite numbers.',
+      );
+    }
+    return ParkingPoint(x: x.toDouble(), y: y.toDouble());
+  }
+}
+
 /// Geometry is stored in parking-plan world coordinates (metres), never pixels.
 /// [centerX] and [centerY] identify the centre of the rectangular space.
 class ParkingSpaceGeometry {
