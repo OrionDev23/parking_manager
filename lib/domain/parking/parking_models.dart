@@ -451,9 +451,12 @@ class ParkingBackgroundTransform {
     final angle = rotationDegrees * math.pi / 180;
     final cosine = math.cos(angle);
     final sine = math.sin(angle);
+    // Raster pixels use a top-left origin with Y increasing downward;
+    // parking-plan coordinates use a bottom-left origin with Y increasing up.
+    final imageY = -pixel.y;
     return ParkingPoint(
-      x: originXM + (pixel.x * cosine - pixel.y * sine) * scale,
-      y: originYM + (pixel.x * sine + pixel.y * cosine) * scale,
+      x: originXM + (pixel.x * cosine - imageY * sine) * scale,
+      y: originYM + (pixel.x * sine + imageY * cosine) * scale,
     );
   }
 
