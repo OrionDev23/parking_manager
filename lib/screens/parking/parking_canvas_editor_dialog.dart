@@ -55,6 +55,7 @@ class _ParkingCanvasEditorDialogState extends State<ParkingCanvasEditorDialog> {
   String? _error;
   bool _snapToGrid = true;
   bool _draggingSelection = false;
+  bool _selectionWasMoved = false;
   bool _draggingCamera = false;
   ui.Offset? _lastScreenPosition;
   List<ParkingPoint> _polygonPoints = [];
@@ -225,6 +226,7 @@ class _ParkingCanvasEditorDialogState extends State<ParkingCanvasEditorDialog> {
     setState(() {
       _lastScreenPosition = screen;
       _draggingSelection = false;
+      _selectionWasMoved = false;
       _draggingCamera = tool == ParkingCanvasTool.hand;
       _draftStart = null;
       _draftEnd = null;
@@ -292,12 +294,15 @@ class _ParkingCanvasEditorDialogState extends State<ParkingCanvasEditorDialog> {
     if (_draggingSelection && _editor.selectedObjectIds.isNotEmpty) {
       final previousWorld = _toWorld(previousScreen, camera);
       final currentWorld = _toWorld(screen, camera);
+      final deltaX = currentWorld.x - previousWorld.x;
+      final deltaY = currentWorld.y - previousWorld.y;
+      if (deltaX == 0 && deltaY == 0) return;
       try {
-        _editor.moveSelection(
-          currentWorld.x - previousWorld.x,
-          currentWorld.y - previousWorld.y,
-        );
-        setState(() => _lastScreenPosition = screen);
+        _editor.moveSelection(deltaX, deltaY);
+        setState(() {
+          _selectionWasMoved = true;
+          _lastScreenPosition = screen;
+        });
       } catch (error) {
         _editor.rollbackTransaction();
         setState(() {
@@ -309,7 +314,7 @@ class _ParkingCanvasEditorDialogState extends State<ParkingCanvasEditorDialog> {
   }
 
   void _onScaleEnd(ScaleEndDetails details) {
-    if (_draggingSelection && _snapToGrid) {
+    if (_draggingSelection && _selectionWasMoved && _snapToGrid) {
       try {
         _editor.moveSelection(
           0,
@@ -330,6 +335,7 @@ class _ParkingCanvasEditorDialogState extends State<ParkingCanvasEditorDialog> {
       _draftStart = null;
       _draftEnd = null;
       _draggingSelection = false;
+      _selectionWasMoved = false;
       _draggingCamera = false;
       _lastScreenPosition = null;
       _lastScale = 1;
