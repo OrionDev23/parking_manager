@@ -609,7 +609,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
               value: occupied.toString(),
               detail: 'Occupation physique',
               theme: theme,
-              icon: FluentIcons.car_solid,
+              icon: FluentIcons.car,
               accent: theme.color,
             ),
             _MetricCard(
