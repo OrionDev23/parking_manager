@@ -1276,8 +1276,10 @@ class _ParkingPlanPainter extends CustomPainter {
         originY: originY,
         scale: scale,
       );
-      final imageWidthScreen = image.width * metersPerPixel * scale;
-      final imageHeightScreen = image.height * metersPerPixel * scale;
+      final imageWidthScreen =
+          image.width.toDouble() * metersPerPixel * scale;
+      final imageHeightScreen =
+          image.height.toDouble() * metersPerPixel * scale;
       canvas.save();
       canvas.clipRect(planRect);
       canvas.translate(imageCenterScreen.dx, imageCenterScreen.dy);
