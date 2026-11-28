@@ -463,6 +463,123 @@ void main() {
       );
     });
 
+    test('attaches a calibrated raster background and media metadata atomically',
+        () async {
+      await seedConfiguration();
+      final current = (await parking.getLayouts('lot-001')).single;
+      const calibration = ParkingBackgroundCalibration(
+        firstPixel: ParkingPoint(x: 100, y: 200),
+        secondPixel: ParkingPoint(x: 500, y: 200),
+        realDistanceM: 20,
+      );
+      final transform = ParkingBackgroundTransform(
+        originXM: 0,
+        originYM: current.heightM,
+        metersPerPixel: calibration.metersPerPixel,
+        opacity: 0.65,
+        calibration: calibration,
+      );
+      final updated = ParkingLayout(
+        id: current.id,
+        companyId: current.companyId,
+        parkingLotId: current.parkingLotId,
+        name: current.name,
+        version: current.version,
+        status: current.status,
+        widthM: current.widthM,
+        heightM: current.heightM,
+        gridStepM: current.gridStepM,
+        backgroundFileId: 'background-001',
+        backgroundTransform: transform,
+        layersJson: current.layersJson,
+        createdAt: current.createdAt,
+        updatedAt: updatedAt,
+      );
+      final media = ParkingMedia(
+        id: 'media-background-001',
+        companyId: companyId,
+        parkingLotId: 'lot-001',
+        layoutId: current.id,
+        fileId: 'background-001',
+        purpose: ParkingMediaPurpose.layoutBackground,
+        fileName: 'site-plan.png',
+        mimeType: 'image/png',
+        fileSize: 8192,
+        pixelWidth: 1600,
+        pixelHeight: 900,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+
+      await parking.attachLayoutBackground(layout: updated, media: media);
+
+      final restoredLayout = (await parking.getLayouts('lot-001')).single;
+      final restoredMedia = (await parking.getMedia('lot-001')).single;
+      expect(restoredLayout.backgroundFileId, 'background-001');
+      expect(restoredLayout.backgroundTransform!.metersPerPixel, 0.05);
+      expect(restoredLayout.backgroundTransform!.opacity, 0.65);
+      expect(restoredMedia.pixelWidth, 1600);
+      expect(restoredMedia.pixelHeight, 900);
+    });
+
+    test('rolls back a background attachment with inconsistent media references',
+        () async {
+      await seedConfiguration();
+      final current = (await parking.getLayouts('lot-001')).single;
+      final updated = ParkingLayout(
+        id: current.id,
+        companyId: current.companyId,
+        parkingLotId: current.parkingLotId,
+        name: current.name,
+        version: current.version,
+        status: current.status,
+        widthM: current.widthM,
+        heightM: current.heightM,
+        gridStepM: current.gridStepM,
+        backgroundFileId: 'background-correct',
+        backgroundTransform: const ParkingBackgroundTransform(
+          originYM: 45,
+          metersPerPixel: 0.05,
+          calibration: ParkingBackgroundCalibration(
+            firstPixel: ParkingPoint(x: 0, y: 0),
+            secondPixel: ParkingPoint(x: 400, y: 0),
+            realDistanceM: 20,
+          ),
+        ),
+        layersJson: current.layersJson,
+        createdAt: current.createdAt,
+        updatedAt: updatedAt,
+      );
+      final inconsistentMedia = ParkingMedia(
+        id: 'media-background-wrong',
+        companyId: companyId,
+        parkingLotId: 'lot-001',
+        layoutId: current.id,
+        fileId: 'background-wrong',
+        purpose: ParkingMediaPurpose.layoutBackground,
+        fileName: 'wrong.png',
+        mimeType: 'image/png',
+        fileSize: 1024,
+        pixelWidth: 400,
+        pixelHeight: 300,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+
+      await expectLater(
+        parking.attachLayoutBackground(
+          layout: updated,
+          media: inconsistentMedia,
+        ),
+        throwsA(isA<ArgumentError>()),
+      );
+      expect(
+        (await parking.getLayouts('lot-001')).single.backgroundFileId,
+        isNull,
+      );
+      expect(await parking.getMedia('lot-001'), isEmpty);
+    });
+
     test('stores media metadata without putting file bytes in SQLite payload',
         () async {
       await seedConfiguration();
@@ -476,6 +593,8 @@ void main() {
         fileName: 'plan.pdf',
         mimeType: 'application/pdf',
         fileSize: 4096,
+        pixelWidth: 1024,
+        pixelHeight: 768,
         sha256: List.filled(64, 'b').join(),
         createdAt: createdAt,
         updatedAt: updatedAt,
@@ -486,6 +605,8 @@ void main() {
 
       expect(restored.fileId, media.fileId);
       expect(restored.fileSize, 4096);
+      expect(restored.pixelWidth, 1024);
+      expect(restored.pixelHeight, 768);
       expect(restored.toJson().containsKey('bytes'), isFalse);
     });
   });
