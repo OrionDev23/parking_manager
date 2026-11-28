@@ -174,7 +174,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
     if (!normalized.contains(requested.toLowerCase())) return requested;
 
     for (var suffixNumber = 2; suffixNumber < 10000; suffixNumber++) {
-      final suffix = '-' + suffixNumber.toString().padLeft(2, '0');
+      final suffix = '-${suffixNumber.toString().padLeft(2, '0')}';
       final prefixLength = requested.length <= 40 - suffix.length
           ? requested.length
           : 40 - suffix.length;
@@ -259,7 +259,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
         companyId: services.companyId,
         parkingLotId: parkingLotId,
         code: input.zoneCode,
-        name: 'Zone ' + input.zoneCode,
+        name: 'Zone ${input.zoneCode}',
         type: ParkingZoneType.standard,
         boundary: ParkingPolygon(
           points: [
@@ -281,7 +281,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
           ParkingRowSpec(
             zoneCode: input.zoneCode,
             rowCode: rowCode,
-            spacePrefix: rowCode + '-',
+            spacePrefix: '$rowCode-',
             count: input.spacesPerRow,
             numberPadding: 3,
             anchorX: horizontal
@@ -302,7 +302,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
           final ordinal = spaces.length + 1;
           spaces.add(
             ParkingSpace(
-              id: 'space_' + stamp + '_' + ordinal.toString(),
+              id: 'space_${stamp}_$ordinal',
               companyId: services.companyId,
               parkingZoneId: zoneId,
               code: generatedSpace.code,
@@ -546,9 +546,8 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
         builder: (context, close) => InfoBar(
           title: const Text('Fond de plan importé'),
           content: Text(
-            'Calibration : ' +
-                metersPerPixel.toStringAsFixed(4) +
-                ' m/pixel. Le fond est stocké localement sur cet appareil.',
+            'Calibration : ${metersPerPixel.toStringAsFixed(4)} '
+            'm/pixel. Le fond est stocké localement sur cet appareil.',
           ),
           severity: InfoBarSeverity.success,
         ),
@@ -851,20 +850,15 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
           ),
         const SizedBox(height: 4),
         Text(
-          'Site : ' + selectedSiteName +
-              ' • ' + selectedLot.code + ' • ' + selectedLot.status.name,
+          'Site : $selectedSiteName • ${selectedLot.code} • ${selectedLot.status.name}',
           style: TextStyle(color: theme.mutedTextColor, fontSize: 12),
         ),
         if (data.layouts.isNotEmpty) ...[
           const SizedBox(height: 5),
           Text(
-            'Plan v' +
-                data.layouts.first.version.toString() +
-                ' — ' +
-                data.layouts.first.widthM.toStringAsFixed(1) +
-                ' × ' +
-                data.layouts.first.heightM.toStringAsFixed(1) +
-                ' m',
+            'Plan v${data.layouts.first.version} — '
+            '${data.layouts.first.widthM.toStringAsFixed(1)} × '
+            '${data.layouts.first.heightM.toStringAsFixed(1)} m',
             style: TextStyle(color: theme.mutedTextColor, fontSize: 11),
           ),
         ],
@@ -954,7 +948,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
               children: [
                 Expanded(
                   child: Text(
-                    zone.name + ' (' + zone.code + ')',
+                    '${zone.name} (${zone.code})'',
                     style: TextStyle(
                       color: theme.textColor,
                       fontSize: 15,
@@ -1097,7 +1091,7 @@ class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
       final frame = await codec.getNextFrame();
       decodedImage = frame.image;
     } catch (_) {
-      decodedImage?.dispose();
+      decodedImage.dispose();
       return;
     } finally {
       codec?.dispose();
@@ -1111,7 +1105,7 @@ class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
     }
     final previous = _backgroundImage;
     setState(() => _backgroundImage = decodedImage);
-    previous.dispose();
+    previous?.dispose();
   }
 
   @override
@@ -1478,10 +1472,8 @@ class _ParkingPlanPainter extends CustomPainter {
       );
     }
 
-    final sizeLabel = layout.widthM.toStringAsFixed(1) +
-        ' × ' +
-        layout.heightM.toStringAsFixed(1) +
-        ' m';
+    final sizeLabel = '${layout.widthM.toStringAsFixed(1)} × '
+        '${layout.heightM.toStringAsFixed(1)} m';
     final labelPainter = TextPainter(
       text: TextSpan(
         text: sizeLabel,
@@ -2405,10 +2397,8 @@ class _SpaceInspector extends StatelessWidget {
     final geometry = space.rectangle;
     final dimensions = geometry == null
         ? 'Forme polygonale'
-        : geometry.width.toStringAsFixed(2) +
-            ' × ' +
-            geometry.length.toStringAsFixed(2) +
-            ' m';
+        : '${geometry.width.toStringAsFixed(2)} × '
+            '${geometry.length.toStringAsFixed(2)} m';
 
     return Container(
       padding: const EdgeInsets.all(16),
