@@ -371,11 +371,12 @@ Le schéma local était à la version 11 au début de l'implémentation de phase
 | 16 | **Codée sur master** — introduction des index uniques partiels pour affectations physiques actives ; ils sont remplacés par des index temporels en v18 |
 | 17 | **Codée sur master** — ajouter assignment_id aux événements d'accès Parking et son index local |
 | 18 | **Codée sur master** — remplacer les index uniques trop stricts par des index de recherche temporelle ; les conflits sont arbitrés dans une transaction par la politique d'affectation |
-| 19 | À implémenter — ajouter meter readings et maintenance |
-| 20 | À implémenter après gate privacy/légal — tracking_devices/sessions/location buffer |
-| 21 | À implémenter — vehicle_events et mécanisme de receipts/cursors par domaine si requis |
+| 19 | **Codée sur master** — ajouter les dimensions pixels aux médias locaux des fonds raster |
+| 20 | À implémenter — ajouter meter readings et maintenance |
+| 21 | À implémenter après gate privacy/légal — tracking_devices/sessions/location buffer |
+| 22 | À implémenter — vehicle_events et mécanisme de receipts/cursors par domaine si requis |
 
-Les migrations 13 à 18 sont additives et s'exécutent localement à l'ouverture de SQLite ; elles ne créent ni table ni colonne dans Appwrite. Les tables et repositories locaux du Parking sont présents sur `master`. Les opérations Parking ne sont volontairement pas ajoutées à l'outbox tant que le schéma Appwrite distant, les validations serveur et les handlers idempotents ne sont pas provisionnés. Les tests ciblés sont ajoutés ; leur exécution CI reste le critère de validation.
+Les migrations 13 à 19 sont additives et s'exécutent localement à l'ouverture de SQLite ; elles ne créent ni table ni colonne dans Appwrite. Les tables et repositories locaux du Parking sont présents sur `master`. Les opérations Parking ne sont volontairement pas ajoutées à l'outbox tant que le schéma Appwrite distant, les validations serveur et les handlers idempotents ne sont pas provisionnés. Les tests ciblés sont ajoutés ; leur exécution CI reste le critère de validation.
 
 Chaque migration :
 - est idempotente et testée depuis schema version 11 ;
