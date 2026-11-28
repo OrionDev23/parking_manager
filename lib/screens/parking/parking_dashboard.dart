@@ -1322,7 +1322,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
           ],
         ),
         const SizedBox(height: 22),
-        if (data.layouts.isNotEmpty) [...
+        if (data.layouts.isNotEmpty) ...[
           Row(
             children: [
               Expanded(
