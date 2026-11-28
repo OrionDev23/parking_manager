@@ -948,7 +948,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
               children: [
                 Expanded(
                   child: Text(
-                    '${zone.name} (${zone.code})'',
+                    '${zone.name} (${zone.code})',
                     style: TextStyle(
                       color: theme.textColor,
                       fontSize: 15,
@@ -957,11 +957,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
                   ),
                 ),
                 Text(
-                  data.spaces
-                      .where((space) => space.parkingZoneId == zone.id)
-                      .length
-                      .toString() +
-                      ' places',
+                  '${data.spaces.where((space) => space.parkingZoneId == zone.id).length} places',
                   style: TextStyle(color: theme.mutedTextColor, fontSize: 11),
                 ),
               ],
