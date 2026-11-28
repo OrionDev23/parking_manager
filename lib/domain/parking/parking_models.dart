@@ -139,6 +139,11 @@ DateTime? _optionalDate(Map<String, dynamic> json, String key) {
   return parsed.toUtc();
 }
 
+String _enumName<T extends Enum>(T value) => value.name.replaceAllMapped(
+      RegExp(r'[A-Z]'),
+      (match) => '_${match.group(0)!.toLowerCase()}',
+    );
+
 T _enumValue<T extends Enum>(
   Iterable<T> values,
   Object? raw,
@@ -508,7 +513,7 @@ class ParkingLot {
         'code': code,
         'name': name,
         'address': address,
-        'status': status.name,
+        'status': _enumName(status),
         'createdAt': createdAt.toUtc().toIso8601String(),
         'updatedAt': updatedAt.toUtc().toIso8601String(),
       };
@@ -597,7 +602,7 @@ class ParkingLayout {
         'parkingLotId': parkingLotId,
         'name': name,
         'version': version,
-        'status': status.name,
+        'status': _enumName(status),
         'widthM': widthM,
         'heightM': heightM,
         'unit': 'm',
@@ -710,8 +715,8 @@ class ParkingZone {
         'parkingLotId': parkingLotId,
         'code': code,
         'name': name,
-        'zoneType': type.name,
-        'status': status.name,
+        'zoneType': _enumName(type),
+        'status': _enumName(status),
         'geometryJson':
             boundary == null ? null : jsonEncode(boundary!.toJson()),
         'sortOrder': sortOrder,
@@ -828,11 +833,13 @@ class ParkingSpace {
         if (rectangle == null || polygon != null || !rectangle!.isValid) {
           throw ArgumentError('Rectangular spaces require valid rectangle geometry only.');
         }
+        break;
       case ParkingSpaceShape.polygon:
         if (polygon == null || rectangle != null) {
           throw ArgumentError('Polygon spaces require polygon geometry only.');
         }
         polygon!.validate();
+        break;
     }
     _validateDateOrder(createdAt, updatedAt);
   }
@@ -842,9 +849,9 @@ class ParkingSpace {
         'companyId': companyId,
         'parkingZoneId': parkingZoneId,
         'code': code,
-        'spaceType': type.name,
-        'status': status.name,
-        'shapeType': shape.name,
+        'spaceType': _enumName(type),
+        'status': _enumName(status),
+        'shapeType': _enumName(shape),
         if (rectangle != null) ...{
           'xM': rectangle!.centerX,
           'yM': rectangle!.centerY,
@@ -1012,8 +1019,8 @@ class VehicleParkingAssignment {
         'companyId': companyId,
         'vehicleId': vehicleId,
         'parkingSpaceId': parkingSpaceId,
-        'assignmentType': type.name,
-        'status': status.name,
+        'assignmentType': _enumName(type),
+        'status': _enumName(status),
         'sourceType': _enumName(source),
         'startAt': startAt.toUtc().toIso8601String(),
         'endAt': endAt?.toUtc().toIso8601String(),
@@ -1136,8 +1143,8 @@ class ParkingAccessEvent {
         'companyId': companyId,
         'parkingLotId': parkingLotId,
         'vehicleId': vehicleId,
-        'eventType': type.name,
-        'sourceType': source.name,
+        'eventType': _enumName(type),
+        'sourceType': _enumName(source),
         'occurredAt': occurredAt.toUtc().toIso8601String(),
         'recordedAt': recordedAt.toUtc().toIso8601String(),
         'registrationCaptured': registrationCaptured,
@@ -1238,7 +1245,7 @@ class ParkingMedia {
         'parkingLotId': parkingLotId,
         'layoutId': layoutId,
         'fileId': fileId,
-        'purpose': purpose.name,
+        'purpose': _enumName(purpose),
         'fileName': fileName,
         'mimeType': mimeType,
         'fileSize': fileSize,
