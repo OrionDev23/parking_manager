@@ -1603,9 +1603,17 @@ class _CalibrateBackgroundDialogState
       final targetAngle = _referenceAxis == ParkingRowOrientation.horizontal
           ? 0.0
           : math.pi / 2;
-      var rotationDegrees =
-          (targetAngle - currentAngle) * 180 / math.pi;
-      rotationDegrees = ((rotationDegrees + 180) % 360) - 180;
+      double normalizeAngle(double angle) =>
+          ((angle + math.pi) % (2 * math.pi)) - math.pi;
+      final positiveAxisRotation =
+          normalizeAngle(targetAngle - currentAngle);
+      final oppositeAxisRotation =
+          normalizeAngle(targetAngle + math.pi - currentAngle);
+      final selectedRotation =
+          positiveAxisRotation.abs() <= oppositeAxisRotation.abs()
+              ? positiveAxisRotation
+              : oppositeAxisRotation;
+      final rotationDegrees = selectedRotation * 180 / math.pi;
       Navigator.of(context).pop(
         _CalibratedBackgroundResult(
           calibration: calibration,
