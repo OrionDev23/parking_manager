@@ -910,7 +910,7 @@ class _ParkingPlanPainter extends CustomPainter {
     final scale = math.min(
       (size.width - padding * 2) / layout.widthM,
       (size.height - padding * 2) / layout.heightM,
-    );
+    ).toDouble();
     if (!scale.isFinite || scale <= 0) return;
 
     final planWidth = layout.widthM * scale;
@@ -941,7 +941,7 @@ class _ParkingPlanPainter extends CustomPainter {
     final gridStep = math.max(
       5.0,
       math.max(layout.widthM, layout.heightM) / 20,
-    );
+    ).toDouble();
     final gridPaint = ui.Paint()
       ..color = borderColor.withValues(alpha: .38)
       ..style = ui.PaintingStyle.stroke
@@ -1023,10 +1023,10 @@ class _ParkingPlanPainter extends CustomPainter {
           originY: originY,
           scale: scale,
         );
-        minX = math.min(minX, screen.dx);
-        minY = math.min(minY, screen.dy);
-        maxX = math.max(maxX, screen.dx);
-        maxY = math.max(maxY, screen.dy);
+        minX = math.min(minX, screen.dx).toDouble();
+        minY = math.min(minY, screen.dy).toDouble();
+        maxX = math.max(maxX, screen.dx).toDouble();
+        maxY = math.max(maxY, screen.dy).toDouble();
         centerX += screen.dx;
         centerY += screen.dy;
       }
@@ -1039,7 +1039,7 @@ class _ParkingPlanPainter extends CustomPainter {
           text: space.code,
           style: TextStyle(
             color: textColor,
-            fontSize: math.min(11.0, math.max(8.0, boundsHeight / 2.2)),
+            fontSize: math.min(11.0, math.max(8.0, boundsHeight / 2.2)).toDouble(),
             fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
           ),
         ),
