@@ -288,6 +288,398 @@ class LocalDatabase {
     }
   }
 
+
+    if (version < 13) {
+      db.execute('BEGIN IMMEDIATE');
+      try {
+        bool hasColumn(String table, String column) => db
+            .select('PRAGMA table_info($table)')
+            .any((row) => row['name'] == column);
+
+        void addColumnIfMissing(String table, String column, String definition) {
+          if (!hasColumn(table, column)) {
+            db.execute('ALTER TABLE $table ADD COLUMN $column $definition');
+          }
+        }
+
+        addColumnIfMissing('sync_operations', 'base_revision', 'INTEGER');
+        addColumnIfMissing(
+          'sync_operations',
+          'depends_on_operation_id',
+          'TEXT',
+        );
+        addColumnIfMissing(
+          'sync_operations',
+          'sequence_no',
+          'INTEGER NOT NULL DEFAULT 0',
+        );
+
+        // Preserve the original order deterministically per tenant. rowid is
+        // only a tie-breaker for legacy rows with identical timestamps.
+        final oldOperations = db.select(
+          'SELECT id, company_id FROM sync_operations '
+          'ORDER BY company_id, created_at, rowid',
+        );
+        String? currentCompany;
+        var sequence = 0;
+        for (final row in oldOperations) {
+          final operationCompany = row['company_id'] as String;
+          if (operationCompany != currentCompany) {
+            currentCompany = operationCompany;
+            sequence = 0;
+          }
+          sequence++;
+          db.execute(
+            'UPDATE sync_operations SET sequence_no = ? WHERE id = ?',
+            [sequence, row['id']],
+          );
+        }
+
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_sync_entity_order '
+          'ON sync_operations(company_id, entity, entity_id, sequence_no)',
+        );
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_sync_operation_dependency '
+          'ON sync_operations(company_id, depends_on_operation_id)',
+        );
+        db.execute(
+          "INSERT INTO schema_migrations(version, applied_at) "
+          "VALUES (13, datetime('now'))",
+        );
+        db.execute('COMMIT');
+      } catch (_) {
+        db.execute('ROLLBACK');
+        rethrow;
+      }
+    }
+
+    if (version < 14) {
+      db.execute('BEGIN IMMEDIATE');
+      try {
+        bool hasColumn(String table, String column) => db
+            .select('PRAGMA table_info($table)')
+            .any((row) => row['name'] == column);
+
+        void addColumnIfMissing(String table, String column, String definition) {
+          if (!hasColumn(table, column)) {
+            db.execute('ALTER TABLE $table ADD COLUMN $column $definition');
+          }
+        }
+
+        addColumnIfMissing(
+          'vehicles',
+          'server_revision',
+          'INTEGER NOT NULL DEFAULT 0',
+        );
+        addColumnIfMissing(
+          'drivers',
+          'server_revision',
+          'INTEGER NOT NULL DEFAULT 0',
+        );
+        db.execute(
+          'CREATE UNIQUE INDEX IF NOT EXISTS ux_vehicles_company_id '
+          'ON vehicles(company_id, id)',
+        );
+        db.execute(
+          'CREATE UNIQUE INDEX IF NOT EXISTS ux_drivers_company_id '
+          'ON drivers(company_id, id)',
+        );
+
+        db.execute('''
+          CREATE TABLE IF NOT EXISTS sites (
+            id TEXT PRIMARY KEY,
+            company_id TEXT NOT NULL,
+            code TEXT NOT NULL,
+            name TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'active',
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            server_revision INTEGER NOT NULL DEFAULT 0,
+            payload TEXT NOT NULL DEFAULT '{}',
+            UNIQUE(company_id, id),
+            UNIQUE(company_id, code)
+          )
+        ''');
+        db.execute('''
+          CREATE TABLE IF NOT EXISTS vehicle_assignments (
+            id TEXT PRIMARY KEY,
+            company_id TEXT NOT NULL,
+            vehicle_id TEXT NOT NULL,
+            driver_id TEXT,
+            status TEXT NOT NULL,
+            start_at TEXT NOT NULL,
+            end_at TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            server_revision INTEGER NOT NULL DEFAULT 0,
+            payload TEXT NOT NULL DEFAULT '{}',
+            UNIQUE(company_id, id),
+            FOREIGN KEY(company_id, vehicle_id)
+              REFERENCES vehicles(company_id, id),
+            FOREIGN KEY(company_id, driver_id)
+              REFERENCES drivers(company_id, id)
+          )
+        ''');
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_sites_company_status '
+          'ON sites(company_id, status)',
+        );
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_vehicle_assignments_vehicle '
+          'ON vehicle_assignments(company_id, vehicle_id, status, start_at)',
+        );
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_vehicle_assignments_driver '
+          'ON vehicle_assignments(company_id, driver_id, status, start_at)',
+        );
+        db.execute(
+          "INSERT INTO schema_migrations(version, applied_at) "
+          "VALUES (14, datetime('now'))",
+        );
+        db.execute('COMMIT');
+      } catch (_) {
+        db.execute('ROLLBACK');
+        rethrow;
+      }
+    }
+
+    if (version < 15) {
+      db.execute('BEGIN IMMEDIATE');
+      try {
+        db.execute('''
+          CREATE TABLE IF NOT EXISTS parking_lots (
+            id TEXT PRIMARY KEY,
+            company_id TEXT NOT NULL,
+            site_id TEXT NOT NULL,
+            code TEXT NOT NULL,
+            name TEXT NOT NULL,
+            address TEXT,
+            status TEXT NOT NULL DEFAULT 'active',
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            server_revision INTEGER NOT NULL DEFAULT 0,
+            payload TEXT NOT NULL DEFAULT '{}',
+            UNIQUE(company_id, id),
+            UNIQUE(company_id, site_id, code),
+            FOREIGN KEY(company_id, site_id)
+              REFERENCES sites(company_id, id)
+          )
+        ''');
+        db.execute('''
+          CREATE TABLE IF NOT EXISTS parking_layouts (
+            id TEXT PRIMARY KEY,
+            company_id TEXT NOT NULL,
+            parking_lot_id TEXT NOT NULL,
+            name TEXT NOT NULL,
+            version INTEGER NOT NULL,
+            status TEXT NOT NULL DEFAULT 'draft',
+            width_m REAL NOT NULL,
+            height_m REAL NOT NULL,
+            unit TEXT NOT NULL DEFAULT 'm',
+            grid_step_m REAL NOT NULL DEFAULT 0.25,
+            background_file_id TEXT,
+            background_transform_json TEXT,
+            layers_json TEXT NOT NULL DEFAULT '[]',
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            server_revision INTEGER NOT NULL DEFAULT 0,
+            payload TEXT NOT NULL DEFAULT '{}',
+            UNIQUE(company_id, id),
+            UNIQUE(company_id, parking_lot_id, version),
+            FOREIGN KEY(company_id, parking_lot_id)
+              REFERENCES parking_lots(company_id, id)
+          )
+        ''');
+        db.execute('''
+          CREATE TABLE IF NOT EXISTS parking_zones (
+            id TEXT PRIMARY KEY,
+            company_id TEXT NOT NULL,
+            parking_lot_id TEXT NOT NULL,
+            code TEXT NOT NULL,
+            name TEXT NOT NULL,
+            zone_type TEXT NOT NULL DEFAULT 'standard',
+            status TEXT NOT NULL DEFAULT 'active',
+            geometry_json TEXT,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            color_token TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            server_revision INTEGER NOT NULL DEFAULT 0,
+            payload TEXT NOT NULL DEFAULT '{}',
+            UNIQUE(company_id, id),
+            UNIQUE(company_id, parking_lot_id, code),
+            FOREIGN KEY(company_id, parking_lot_id)
+              REFERENCES parking_lots(company_id, id)
+          )
+        ''');
+        db.execute('''
+          CREATE TABLE IF NOT EXISTS parking_spaces (
+            id TEXT PRIMARY KEY,
+            company_id TEXT NOT NULL,
+            parking_zone_id TEXT NOT NULL,
+            code TEXT NOT NULL,
+            space_type TEXT NOT NULL DEFAULT 'standard',
+            status TEXT NOT NULL DEFAULT 'active',
+            x_m REAL,
+            y_m REAL,
+            width_m REAL,
+            length_m REAL,
+            rotation_deg REAL NOT NULL DEFAULT 0,
+            shape_type TEXT NOT NULL DEFAULT 'rectangle',
+            geometry_json TEXT,
+            row_code TEXT,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            max_length_mm INTEGER,
+            max_width_mm INTEGER,
+            max_height_mm INTEGER,
+            max_weight_kg INTEGER,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            server_revision INTEGER NOT NULL DEFAULT 0,
+            payload TEXT NOT NULL DEFAULT '{}',
+            UNIQUE(company_id, id),
+            UNIQUE(company_id, parking_zone_id, code),
+            FOREIGN KEY(company_id, parking_zone_id)
+              REFERENCES parking_zones(company_id, id)
+          )
+        ''');
+        db.execute('''
+          CREATE TABLE IF NOT EXISTS parking_access_events (
+            id TEXT PRIMARY KEY,
+            company_id TEXT NOT NULL,
+            parking_lot_id TEXT NOT NULL,
+            vehicle_id TEXT,
+            event_type TEXT NOT NULL,
+            source_type TEXT NOT NULL,
+            occurred_at TEXT NOT NULL,
+            recorded_at TEXT NOT NULL,
+            registration_captured TEXT,
+            registration_normalized TEXT,
+            confidence REAL,
+            device_id TEXT,
+            actor_user_id TEXT,
+            notes TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            server_revision INTEGER NOT NULL DEFAULT 0,
+            payload TEXT NOT NULL DEFAULT '{}',
+            UNIQUE(company_id, id),
+            FOREIGN KEY(company_id, parking_lot_id)
+              REFERENCES parking_lots(company_id, id),
+            FOREIGN KEY(company_id, vehicle_id)
+              REFERENCES vehicles(company_id, id)
+          )
+        ''');
+        db.execute('''
+          CREATE TABLE IF NOT EXISTS vehicle_parking_assignments (
+            id TEXT PRIMARY KEY,
+            company_id TEXT NOT NULL,
+            vehicle_id TEXT NOT NULL,
+            parking_space_id TEXT NOT NULL,
+            assignment_type TEXT NOT NULL DEFAULT 'assigned',
+            status TEXT NOT NULL DEFAULT 'active',
+            source_type TEXT NOT NULL DEFAULT 'manual',
+            start_at TEXT NOT NULL,
+            end_at TEXT,
+            entry_event_id TEXT,
+            exit_event_id TEXT,
+            assigned_by TEXT,
+            ended_by TEXT,
+            notes TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            server_revision INTEGER NOT NULL DEFAULT 0,
+            payload TEXT NOT NULL DEFAULT '{}',
+            UNIQUE(company_id, id),
+            FOREIGN KEY(company_id, vehicle_id)
+              REFERENCES vehicles(company_id, id),
+            FOREIGN KEY(company_id, parking_space_id)
+              REFERENCES parking_spaces(company_id, id)
+          )
+        ''');
+        db.execute('''
+          CREATE TABLE IF NOT EXISTS parking_media (
+            id TEXT PRIMARY KEY,
+            company_id TEXT NOT NULL,
+            parking_lot_id TEXT NOT NULL,
+            layout_id TEXT,
+            file_id TEXT NOT NULL,
+            purpose TEXT NOT NULL,
+            file_name TEXT NOT NULL,
+            mime_type TEXT NOT NULL,
+            file_size INTEGER NOT NULL,
+            sha256 TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            server_revision INTEGER NOT NULL DEFAULT 0,
+            payload TEXT NOT NULL DEFAULT '{}',
+            UNIQUE(company_id, id),
+            UNIQUE(company_id, file_id),
+            FOREIGN KEY(company_id, parking_lot_id)
+              REFERENCES parking_lots(company_id, id),
+            FOREIGN KEY(company_id, layout_id)
+              REFERENCES parking_layouts(company_id, id)
+          )
+        ''');
+
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_parking_lots_site_status '
+          'ON parking_lots(company_id, site_id, status)',
+        );
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_parking_layouts_lot_status '
+          'ON parking_layouts(company_id, parking_lot_id, status)',
+        );
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_parking_zones_lot_order '
+          'ON parking_zones(company_id, parking_lot_id, sort_order)',
+        );
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_parking_spaces_zone_status '
+          'ON parking_spaces(company_id, parking_zone_id, status)',
+        );
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_parking_spaces_code '
+          'ON parking_spaces(company_id, code)',
+        );
+        db.execute(
+          'CREATE UNIQUE INDEX IF NOT EXISTS ux_parking_active_space '
+          'ON vehicle_parking_assignments(company_id, parking_space_id) '
+          "WHERE status = 'active'",
+        );
+        db.execute(
+          'CREATE UNIQUE INDEX IF NOT EXISTS ux_parking_active_vehicle '
+          'ON vehicle_parking_assignments(company_id, vehicle_id) '
+          "WHERE status = 'active'",
+        );
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_vehicle_parking_history '
+          'ON vehicle_parking_assignments(company_id, vehicle_id, start_at)',
+        );
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_parking_events_lot_time '
+          'ON parking_access_events(company_id, parking_lot_id, occurred_at)',
+        );
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_parking_events_vehicle_time '
+          'ON parking_access_events(company_id, vehicle_id, occurred_at)',
+        );
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_parking_media_lot '
+          'ON parking_media(company_id, parking_lot_id, purpose)',
+        );
+        db.execute(
+          "INSERT INTO schema_migrations(version, applied_at) "
+          "VALUES (15, datetime('now'))",
+        );
+        db.execute('COMMIT');
+      } catch (_) {
+        db.execute('ROLLBACK');
+        rethrow;
+      }
+    }
+
   bool isStartupMigrationComplete({
     required String companyId,
     required String migrationKey,
