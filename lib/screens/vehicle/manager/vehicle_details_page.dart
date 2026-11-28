@@ -1957,7 +1957,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         dialogTitle: 'vehicle_doc_download_title'.tr(),
         fileName: document.fileName?.trim().isNotEmpty == true
             ? document.fileName!.trim()
-            : 'document-' + fileId,
+            : 'document-$fileId',
         bytes: bytes,
         mimeType: document.mimeType ?? 'application/octet-stream',
       );
@@ -2045,7 +2045,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(
-                    ('vehicle_doc_type_' + document.documentType!).tr(),
+                    ('vehicle_doc_type_${document.documentType!}').tr(),
                     style: TextStyle(color: accent, fontSize: 11),
                   ),
                 ),
@@ -2053,9 +2053,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 Padding(
                   padding: const EdgeInsets.only(top: 3),
                   child: Text(
-                    'vehicle_doc_issue_date_prefix'.tr() +
-                        ': ' +
-                        _date(document.issueDate),
+                    '${'vehicle_doc_issue_date_prefix'.tr()}: ${_date(document.issueDate)}',
                     style: TextStyle(color: Colors.grey[100], fontSize: 10),
                   ),
                 ),
