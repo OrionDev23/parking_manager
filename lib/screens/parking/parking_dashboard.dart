@@ -1300,7 +1300,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(FluentIcons.sign_in, size: 14),
+                  Icon(FluentIcons.signin, size: 14),
                   SizedBox(width: 7),
                   Text('Entrée manuelle'),
                 ],
