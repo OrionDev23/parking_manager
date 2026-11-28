@@ -47,6 +47,8 @@ enum ParkingAssignmentStatus { active, ended, cancelled }
 
 enum ParkingEventSource { manual, connectScan }
 
+enum ParkingAssignmentSource { manual, connectScan, import, system }
+
 enum ParkingAccessEventType { entry, exit, unknownPlate, manualCorrection }
 
 enum ParkingMediaPurpose { layoutBackground, accessEvidence, attachment }
@@ -148,7 +150,11 @@ T _enumValue<T extends Enum>(
     throw FormatException('Missing or invalid "$field".');
   }
   for (final value in values) {
-    if (value.name == raw) return value;
+    final snakeCase = value.name.replaceAllMapped(
+      RegExp(r'[A-Z]'),
+      (match) => '_${match.group(0)!.toLowerCase()}',
+    );
+    if (value.name == raw || snakeCase == raw) return value;
   }
   throw FormatException('Unsupported "$field": $raw.');
 }
@@ -260,12 +266,14 @@ class ParkingPolygon {
   Map<String, Object> toJson() => {
         'version': 1,
         'type': 'polygon',
+        'unit': 'm',
         'points': points.map((point) => point.toJson()).toList(growable: false),
       };
 
   factory ParkingPolygon.fromJson(Map<String, dynamic> json) {
     if ((json['version'] as num?)?.toInt() != 1 ||
         json['type'] != 'polygon' ||
+        (json['unit'] != null && json['unit'] != 'm') ||
         json['points'] is! List) {
       throw const FormatException('Unsupported parking polygon schema.');
     }
@@ -837,7 +845,13 @@ class ParkingSpace {
         'spaceType': type.name,
         'status': status.name,
         'shapeType': shape.name,
-        if (rectangle != null) ...rectangle!.toJson(),
+        if (rectangle != null) ...{
+          'xM': rectangle!.centerX,
+          'yM': rectangle!.centerY,
+          'widthM': rectangle!.width,
+          'lengthM': rectangle!.length,
+          'rotationDeg': rectangle!.rotationDegrees,
+        },
         'geometryJson':
             polygon == null ? null : jsonEncode(polygon!.toJson()),
         'rowCode': rowCode,
@@ -873,7 +887,13 @@ class ParkingSpace {
 
     ParkingSpaceGeometry? rectangle;
     if (shape == ParkingSpaceShape.rectangle) {
-      rectangle = ParkingSpaceGeometry.fromJson(json);
+      rectangle = ParkingSpaceGeometry.fromJson({
+        'xM': json['xM'],
+        'yM': json['yM'],
+        'width': json['widthM'] ?? json['width'],
+        'length': json['lengthM'] ?? json['length'],
+        'rotationDegrees': json['rotationDeg'] ?? json['rotationDegrees'],
+      });
     }
     return ParkingSpace(
       id: _requiredString(json, 'id', maxLength: 36),
@@ -916,7 +936,7 @@ class VehicleParkingAssignment {
   final String parkingSpaceId;
   final ParkingAssignmentType type;
   final ParkingAssignmentStatus status;
-  final ParkingEventSource source;
+  final ParkingAssignmentSource source;
   final DateTime startAt;
   final DateTime? endAt;
   final String? entryEventId;
@@ -934,7 +954,7 @@ class VehicleParkingAssignment {
     required this.parkingSpaceId,
     this.type = ParkingAssignmentType.assigned,
     this.status = ParkingAssignmentStatus.active,
-    this.source = ParkingEventSource.manual,
+    this.source = ParkingAssignmentSource.manual,
     required this.startAt,
     this.endAt,
     this.entryEventId,
@@ -994,7 +1014,7 @@ class VehicleParkingAssignment {
         'parkingSpaceId': parkingSpaceId,
         'assignmentType': type.name,
         'status': status.name,
-        'sourceType': source.name,
+        'sourceType': _enumName(source),
         'startAt': startAt.toUtc().toIso8601String(),
         'endAt': endAt?.toUtc().toIso8601String(),
         'entryEventId': entryEventId,
@@ -1025,10 +1045,10 @@ class VehicleParkingAssignment {
           defaultValue: ParkingAssignmentStatus.active,
         ),
         source: _enumValue(
-          ParkingEventSource.values,
+          ParkingAssignmentSource.values,
           json['sourceType'],
           'sourceType',
-          defaultValue: ParkingEventSource.manual,
+          defaultValue: ParkingAssignmentSource.manual,
         ),
         startAt: _requiredDate(json, 'startAt'),
         endAt: _optionalDate(json, 'endAt'),
@@ -1109,9 +1129,6 @@ class ParkingAccessEvent {
       throw ArgumentError.value(notes, 'notes', 'Maximum 2000 characters.');
     }
     _validateDateOrder(createdAt, updatedAt);
-    if (recordedAt.isBefore(occurredAt)) {
-      throw ArgumentError('recordedAt cannot be earlier than occurredAt.');
-    }
   }
 
   Map<String, Object?> toJson() => {
