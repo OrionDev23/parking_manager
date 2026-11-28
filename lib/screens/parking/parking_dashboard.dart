@@ -8,9 +8,12 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart';
 
 import '../../core/services/parking_services.dart';
+import '../../data/local/vehicles/sqlite_vehicle_source.dart';
+import '../../domain/entities/vehicle.dart';
 import '../../domain/parking/parking_canvas_document.dart';
 import '../../domain/parking/parking_geometry.dart';
 import '../../domain/parking/parking_models.dart';
+import 'parking_access_dialog.dart';
 import 'parking_canvas_editor_dialog.dart';
 import '../../theme.dart';
 
@@ -734,6 +737,266 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
     }
   }
 
+
+  Future<void> _registerManualEntry(
+    _ParkingSnapshot data,
+    AppTheme theme,
+  ) async {
+    final services = _services;
+    if (services == null || kIsWeb || data.selectedLot == null) return;
+
+    try {
+      final vehicles = await SqliteVehicleSource(
+        services.localDatabase,
+        companyId: services.companyId,
+      ).getVehicles();
+      final allAssignments = await services.local.getAssignments();
+      final now = DateTime.now().toUtc();
+      final blockingAssignments = allAssignments.where((assignment) {
+        return assignment.status == ParkingAssignmentStatus.active &&
+            (assignment.endAt == null || assignment.endAt!.isAfter(now));
+      }).toList(growable: false);
+      final busyVehicleIds = blockingAssignments
+          .map((assignment) => assignment.vehicleId)
+          .toSet();
+      final availableVehicles = vehicles
+          .where((vehicle) => !busyVehicleIds.contains(vehicle.id))
+          .toList(growable: false);
+      final busySpaceIds = blockingAssignments
+          .map((assignment) => assignment.parkingSpaceId)
+          .toSet();
+      final availableSpaces = data.spaces
+          .where(
+            (space) =>
+                space.canReceiveAssignment && !busySpaceIds.contains(space.id),
+          )
+          .toList(growable: false);
+
+      if (availableVehicles.isEmpty) {
+        throw StateError(
+          vehicles.isEmpty
+              ? 'Aucun véhicule local n’est disponible. Synchronise d’abord la flotte.'
+              : 'Tous les véhicules disposent déjà d’une affectation active ou d’une réservation.',
+        );
+      }
+      if (availableSpaces.isEmpty) {
+        throw StateError(
+          'Aucune place libre et disponible n’est configurée dans ce parking.',
+        );
+      }
+
+      final selection = await showDialog<ParkingAccessSelection>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => ParkingAccessDialog(
+          isEntry: true,
+          vehicles: availableVehicles,
+          availableSpaces: availableSpaces,
+          activeAssignments: const [],
+          primaryColor: theme.color,
+          backgroundColor: theme.surfaceColor,
+          borderColor: theme.borderColor,
+          textColor: theme.textColor,
+          mutedColor: theme.mutedTextColor,
+        ),
+      );
+      if (selection == null || !mounted) return;
+
+      Vehicle? selectedVehicle;
+      for (final vehicle in availableVehicles) {
+        if (vehicle.id == selection.vehicleId) {
+          selectedVehicle = vehicle;
+          break;
+        }
+      }
+      if (selectedVehicle == null || selection.parkingSpaceId == null) {
+        throw StateError('La sélection du véhicule ou de la place est invalide.');
+      }
+
+      final instant = DateTime.now().toUtc();
+      final stamp = instant.microsecondsSinceEpoch.toString();
+      final assignmentId = 'assign_$stamp';
+      final eventId = 'entry_$stamp';
+      final assignment = VehicleParkingAssignment(
+        id: assignmentId,
+        companyId: services.companyId,
+        vehicleId: selectedVehicle.id,
+        parkingSpaceId: selection.parkingSpaceId!,
+        type: ParkingAssignmentType.assigned,
+        status: ParkingAssignmentStatus.active,
+        source: ParkingAssignmentSource.manual,
+        startAt: instant,
+        entryEventId: eventId,
+        notes: selection.notes,
+        createdAt: instant,
+        updatedAt: instant,
+      );
+      final event = ParkingAccessEvent(
+        id: eventId,
+        companyId: services.companyId,
+        parkingLotId: data.selectedLot!.id,
+        vehicleId: selectedVehicle.id,
+        assignmentId: assignmentId,
+        type: ParkingAccessEventType.entry,
+        source: ParkingEventSource.manual,
+        occurredAt: instant,
+        recordedAt: instant,
+        registrationCaptured: selectedVehicle.registration,
+        registrationNormalized: ParkingAccessEvent.normalizeRegistration(
+          selectedVehicle.registration,
+        ),
+        notes: selection.notes,
+        createdAt: instant,
+        updatedAt: instant,
+      );
+
+      await services.local.createAssignment(assignment, event: event);
+      if (!mounted) return;
+      _selectedSpaceId = selection.parkingSpaceId;
+      _refresh(parkingLotId: data.selectedLot!.id);
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Entrée enregistrée'),
+          content: Text(
+            selectedVehicle!.registration +
+                ' a été affecté à la place sélectionnée. L’événement est enregistré localement.',
+          ),
+          severity: InfoBarSeverity.success,
+        ),
+        duration: const Duration(seconds: 5),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Entrée impossible'),
+          content: Text(error.toString()),
+          severity: InfoBarSeverity.error,
+        ),
+        duration: const Duration(seconds: 7),
+      );
+    }
+  }
+
+  Future<void> _registerManualExit(
+    _ParkingSnapshot data,
+    AppTheme theme,
+  ) async {
+    final services = _services;
+    if (services == null || kIsWeb || data.selectedLot == null) return;
+
+    try {
+      final vehicles = await SqliteVehicleSource(
+        services.localDatabase,
+        companyId: services.companyId,
+      ).getVehicles();
+      final now = DateTime.now().toUtc();
+      final activeAssignments = data.assignments
+          .where(
+            (assignment) =>
+                assignment.type != ParkingAssignmentType.reserved &&
+                assignment.isEffectiveAt(now),
+          )
+          .toList(growable: false);
+      final vehicleIds = activeAssignments
+          .map((assignment) => assignment.vehicleId)
+          .toSet();
+      final activeVehicles = vehicles
+          .where((vehicle) => vehicleIds.contains(vehicle.id))
+          .toList(growable: false);
+
+      if (activeAssignments.isEmpty || activeVehicles.isEmpty) {
+        throw StateError(
+          'Aucun véhicule avec une entrée active n’est actuellement présent dans ce parking.',
+        );
+      }
+
+      final selection = await showDialog<ParkingAccessSelection>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => ParkingAccessDialog(
+          isEntry: false,
+          vehicles: activeVehicles,
+          availableSpaces: data.spaces,
+          activeAssignments: activeAssignments,
+          primaryColor: theme.color,
+          backgroundColor: theme.surfaceColor,
+          borderColor: theme.borderColor,
+          textColor: theme.textColor,
+          mutedColor: theme.mutedTextColor,
+        ),
+      );
+      if (selection == null || !mounted || selection.assignmentId == null) {
+        return;
+      }
+
+      Vehicle? selectedVehicle;
+      for (final vehicle in activeVehicles) {
+        if (vehicle.id == selection.vehicleId) {
+          selectedVehicle = vehicle;
+          break;
+        }
+      }
+      if (selectedVehicle == null) {
+        throw StateError('Le véhicule sélectionné est introuvable.');
+      }
+
+      final instant = DateTime.now().toUtc();
+      final eventId = 'exit_' + instant.microsecondsSinceEpoch.toString();
+      final event = ParkingAccessEvent(
+        id: eventId,
+        companyId: services.companyId,
+        parkingLotId: data.selectedLot!.id,
+        vehicleId: selectedVehicle.id,
+        assignmentId: selection.assignmentId,
+        type: ParkingAccessEventType.exit,
+        source: ParkingEventSource.manual,
+        occurredAt: instant,
+        recordedAt: instant,
+        registrationCaptured: selectedVehicle.registration,
+        registrationNormalized: ParkingAccessEvent.normalizeRegistration(
+          selectedVehicle.registration,
+        ),
+        notes: selection.notes,
+        createdAt: instant,
+        updatedAt: instant,
+      );
+
+      await services.local.endAssignment(
+        assignmentId: selection.assignmentId!,
+        endedAt: instant,
+        event: event,
+      );
+      if (!mounted) return;
+      _refresh(parkingLotId: data.selectedLot!.id);
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Sortie enregistrée'),
+          content: Text(
+            selectedVehicle!.registration +
+                ' a quitté le parking. La sortie est ajoutée à l’historique local.',
+          ),
+          severity: InfoBarSeverity.success,
+        ),
+        duration: const Duration(seconds: 5),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Sortie impossible'),
+          content: Text(error.toString()),
+          severity: InfoBarSeverity.error,
+        ),
+        duration: const Duration(seconds: 7),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = context.watch<AppTheme>();
@@ -900,6 +1163,13 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
             state == _SpaceDisplayState.maintenance)
         .length;
     final free = total - occupied - reserved - blocked;
+    final activePhysicalAssignments = data.assignments
+        .where(
+          (assignment) =>
+              assignment.type != ParkingAssignmentType.reserved &&
+              assignment.isEffectiveAt(now),
+        )
+        .toList(growable: false);
     ParkingSpace? selectedSpace;
     for (final space in data.spaces) {
       if (space.id == _selectedSpaceId) selectedSpace = space;
@@ -1020,8 +1290,39 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
             ),
           ],
         ),
+        const SizedBox(height: 14),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            FilledButton(
+              onPressed: kIsWeb ? null : () => _registerManualEntry(data, theme),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(FluentIcons.sign_in, size: 14),
+                  SizedBox(width: 7),
+                  Text('Entrée manuelle'),
+                ],
+              ),
+            ),
+            Button(
+              onPressed: kIsWeb || activePhysicalAssignments.isEmpty
+                  ? null
+                  : () => _registerManualExit(data, theme),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(FluentIcons.sign_out, size: 14),
+                  SizedBox(width: 7),
+                  Text('Sortie manuelle'),
+                ],
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: 22),
-        if (data.layouts.isNotEmpty) ...[
+        if (data.layouts.isNotEmpty) [...
           Row(
             children: [
               Expanded(
