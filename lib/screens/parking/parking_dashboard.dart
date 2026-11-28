@@ -417,7 +417,8 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
         throw StateError('Dimensions de l’image non prises en charge.');
       }
 
-      final calibration = await showDialog<ParkingBackgroundCalibration>(
+      final calibrationResult =
+          await showDialog<_CalibratedBackgroundResult>(
         context: context,
         builder: (context) => _CalibrateBackgroundDialog(
           bytes: bytes,
@@ -426,12 +427,21 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
           pixelHeight: imageSize.height.toInt(),
         ),
       );
-      if (calibration == null || !mounted) return;
+      if (calibrationResult == null || !mounted) return;
 
+      final calibration = calibrationResult.calibration;
+      final rotationDegrees = calibrationResult.rotationDegrees;
       calibration.validate();
       final metersPerPixel = calibration.metersPerPixel;
-      final importedWidthM = imageSize.width * metersPerPixel;
-      final importedHeightM = imageSize.height * metersPerPixel;
+      final angleRadians = rotationDegrees * math.pi / 180;
+      final cosine = math.cos(angleRadians).abs();
+      final sine = math.sin(angleRadians).abs();
+      final importedWidthM =
+          (imageSize.width * cosine + imageSize.height * sine) *
+              metersPerPixel;
+      final importedHeightM =
+          (imageSize.width * sine + imageSize.height * cosine) *
+              metersPerPixel;
       if (!importedWidthM.isFinite ||
           !importedHeightM.isFinite ||
           importedWidthM <= 0 ||
@@ -456,11 +466,19 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
       final stamp = now.microsecondsSinceEpoch.toString();
       final fileId = 'planimg_$stamp';
       final mediaId = 'media_$stamp';
+      final offsetX =
+          (imageSize.width / 2 * math.cos(angleRadians) +
+                  imageSize.height / 2 * math.sin(angleRadians)) *
+              metersPerPixel;
+      final offsetY =
+          (imageSize.width / 2 * math.sin(angleRadians) -
+                  imageSize.height / 2 * math.cos(angleRadians)) *
+              metersPerPixel;
       final transform = ParkingBackgroundTransform(
-        originXM: (layoutWidthM - importedWidthM) / 2,
-        originYM: (layoutHeightM + importedHeightM) / 2,
+        originXM: layoutWidthM / 2 - offsetX,
+        originYM: layoutHeightM / 2 - offsetY,
         metersPerPixel: metersPerPixel,
-        rotationDegrees: 0,
+        rotationDegrees: rotationDegrees,
         opacity: 0.58,
         calibration: calibration,
       );
@@ -1243,17 +1261,24 @@ class _ParkingPlanPainter extends CustomPainter {
     if (image != null && transform != null) {
       final metersPerPixel =
           transform.calibration?.metersPerPixel ?? transform.metersPerPixel;
-      final imageLeft = originX + transform.originXM * scale;
-      final imageTop =
-          originY + (layout.heightM - transform.originYM) * scale;
-      final destination = ui.Rect.fromLTWH(
-        imageLeft,
-        imageTop,
-        image.width.toDouble() * metersPerPixel * scale,
-        image.height.toDouble() * metersPerPixel * scale,
+      final imageCenterWorld = transform.imageToWorld(
+        ParkingPoint(
+          x: image.width / 2,
+          y: image.height / 2,
+        ),
       );
+      final imageCenterScreen = _screenPoint(
+        imageCenterWorld,
+        originX: originX,
+        originY: originY,
+        scale: scale,
+      );
+      final imageWidthScreen = image.width * metersPerPixel * scale;
+      final imageHeightScreen = image.height * metersPerPixel * scale;
       canvas.save();
       canvas.clipRect(planRect);
+      canvas.translate(imageCenterScreen.dx, imageCenterScreen.dy);
+      canvas.rotate(-transform.rotationDegrees * math.pi / 180);
       canvas.drawImageRect(
         image,
         ui.Rect.fromLTWH(
@@ -1262,7 +1287,12 @@ class _ParkingPlanPainter extends CustomPainter {
           image.width.toDouble(),
           image.height.toDouble(),
         ),
-        destination,
+        ui.Rect.fromLTWH(
+          -imageWidthScreen / 2,
+          -imageHeightScreen / 2,
+          imageWidthScreen,
+          imageHeightScreen,
+        ),
         ui.Paint()
           ..color = ui.Color.fromARGB(
             (transform.opacity * 255).round(),
@@ -1426,6 +1456,16 @@ class _ParkingPlanPainter extends CustomPainter {
 }
 
 
+class _CalibratedBackgroundResult {
+  final ParkingBackgroundCalibration calibration;
+  final double rotationDegrees;
+
+  const _CalibratedBackgroundResult({
+    required this.calibration,
+    required this.rotationDegrees,
+  });
+}
+
 class _CalibrateBackgroundDialog extends StatefulWidget {
   final Uint8List bytes;
   final String fileName;
@@ -1449,6 +1489,7 @@ class _CalibrateBackgroundDialogState
   final _distanceController = TextEditingController(text: '5.00');
   ui.Offset? _first;
   ui.Offset? _second;
+  ParkingRowOrientation _referenceAxis = ParkingRowOrientation.horizontal;
   String? _error;
 
   @override
@@ -1506,7 +1547,25 @@ class _CalibrateBackgroundDialogState
       if (!metersPerPixel.isFinite || metersPerPixel <= 0) {
         throw ArgumentError('Échelle de calibration invalide.');
       }
-      Navigator.of(context).pop(calibration);
+      final pixelDx =
+          calibration.secondPixel.x - calibration.firstPixel.x;
+      final pixelDy =
+          calibration.secondPixel.y - calibration.firstPixel.y;
+      // Pixel Y grows downwards. Convert the measured vector to the plan's
+      // Y-up axis, then rotate it onto the selected plan axis.
+      final currentAngle = math.atan2(-pixelDy, pixelDx);
+      final targetAngle = _referenceAxis == ParkingRowOrientation.horizontal
+          ? 0.0
+          : math.pi / 2;
+      var rotationDegrees =
+          (targetAngle - currentAngle) * 180 / math.pi;
+      rotationDegrees = ((rotationDegrees + 180) % 360) - 180;
+      Navigator.of(context).pop(
+        _CalibratedBackgroundResult(
+          calibration: calibration,
+          rotationDegrees: rotationDegrees,
+        ),
+      );
     } on ArgumentError catch (error) {
       setState(() => _error = error.message?.toString() ??
           'Les deux points doivent être distincts.');
@@ -1591,6 +1650,27 @@ class _CalibrateBackgroundDialogState
                           ? 'Point 1 sélectionné — choisis le point 2'
                           : 'Deux points sélectionnés',
                   style: FluentTheme.of(context).typography.caption,
+                ),
+                const SizedBox(height: 12),
+                const Text('Orientation de la distance de référence'),
+                const SizedBox(height: 5),
+                ComboBox<ParkingRowOrientation>(
+                  value: _referenceAxis,
+                  isExpanded: true,
+                  items: const [
+                    ComboBoxItem(
+                      value: ParkingRowOrientation.horizontal,
+                      child: Text('Aligner horizontalement'),
+                    ),
+                    ComboBoxItem(
+                      value: ParkingRowOrientation.vertical,
+                      child: Text('Aligner verticalement'),
+                    ),
+                  ],
+                  onChanged: (value) => setState(() {
+                    _referenceAxis =
+                        value ?? ParkingRowOrientation.horizontal;
+                  }),
                 ),
                 const SizedBox(height: 12),
                 const Text('Distance réelle entre les deux points (mètres)'),
