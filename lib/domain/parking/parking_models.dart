@@ -1271,6 +1271,7 @@ class ParkingAccessEvent {
   final String companyId;
   final String parkingLotId;
   final String? vehicleId;
+  final String? assignmentId;
   final ParkingAccessEventType type;
   final ParkingEventSource source;
   final DateTime occurredAt;
@@ -1289,6 +1290,7 @@ class ParkingAccessEvent {
     required this.companyId,
     required this.parkingLotId,
     this.vehicleId,
+    this.assignmentId,
     required this.type,
     required this.source,
     required this.occurredAt,
@@ -1311,6 +1313,7 @@ class ParkingAccessEvent {
     _validateId(companyId, 'companyId');
     _validateId(parkingLotId, 'parkingLotId');
     if (vehicleId != null) _validateId(vehicleId!, 'vehicleId');
+    if (assignmentId != null) _validateId(assignmentId!, 'assignmentId');
     if ((registrationCaptured?.length ?? 0) > 40 ||
         (registrationNormalized?.length ?? 0) > 40) {
       throw ArgumentError('Registration values cannot exceed 40 characters.');
@@ -1345,6 +1348,7 @@ class ParkingAccessEvent {
         'companyId': companyId,
         'parkingLotId': parkingLotId,
         'vehicleId': vehicleId,
+        'assignmentId': assignmentId,
         'eventType': _enumName(type),
         'sourceType': _enumName(source),
         'occurredAt': occurredAt.toUtc().toIso8601String(),
@@ -1368,6 +1372,7 @@ class ParkingAccessEvent {
         companyId: _requiredString(json, 'companyId', maxLength: 36),
         parkingLotId: _requiredString(json, 'parkingLotId', maxLength: 36),
         vehicleId: _optionalString(json, 'vehicleId', maxLength: 36),
+        assignmentId: _optionalString(json, 'assignmentId', maxLength: 36),
         type: _enumValue(
           ParkingAccessEventType.values,
           json['eventType'],
