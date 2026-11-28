@@ -24,8 +24,8 @@ void main() {
     test('rejects non-positive dimensions', () {
       expect(
         () => ParkingSpaceGeometry.fromJson({
-          'centerX': 0,
-          'centerY': 0,
+          'xM': 0,
+          'yM': 0,
           'width': 0,
           'length': 5,
         }),
@@ -81,6 +81,27 @@ void main() {
       expect(spaces[1].geometry.rotationDegrees, 90);
       expect(spaces[1].geometry.width, 2.5);
       expect(spaces[1].geometry.length, 5);
+    });
+
+    test('uses a vertical axis when the row orientation is vertical', () {
+      final spaces = generator.generate(
+        const ParkingRowSpec(
+          zoneCode: 'C',
+          rowCode: 'C1',
+          spacePrefix: 'C-',
+          count: 2,
+          anchorX: 3,
+          anchorY: 4,
+          spaceWidth: 2.5,
+          spaceLength: 5,
+          gap: 0.5,
+          orientation: ParkingRowOrientation.vertical,
+        ),
+      );
+
+      expect(spaces[1].geometry.centerX, closeTo(3, 1e-10));
+      expect(spaces[1].geometry.centerY, closeTo(9.5, 1e-10));
+      expect(spaces[1].geometry.rotationDegrees, 90);
     });
 
     test('rejects invalid counts and dimensions before generating', () {
