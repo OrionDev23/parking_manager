@@ -984,7 +984,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
 }
 
 
-class _ParkingPlanPreview extends StatelessWidget {
+class _ParkingPlanPreview extends StatefulWidget {
   final ParkingLayout layout;
   final List<ParkingZone> zones;
   final List<ParkingSpace> spaces;
@@ -995,6 +995,7 @@ class _ParkingPlanPreview extends StatelessWidget {
   final Color borderColor;
   final Color textColor;
   final Color mutedColor;
+  final Uint8List? backgroundBytes;
 
   const _ParkingPlanPreview({
     required this.layout,
@@ -1007,7 +1008,66 @@ class _ParkingPlanPreview extends StatelessWidget {
     required this.borderColor,
     required this.textColor,
     required this.mutedColor,
+    required this.backgroundBytes,
   });
+
+  @override
+  State<_ParkingPlanPreview> createState() => _ParkingPlanPreviewState();
+}
+
+class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
+  ui.Image? _backgroundImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _decodeBackground();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ParkingPlanPreview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.backgroundBytes, widget.backgroundBytes)) {
+      if (widget.backgroundBytes == null) {
+        _backgroundImage?.dispose();
+        _backgroundImage = null;
+      } else {
+        _decodeBackground();
+      }
+    }
+  }
+
+  Future<void> _decodeBackground() async {
+    final bytes = widget.backgroundBytes;
+    if (bytes == null || bytes.isEmpty) return;
+
+    ui.Image? decodedImage;
+    ui.Codec? codec;
+    try {
+      codec = await ui.instantiateImageCodec(bytes);
+      final frame = await codec.getNextFrame();
+      decodedImage = frame.image;
+    } catch (_) {
+      decodedImage?.dispose();
+      return;
+    } finally {
+      codec?.dispose();
+    }
+
+    if (!mounted) {
+      decodedImage?.dispose();
+      return;
+    }
+    final previous = _backgroundImage;
+    setState(() => _backgroundImage = decodedImage);
+    previous?.dispose();
+  }
+
+  @override
+  void dispose() {
+    _backgroundImage?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1016,13 +1076,13 @@ class _ParkingPlanPreview extends StatelessWidget {
         final width = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : 640.0;
-        final ratio = layout.widthM / layout.heightM;
+        final ratio = widget.layout.widthM / widget.layout.heightM;
         final height = (width / ratio).clamp(220.0, 420.0).toDouble();
         return Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: backgroundColor,
-            border: Border.all(color: borderColor),
+            color: widget.backgroundColor,
+            border: Border.all(color: widget.borderColor),
             borderRadius: BorderRadius.circular(12),
           ),
           child: SizedBox(
@@ -1030,16 +1090,17 @@ class _ParkingPlanPreview extends StatelessWidget {
             height: height,
             child: CustomPaint(
               painter: _ParkingPlanPainter(
-                layout: layout,
-                zones: zones,
-                spaces: spaces,
-                states: states,
-                selectedSpaceId: selectedSpaceId,
-                primaryColor: primaryColor,
-                backgroundColor: backgroundColor,
-                borderColor: borderColor,
-                textColor: textColor,
-                mutedColor: mutedColor,
+                layout: widget.layout,
+                zones: widget.zones,
+                spaces: widget.spaces,
+                states: widget.states,
+                selectedSpaceId: widget.selectedSpaceId,
+                primaryColor: widget.primaryColor,
+                backgroundColor: widget.backgroundColor,
+                borderColor: widget.borderColor,
+                textColor: widget.textColor,
+                mutedColor: widget.mutedColor,
+                backgroundImage: _backgroundImage,
               ),
             ),
           ),
@@ -1060,6 +1121,7 @@ class _ParkingPlanPainter extends CustomPainter {
   final Color borderColor;
   final Color textColor;
   final Color mutedColor;
+  final ui.Image? backgroundImage;
 
   _ParkingPlanPainter({
     required this.layout,
@@ -1072,6 +1134,7 @@ class _ParkingPlanPainter extends CustomPainter {
     required this.borderColor,
     required this.textColor,
     required this.mutedColor,
+    required this.backgroundImage,
   });
 
   Color _spaceColor(_SpaceDisplayState state) {
@@ -1178,6 +1241,43 @@ class _ParkingPlanPainter extends CustomPainter {
         ..color = backgroundColor.withValues(alpha: .35)
         ..style = ui.PaintingStyle.fill,
     );
+    final image = backgroundImage;
+    final transform = layout.backgroundTransform;
+    if (image != null && transform != null) {
+      final metersPerPixel =
+          transform.calibration?.metersPerPixel ?? transform.metersPerPixel;
+      final imageLeft = originX + transform.originXM * scale;
+      final imageTop =
+          originY + (layout.heightM - transform.originYM) * scale;
+      final destination = ui.Rect.fromLTWH(
+        imageLeft,
+        imageTop,
+        image.width * metersPerPixel * scale,
+        image.height * metersPerPixel * scale,
+      );
+      canvas.save();
+      canvas.clipRect(planRect);
+      canvas.drawImageRect(
+        image,
+        ui.Rect.fromLTWH(
+          0,
+          0,
+          image.width.toDouble(),
+          image.height.toDouble(),
+        ),
+        destination,
+        ui.Paint()
+          ..color = ui.Color.fromARGB(
+            (transform.opacity * 255).round(),
+            255,
+            255,
+            255,
+          )
+          ..filterQuality = ui.FilterQuality.medium,
+      );
+      canvas.restore();
+    }
+
     canvas.drawRect(
       planRect,
       ui.Paint()
