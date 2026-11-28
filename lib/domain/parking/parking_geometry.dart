@@ -171,9 +171,9 @@ class ParkingRowGenerator {
     final effectiveAngle = spec.angleDegrees +
         (spec.orientation == ParkingRowOrientation.vertical ? 90 : 0);
     final radians = effectiveAngle * math.pi / 180;
-    final basePitch = spec.orientation == ParkingRowOrientation.horizontal
-        ? spec.spaceWidth + spec.gap
-        : spec.spaceLength + spec.gap;
+    // The width axis is the row pitch axis in both orientations.
+    // A 90-degree row rotation turns that same width axis from X to Y.
+    final basePitch = spec.spaceWidth + spec.gap;
     final dx = math.cos(radians) * basePitch;
     final dy = math.sin(radians) * basePitch;
 
