@@ -37,9 +37,9 @@ class ParkingFileStore {
   Future<Directory> _tenantDirectory() async {
     final root = await getApplicationSupportDirectory();
     final directory = Directory(
-      '\${root.path}\${Platform.pathSeparator}parcoto'
-      '\${Platform.pathSeparator}parking'
-      '\${Platform.pathSeparator}$companyId',
+      '${root.path}${Platform.pathSeparator}parcoto'
+      '${Platform.pathSeparator}parking'
+      '${Platform.pathSeparator}$companyId',
     );
     await directory.create(recursive: true);
     return directory;
@@ -57,7 +57,7 @@ class ParkingFileStore {
     }
     final directory = await _tenantDirectory();
     final file = File(
-      '\${directory.path}\${Platform.pathSeparator}$safeId.$extension',
+      '${directory.path}${Platform.pathSeparator}$safeId.$extension',
     );
     await file.writeAsBytes(bytes, flush: true);
     return file.path;
@@ -71,10 +71,10 @@ class ParkingFileStore {
     final extension = _extension(fileName);
     final root = await getApplicationSupportDirectory();
     final file = File(
-      '\${root.path}\${Platform.pathSeparator}parcoto'
-      '\${Platform.pathSeparator}parking'
-      '\${Platform.pathSeparator}$companyId'
-      '\${Platform.pathSeparator}$safeId.$extension',
+      '${root.path}${Platform.pathSeparator}parcoto'
+      '${Platform.pathSeparator}parking'
+      '${Platform.pathSeparator}$companyId'
+      '${Platform.pathSeparator}$safeId.$extension',
     );
     return await file.exists() ? file.path : null;
   }
