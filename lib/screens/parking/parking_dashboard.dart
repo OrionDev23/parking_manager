@@ -356,12 +356,12 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
   }
 
 
-  Future<Size> _readImageDimensions(Uint8List bytes) async {
+  Future<ui.Size> _readImageDimensions(Uint8List bytes) async {
     final codec = await ui.instantiateImageCodec(bytes);
     try {
       final frame = await codec.getNextFrame();
       try {
-        return Size(
+        return ui.Size(
           frame.image.width.toDouble(),
           frame.image.height.toDouble(),
         );
@@ -1252,8 +1252,8 @@ class _ParkingPlanPainter extends CustomPainter {
       final destination = ui.Rect.fromLTWH(
         imageLeft,
         imageTop,
-        image.width * metersPerPixel * scale,
-        image.height * metersPerPixel * scale,
+        image.width.toDouble() * metersPerPixel * scale,
+        image.height.toDouble() * metersPerPixel * scale,
       );
       canvas.save();
       canvas.clipRect(planRect);
