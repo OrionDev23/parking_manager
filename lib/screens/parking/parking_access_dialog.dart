@@ -77,7 +77,7 @@ class _ParkingAccessDialogState extends State<ParkingAccessDialog> {
       if ((vehicle.type ?? '').trim().isNotEmpty) vehicle.type!.trim(),
       if (vehicle.modelYear != null) vehicle.modelYear.toString(),
       if ((vehicle.fleetNumber ?? '').trim().isNotEmpty)
-        'Parc ' + vehicle.fleetNumber!.trim(),
+        'Parc ${vehicle.fleetNumber!.trim()}',
     ];
     return details.isEmpty ? 'Véhicule de la flotte' : details.join(' • ');
   }
@@ -251,7 +251,7 @@ class _ParkingAccessDialogState extends State<ParkingAccessDialog> {
         final startedAt = assignment.startAt.toLocal().toString();
         return _optionTile(
           title: vehicle.registration,
-          subtitle: spaceLabel + ' • Depuis ' + startedAt.substring(0, 16),
+          subtitle: '$spaceLabel • Depuis ${startedAt.substring(0, 16)}',
           selected: assignment.id == _selectedAssignmentId,
           onPressed: () =>
               setState(() => _selectedAssignmentId = assignment.id),
