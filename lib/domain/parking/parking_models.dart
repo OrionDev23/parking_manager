@@ -4,6 +4,8 @@ import 'dart:math' as math;
 import 'parking_canvas_document.dart';
 import 'parking_geometry.dart';
 
+export 'parking_geometry.dart' show ParkingPoint;
+
 /// Physical availability of the parking itself. This is deliberately separate
 /// from whether a space currently has a vehicle assignment.
 enum ParkingLotStatus { active, inactive, archived }
@@ -197,24 +199,6 @@ void _validateDateOrder(DateTime createdAt, DateTime updatedAt) {
   if (updatedAt.isBefore(createdAt)) {
     throw ArgumentError('updatedAt cannot be earlier than createdAt.');
   }
-}
-
-/// A point in plan coordinates. The unit is metres unless explicitly stated
-/// otherwise by the containing type (image calibration points use pixels).
-class ParkingPoint {
-  final double x;
-  final double y;
-
-  const ParkingPoint({required this.x, required this.y});
-
-  bool get isFinite => x.isFinite && y.isFinite;
-
-  Map<String, Object> toJson() => {'x': x, 'y': y};
-
-  factory ParkingPoint.fromJson(Map<String, dynamic> json) => ParkingPoint(
-        x: _requiredDouble(json, 'x'),
-        y: _requiredDouble(json, 'y'),
-      );
 }
 
 /// A single-ring polygon in the parking plan's metre coordinate system.
