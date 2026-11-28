@@ -203,6 +203,27 @@ void main() {
       );
     });
 
+    test('groups a continuous drag into one undo transaction', () {
+      final editor = ParkingCanvasEditorController(
+        document: documentWithObject(),
+        widthM: 20,
+        heightM: 12,
+      );
+      editor.selectObjects(['road-01']);
+      editor.beginTransaction();
+      editor.moveSelection(0.5, 0);
+      editor.moveSelection(0.5, 0);
+      editor.moveSelection(1, 0);
+
+      expect(editor.canUndo, isFalse);
+      editor.commitTransaction();
+      expect(editor.canUndo, isTrue);
+
+      editor.undo();
+      expect(editor.document.layers.first.objects.single.points.first.x, 2);
+      expect(editor.canUndo, isFalse);
+    });
+
     test('undo history is bounded', () {
       final editor = ParkingCanvasEditorController(
         document: documentWithObject(),
