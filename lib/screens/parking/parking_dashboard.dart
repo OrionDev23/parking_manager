@@ -517,7 +517,7 @@ class _SpaceTile extends StatelessWidget {
                   : space.status == _DemoSpaceStatus.blocked
                       ? FluentIcons.blocked
                       : space.status == _DemoSpaceStatus.reserved
-                          ? FluentIcons.bookings_logo
+                          ? FluentIcons.calendar
                           : FluentIcons.check_mark,
               size: 13,
               color: color,
