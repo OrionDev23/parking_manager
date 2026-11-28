@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/client_database.dart';
@@ -30,8 +28,8 @@ class NotificationDismissalService {
         DatabaseGetter.user?.$id == userId;
   }
 
-  static LinkedHashSet<String> _readLocalTokens(SharedPreferences local) {
-    final result = LinkedHashSet<String>();
+  static Set<String> _readLocalTokens(SharedPreferences local) {
+    final result = <String>{};
     for (final entry in _localPreferenceKeys.entries) {
       final values = local.getStringList(
             userScopedPreferenceKey(entry.value),
@@ -83,7 +81,7 @@ class NotificationDismissalService {
   }
 
   static List<String> _bounded(Iterable<String> values) {
-    final unique = LinkedHashSet<String>()..addAll(values);
+    final unique = <String>{}..addAll(values);
     final result = unique.toList(growable: true);
     if (result.length > _maxDismissedIdsPerCompany) {
       result.removeRange(0, result.length - _maxDismissedIdsPerCompany);
