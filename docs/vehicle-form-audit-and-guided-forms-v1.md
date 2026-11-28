@@ -48,6 +48,10 @@ L'en-tête de la fiche détaillée n'utilise plus `modelYear ?? anneeUtil`. L'an
 
 Les contrôleurs `TextEditingController` possédés par le formulaire sont maintenant libérés dans `dispose()`.
 
+### 2.5 Recherche mobile
+
+Les quatre champs de saisie de la recherche globale (recherche module, recherche globale et leurs dialogues) utilisent désormais une taille de texte explicite de 16 px. C'est une mesure ciblée contre le zoom automatique de certains navigateurs mobiles au focus. Le résultat doit encore être confirmé sur les navigateurs mobiles réellement utilisés ; le comportement peut varier selon le moteur Web et le système.
+
 ## 3. Audit du formulaire actuel
 
 ### 3.1 Structure et ergonomie
@@ -283,7 +287,7 @@ Le formulaire véhicule sera le premier pilote. Après validation avec les utili
 | Ordre | Chantier | Livrable / critère de sortie |
 |---:|---|---|
 | 1 | Vérification responsive des corrections récentes | Parc mobile utilisable, rubriques mobiles accessibles, espacement desktop confirmé, retour à la vue parc testé |
-| 2 | Localiser et corriger le zoom au double-tap dans la recherche | Identifier le vrai champ global concerné ; test sur navigateur mobile réel |
+| 2 | Valider le correctif du zoom dans la recherche | Les quatre champs globaux sont en 16 px ; tester le double-tap/focus sur navigateur mobile réel et ajuster si le zoom persiste |
 | 3 | Socle de formulaire guidé | Étapes, progression, validation, erreurs, brouillon, résumé, responsive |
 | 4 | Migrer le formulaire véhicule | Six étapes, validations métier, automatisations avec confirmation, conservation de toutes les données existantes |
 | 5 | Nettoyer la fiche détaillée | Alignement des libellés, unités, sources et états ; contrôler le bucket et les permissions des pièces jointes |
