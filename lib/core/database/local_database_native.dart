@@ -761,6 +761,7 @@ class LocalDatabase {
         db.execute('ROLLBACK');
         rethrow;
       }
+    }
 
     if (version < 19) {
       db.execute('BEGIN IMMEDIATE');
@@ -788,7 +789,6 @@ class LocalDatabase {
         db.execute('ROLLBACK');
         rethrow;
       }
-    }
     }
   }
 
