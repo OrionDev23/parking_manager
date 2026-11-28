@@ -110,7 +110,7 @@ Colonnes communes tenant-scoped + :
 ### 5.4 Extensions de `parking_spaces`
 - Métier : `parkingZoneId`, `code`, `spaceType`, capacités max (longueur/largeur/hauteur/poids), `status` (active/inactive/blocked/maintenance).
 - Géométrie locale : `xM`, `yM`, `widthM`, `lengthM`, `rotationDeg` en double ; `shapeType` string (rectangle/polygon) ; `geometryJson` nullable pour formes non rectangulaires ; `rowCode` string(40) nullable ; `sortOrder` integer.
-- Géométrie rectangulaire normalisée dans le repère du parking ; ne pas enregistrer des pixels dépendants de la résolution.
+- Géométrie rectangulaire normalisée dans le repère du parking ; `xM`/`yM` représentent le centre de la place, et non son coin supérieur gauche. Ne pas enregistrer des pixels dépendants de la résolution.
 - Les dimensions de capacité véhicule et les dimensions graphiques de la place sont deux données distinctes.
 
 ### 5.5 `vehicle_parking_assignments`
