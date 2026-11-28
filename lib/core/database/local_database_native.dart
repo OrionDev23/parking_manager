@@ -286,8 +286,6 @@ class LocalDatabase {
         rethrow;
       }
     }
-  }
-
 
     if (version < 13) {
       db.execute('BEGIN IMMEDIATE');
@@ -708,6 +706,8 @@ class LocalDatabase {
         rethrow;
       }
     }
+
+  }
 
   bool isStartupMigrationComplete({
     required String companyId,
