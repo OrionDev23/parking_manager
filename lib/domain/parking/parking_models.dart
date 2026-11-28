@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math' as math;
 
+import 'parking_canvas_document.dart';
 import 'parking_geometry.dart';
 
 /// Physical availability of the parking itself. This is deliberately separate
@@ -695,7 +696,11 @@ class ParkingLayout {
       throw ArgumentError.value(backgroundFileId, 'backgroundFileId');
     }
     backgroundTransform?.validate();
-    _validateLayersJson(layersJson);
+    _validateLayersJson(
+      layersJson,
+      widthM: widthM,
+      heightM: heightM,
+    );
     _validateDateOrder(createdAt, updatedAt);
   }
 
@@ -1499,30 +1504,13 @@ class ParkingMedia {
       )..validate();
 }
 
-void _validateLayersJson(String value) {
-  dynamic decoded;
-  try {
-    decoded = jsonDecode(value);
-  } on FormatException {
-    throw const FormatException('layersJson must contain valid JSON.');
-  }
-  if (decoded is! List) {
-    throw const FormatException('layersJson must be a JSON array.');
-  }
-  if (decoded.length > 200) {
-    throw const FormatException('A layout cannot contain more than 200 layers.');
-  }
-  final ids = <String>{};
-  for (final layer in decoded) {
-    if (layer is! Map ||
-        layer['id'] is! String ||
-        (layer['id'] as String).trim().isEmpty ||
-        layer['type'] is! String ||
-        (layer['type'] as String).trim().isEmpty) {
-      throw const FormatException('Every layer requires string id and type.');
-    }
-    if (!ids.add(layer['id'] as String)) {
-      throw const FormatException('Layer IDs must be unique within a layout.');
-    }
-  }
+void _validateLayersJson(
+  String value, {
+  required double widthM,
+  required double heightM,
+}) {
+  ParkingCanvasDocument.fromJsonString(value).validate(
+    widthM: widthM,
+    heightM: heightM,
+  );
 }
