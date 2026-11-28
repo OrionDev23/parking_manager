@@ -42,7 +42,7 @@ class _VehicleMakePickerDialogState
   Widget build(BuildContext context) {
     final makes = VehicleMakeService.search(_query);
     return ContentDialog(
-      title: const Text('vehicle_make_picker_title').tr(),
+      title: Text('vehicle_make_picker_title').tr(),
       content: SizedBox(
         width: 520,
         height: 540,
