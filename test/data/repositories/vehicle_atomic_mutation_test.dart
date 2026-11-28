@@ -187,7 +187,7 @@ void main() {
       }
     });
 
-    test('opens with the version 19 parking schema and ordered outbox', () async {
+    test('opens with the version 20 parking schema and ordered outbox', () async {
       final migrations = database.database.select(
         'SELECT version FROM schema_migrations ORDER BY version',
       );
@@ -197,7 +197,7 @@ void main() {
           .map((row) => row['name'] as String)
           .toSet();
 
-      expect(latestVersion, 19);
+      expect(latestVersion, 20);
       expect(
         columns,
         containsAll({
@@ -319,8 +319,9 @@ void main() {
       db.execute(
         """INSERT INTO vehicle_parking_assignments
            (id, company_id, vehicle_id, parking_space_id, status, start_at,
-            created_at, updated_at)
-           VALUES ('assignment-a', ?, 'vehicle-a', 'space-a', 'active', ?, ?, ?)""",
+            end_at, created_at, updated_at)
+           VALUES ('assignment-a', ?, 'vehicle-a', 'space-a', 'active', ?,
+                   '2026-11-23T10:00:00.000Z', ?, ?)""",
         [companyId, now, now, now],
       );
 
@@ -356,6 +357,22 @@ void main() {
         ),
         throwsA(isA<SqliteException>()),
       );
+      db.execute(
+        """INSERT INTO vehicle_parking_assignments
+           (id, company_id, vehicle_id, parking_space_id, assignment_type,
+            status, start_at, end_at, created_at, updated_at)
+           VALUES ('assignment-d', ?, 'vehicle-a', 'space-a', 'assigned',
+                   'active', '2026-11-23T12:00:00.000Z',
+                   '2026-11-23T13:00:00.000Z', ?, ?)""",
+        [companyId, now, now],
+      );
+      expect(
+        db.select(
+          "SELECT id FROM vehicle_parking_assignments WHERE id='assignment-d'",
+        ).single['id'],
+        'assignment-d',
+      );
+
       expect(
         () => db.execute(
           """INSERT INTO parking_lots
