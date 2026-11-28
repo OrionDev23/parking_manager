@@ -1447,7 +1447,11 @@ class _ParkingPlanPainter extends CustomPainter {
     );
     final image = backgroundImage;
     final transform = layout.backgroundTransform;
-    if (image != null && transform != null) {
+    final backgroundLayer = canvasDocument.layers
+        .where((layer) => layer.type == ParkingCanvasLayerType.background)
+        .firstOrNull;
+    final showBackground = backgroundLayer?.visible ?? true;
+    if (image != null && transform != null && showBackground) {
       final metersPerPixel =
           transform.calibration?.metersPerPixel ?? transform.metersPerPixel;
       final sourceWidth =
