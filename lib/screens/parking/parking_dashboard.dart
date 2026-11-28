@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
@@ -660,7 +661,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
                     children: [
                       Button(
                         onPressed:
-                            services == null ? null : _importPlanImage,
+                            services == null || kIsWeb ? null : _importPlanImage,
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -671,7 +672,8 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
                         ),
                       ),
                       FilledButton(
-                        onPressed: services == null ? null : _createParking,
+                        onPressed:
+                            services == null || kIsWeb ? null : _createParking,
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -740,8 +742,9 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
                             'Commence par créer un site et un parking. '
                             'L’assistant générera les zones et les places '
                             'avec des dimensions modifiables.',
-                        actionLabel: 'Créer mon premier parking',
-                        onAction: _createParking,
+                        actionLabel:
+                            kIsWeb ? null : 'Créer mon premier parking',
+                        onAction: kIsWeb ? null : _createParking,
                       );
                     }
                     return _buildParking(data, theme);
