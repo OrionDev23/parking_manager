@@ -25,6 +25,7 @@ class GuidedFormShell extends StatelessWidget {
   final int currentStep;
   final Widget child;
   final Widget? sidePanel;
+  final ScrollController? scrollController;
   final bool readOnly;
   final bool saving;
   final bool canGoBack;
@@ -44,6 +45,7 @@ class GuidedFormShell extends StatelessWidget {
     required this.currentStep,
     required this.child,
     this.sidePanel,
+    this.scrollController,
     this.readOnly = false,
     this.saving = false,
     this.canGoBack = false,
@@ -83,6 +85,7 @@ class GuidedFormShell extends StatelessWidget {
                 ),
                 Expanded(
                   child: SingleChildScrollView(
+                    controller: scrollController,
                     keyboardDismissBehavior:
                         ScrollViewKeyboardDismissBehavior.onDrag,
                     padding: EdgeInsets.fromLTRB(
