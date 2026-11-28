@@ -785,6 +785,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
         );
       }
 
+      if (!mounted) return;
       final selection = await showDialog<ParkingAccessSelection>(
         context: context,
         barrierDismissible: false,
@@ -813,6 +814,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
         throw StateError('La sélection du véhicule ou de la place est invalide.');
       }
 
+      final selectedRegistration = selectedVehicle.registration;
       final instant = DateTime.now().toUtc();
       final stamp = instant.microsecondsSinceEpoch.toString();
       final assignmentId = 'assign_$stamp';
@@ -859,8 +861,8 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
         builder: (context, close) => InfoBar(
           title: const Text('Entrée enregistrée'),
           content: Text(
-            selectedVehicle!.registration +
-                ' a été affecté à la place sélectionnée. L’événement est enregistré localement.',
+            '$selectedRegistration a été affecté à la place sélectionnée. '
+            'L’événement est enregistré localement.',
           ),
           severity: InfoBarSeverity.success,
         ),
@@ -913,6 +915,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
         );
       }
 
+      if (!mounted) return;
       final selection = await showDialog<ParkingAccessSelection>(
         context: context,
         barrierDismissible: false,
@@ -943,8 +946,9 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
         throw StateError('Le véhicule sélectionné est introuvable.');
       }
 
+      final selectedRegistration = selectedVehicle.registration;
       final instant = DateTime.now().toUtc();
-      final eventId = 'exit_' + instant.microsecondsSinceEpoch.toString();
+      final eventId = 'exit_${instant.microsecondsSinceEpoch}';
       final event = ParkingAccessEvent(
         id: eventId,
         companyId: services.companyId,
@@ -976,8 +980,8 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
         builder: (context, close) => InfoBar(
           title: const Text('Sortie enregistrée'),
           content: Text(
-            selectedVehicle!.registration +
-                ' a quitté le parking. La sortie est ajoutée à l’historique local.',
+            '$selectedRegistration a quitté le parking. '
+            'La sortie est ajoutée à l’historique local.',
           ),
           severity: InfoBarSeverity.success,
         ),
