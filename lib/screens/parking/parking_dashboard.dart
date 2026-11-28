@@ -1328,6 +1328,290 @@ class _ParkingPlanPainter extends CustomPainter {
   bool shouldRepaint(covariant _ParkingPlanPainter oldDelegate) => true;
 }
 
+
+class _CalibrateBackgroundDialog extends StatefulWidget {
+  final Uint8List bytes;
+  final String fileName;
+  final int pixelWidth;
+  final int pixelHeight;
+
+  const _CalibrateBackgroundDialog({
+    required this.bytes,
+    required this.fileName,
+    required this.pixelWidth,
+    required this.pixelHeight,
+  });
+
+  @override
+  State<_CalibrateBackgroundDialog> createState() =>
+      _CalibrateBackgroundDialogState();
+}
+
+class _CalibrateBackgroundDialogState
+    extends State<_CalibrateBackgroundDialog> {
+  final _distanceController = TextEditingController(text: '5.00');
+  ui.Offset? _first;
+  ui.Offset? _second;
+  String? _error;
+
+  @override
+  void dispose() {
+    _distanceController.dispose();
+    super.dispose();
+  }
+
+  void _onImageTap(ui.Offset localPosition, ui.Size size) {
+    if (size.width <= 0 || size.height <= 0) return;
+    final point = ui.Offset(
+      (localPosition.dx / size.width).clamp(0.0, 1.0).toDouble(),
+      (localPosition.dy / size.height).clamp(0.0, 1.0).toDouble(),
+    );
+    setState(() {
+      if (_first == null || _second != null) {
+        _first = point;
+        _second = null;
+      } else {
+        _second = point;
+      }
+      _error = null;
+    });
+  }
+
+  void _submit() {
+    final first = _first;
+    final second = _second;
+    final distance = double.tryParse(
+      _distanceController.text.trim().replaceAll(',', '.'),
+    );
+    if (first == null || second == null) {
+      setState(() => _error = 'Sélectionne les deux points de référence.');
+      return;
+    }
+    if (distance == null || !distance.isFinite || distance <= 0) {
+      setState(() => _error = 'La distance réelle doit être positive.');
+      return;
+    }
+
+    final calibration = ParkingBackgroundCalibration(
+      firstPixel: ParkingPoint(
+        x: first.dx * widget.pixelWidth,
+        y: first.dy * widget.pixelHeight,
+      ),
+      secondPixel: ParkingPoint(
+        x: second.dx * widget.pixelWidth,
+        y: second.dy * widget.pixelHeight,
+      ),
+      realDistanceM: distance,
+    );
+    try {
+      calibration.validate();
+      final metersPerPixel = calibration.metersPerPixel;
+      if (!metersPerPixel.isFinite || metersPerPixel <= 0) {
+        throw ArgumentError('Échelle de calibration invalide.');
+      }
+      Navigator.of(context).pop(calibration);
+    } on ArgumentError catch (error) {
+      setState(() => _error = error.message?.toString() ??
+          'Les deux points doivent être distincts.');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final dialogWidth = (MediaQuery.sizeOf(context).width - 64)
+        .clamp(260.0, 620.0)
+        .toDouble();
+    final imageHeight =
+        dialogWidth * widget.pixelHeight / widget.pixelWidth;
+
+    return ContentDialog(
+      title: const Text('Calibrer le fond de plan'),
+      content: SizedBox(
+        width: dialogWidth,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.sizeOf(context).height * 0.68,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  widget.fileName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: FluentTheme.of(context).typography.caption,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Tape deux points dont tu connais la distance réelle '
+                  '(par exemple deux poteaux ou deux angles mesurés).',
+                ),
+                const SizedBox(height: 10),
+                AspectRatio(
+                  aspectRatio: widget.pixelWidth / widget.pixelHeight,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final imageSize = ui.Size(
+                        constraints.maxWidth,
+                        constraints.maxHeight,
+                      );
+                      return GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTapDown: (details) =>
+                            _onImageTap(details.localPosition, imageSize),
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: FluentTheme.of(context).resources
+                                  .controlStrokeColorDefault,
+                            ),
+                          ),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              Image.memory(
+                                widget.bytes,
+                                fit: BoxFit.fill,
+                                gaplessPlayback: true,
+                              ),
+                              CustomPaint(
+                                painter: _CalibrationMarkerPainter(
+                                  first: _first,
+                                  second: _second,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  _first == null
+                      ? 'Point 1 : non sélectionné'
+                      : _second == null
+                          ? 'Point 1 sélectionné — choisis le point 2'
+                          : 'Deux points sélectionnés',
+                  style: FluentTheme.of(context).typography.caption,
+                ),
+                const SizedBox(height: 12),
+                const Text('Distance réelle entre les deux points (mètres)'),
+                const SizedBox(height: 5),
+                TextBox(
+                  controller: _distanceController,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const InfoBar(
+                  title: Text('Précision de la calibration'),
+                  content: Text(
+                    'Choisis deux repères éloignés l’un de l’autre. '
+                    'Une mesure imprécise faussera toutes les dimensions '
+                    'du plan.',
+                  ),
+                  severity: InfoBarSeverity.info,
+                ),
+                if (_error != null) ...[
+                  const SizedBox(height: 8),
+                  InfoBar(
+                    title: Text(_error!),
+                    severity: InfoBarSeverity.error,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Annuler'),
+        ),
+        FilledButton(
+          onPressed: _submit,
+          child: const Text('Valider la calibration'),
+        ),
+      ],
+    );
+  }
+}
+
+class _CalibrationMarkerPainter extends CustomPainter {
+  final ui.Offset? first;
+  final ui.Offset? second;
+
+  const _CalibrationMarkerPainter({
+    required this.first,
+    required this.second,
+  });
+
+  @override
+  void paint(ui.Canvas canvas, ui.Size size) {
+    ui.Offset toScreen(ui.Offset point) =>
+        ui.Offset(point.dx * size.width, point.dy * size.height);
+
+    final firstPoint = first == null ? null : toScreen(first!);
+    final secondPoint = second == null ? null : toScreen(second!);
+
+    if (firstPoint != null && secondPoint != null) {
+      canvas.drawLine(
+        firstPoint,
+        secondPoint,
+        ui.Paint()
+          ..color = const Color(0xFF00A7E1)
+          ..strokeWidth = 2.5,
+      );
+    }
+
+    void drawMarker(ui.Offset? point, String label) {
+      if (point == null) return;
+      canvas.drawCircle(
+        point,
+        10,
+        ui.Paint()
+          ..color = const Color(0xFF00A7E1)
+          ..style = ui.PaintingStyle.fill,
+      );
+      canvas.drawCircle(
+        point,
+        10,
+        ui.Paint()
+          ..color = const Color(0xFFFFFFFF)
+          ..style = ui.PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
+      final painter = TextPainter(
+        text: TextSpan(
+          text: label,
+          style: const TextStyle(
+            color: Color(0xFFFFFFFF),
+            fontWeight: FontWeight.w800,
+            fontSize: 10,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      painter.paint(
+        canvas,
+        point - ui.Offset(painter.width / 2, painter.height / 2),
+      );
+    }
+
+    drawMarker(firstPoint, '1');
+    drawMarker(secondPoint, '2');
+  }
+
+  @override
+  bool shouldRepaint(covariant _CalibrationMarkerPainter oldDelegate) =>
+      oldDelegate.first != first || oldDelegate.second != second;
+}
+
 class _ParkingSetupInput {
   final String siteName;
   final String siteCode;
