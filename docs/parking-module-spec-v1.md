@@ -54,6 +54,30 @@ Un parking peut être exploité sans plan graphique importé ; un plan peut êtr
 
 ## 4. Concepteur — modes et comportements
 
+### 4.0 Complexité progressive — principe UX obligatoire
+
+Le concepteur propose deux niveaux d'usage sur le même modèle de données. Il ne s'agit pas de deux éditeurs ni de deux formats de plan : changer de niveau ne doit jamais dupliquer, convertir ou perdre les objets.
+
+**Mode guidé (par défaut)**
+- L'utilisateur décrit son parking par étapes courtes : site, dimensions approximatives, zones, type de stationnement et nombre de places.
+- Parcoto propose des valeurs par défaut adaptées au type de parking, des modèles de disposition et une génération prévisualisée avant validation.
+- Les champs techniques (coordonnées, angles, calques, transformations) restent masqués tant qu'ils ne sont pas nécessaires.
+- Chaque étape explique ce qui est demandé, montre le résultat sur le plan et signale les erreurs avec une correction proposée.
+- L'utilisateur peut revenir en arrière, modifier les paramètres et poursuivre sans recommencer le plan.
+
+**Mode avancé (activable à la demande)**
+- Donne accès au canvas vectoriel complet, aux coordonnées métriques, unités, grille, accrochage, rotations, dimensions, calques et propriétés de chaque objet.
+- Autorise la modification individuelle ou multiple, les alignements, duplications, mesures et réglages géométriques précis.
+- Expose les propriétés techniques du fond importé : calibration, opacité, transformation et verrouillage.
+- Ne contourne jamais les validations métier : les outils avancés ne peuvent pas créer une géométrie invalide, une place hors zone ou une affectation incohérente.
+
+**Règles communes**
+- Le mode guidé est le point d'entrée pour tout nouvel utilisateur ; le mode avancé est toujours accessible aux rôles autorisés.
+- Le passage guidé ↔ avancé conserve exactement les mêmes objets, identifiants, géométries et brouillon.
+- Les préférences de niveau d'interface sont individuelles ; elles ne changent ni les permissions ni les données partagées du parking.
+- Sur mobile, l'exploitation et le parcours guidé sont prioritaires. Le mode avancé reste disponible avec des panneaux et commandes tactiles adaptés, sans réduire les outils à des cibles minuscules.
+- Les modèles prédéfinis accélèrent la création mais restent modifiables ; aucun modèle ne crée des places silencieusement sans aperçu et confirmation.
+
 ### 4.1 Assistant guidé
 1. Créer le site et le parking (code, nom, adresse, fuseau horaire, statut).
 2. Définir l'emprise du plan (largeur/hauteur en mètres) et l'échelle.
