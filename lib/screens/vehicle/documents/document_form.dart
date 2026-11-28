@@ -166,9 +166,9 @@ class DocumentFormState extends State<DocumentForm> {
   String _formatFileSize(int? bytes) {
     if (bytes == null || bytes <= 0) return '';
     if (bytes < 1024 * 1024) {
-      return (bytes / 1024).toStringAsFixed(0) + ' Ko';
+      return '${(bytes / 1024).toStringAsFixed(0)} Ko';
     }
-    return (bytes / (1024 * 1024)).toStringAsFixed(1) + ' Mo';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} Mo';
   }
 
   List<String> _filePermissions(String teamId) => [
@@ -259,7 +259,7 @@ class DocumentFormState extends State<DocumentForm> {
     }
 
     final fileId = ID.unique();
-    final safeName = _documentId! + '_' + fileId + '.' + extension;
+    final safeName = '${_documentId!}_$fileId.$extension';
     final uploaded = await Storage(client).createFile(
       bucketId: _vehicleDocumentBucketId,
       fileId: fileId,
@@ -312,7 +312,7 @@ class DocumentFormState extends State<DocumentForm> {
       );
     } catch (error) {
       if (mounted) {
-        _showMessage('vehicle_doc_download_failed'.tr() + ': ${error.toString()}', isError: true);
+        _showMessage('vehicle_doc_download_failed'.tr() + ': $error', isError: true);
       }
     }
   }
