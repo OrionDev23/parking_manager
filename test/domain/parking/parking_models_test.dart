@@ -663,6 +663,8 @@ void main() {
         fileName: 'plan.pdf',
         mimeType: 'application/pdf',
         fileSize: 2048,
+        pixelWidth: 1920,
+        pixelHeight: 1080,
         sha256: List.filled(64, 'a').join(),
         createdAt: createdAt,
         updatedAt: updatedAt,
@@ -672,6 +674,8 @@ void main() {
         Map<String, dynamic>.from(media.toJson()),
       );
       expect(restored.fileSize, 2048);
+      expect(restored.pixelWidth, 1920);
+      expect(restored.pixelHeight, 1080);
       expect(restored.purpose, ParkingMediaPurpose.layoutBackground);
       expect(restored.toJson().containsKey('bytes'), isFalse);
     });
