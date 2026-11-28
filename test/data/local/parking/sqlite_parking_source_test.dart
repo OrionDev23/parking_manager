@@ -879,10 +879,9 @@ void main() {
         ),
       );
 
-      expect(
-        (await parking.getAssignment(current.id))!.status,
-        ParkingAssignmentStatus.ended,
-      );
+      final ended = (await parking.getAssignment(current.id))!;
+      expect(ended.status, ParkingAssignmentStatus.ended);
+      expect(ended.exitEventId, 'event-exit-001');
       expect(await parking.getCurrentAssignment('vehicle-001'), isNull);
       final events = await parking.getAccessEvents(parkingLotId: 'lot-001');
       expect(events.single.type, ParkingAccessEventType.exit);
