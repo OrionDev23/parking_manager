@@ -1171,6 +1171,42 @@ class SqliteParkingSource implements LocalParkingSource {
         .toList(growable: false);
   }
 
+  void _upsertMediaRow(ParkingMedia media) {
+    final json = media.toJson();
+    _db.execute(
+      '''INSERT INTO parking_media
+        (id, company_id, parking_lot_id, layout_id, file_id, purpose,
+         file_name, mime_type, file_size, sha256, pixel_width, pixel_height,
+         created_at, updated_at, payload)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          layout_id=excluded.layout_id, file_id=excluded.file_id,
+          purpose=excluded.purpose, file_name=excluded.file_name,
+          mime_type=excluded.mime_type, file_size=excluded.file_size,
+          sha256=excluded.sha256, pixel_width=excluded.pixel_width,
+          pixel_height=excluded.pixel_height, updated_at=excluded.updated_at,
+          payload=excluded.payload
+        WHERE parking_media.company_id=excluded.company_id''',
+      [
+        media.id,
+        companyId,
+        media.parkingLotId,
+        media.layoutId,
+        media.fileId,
+        json['purpose'],
+        media.fileName,
+        media.mimeType,
+        media.fileSize,
+        media.sha256,
+        media.pixelWidth,
+        media.pixelHeight,
+        media.createdAt.toUtc().toIso8601String(),
+        media.updatedAt.toUtc().toIso8601String(),
+        jsonEncode(json),
+      ],
+    );
+  }
+
   @override
   Future<void> upsertMedia(ParkingMedia media) async {
     media.validate();
@@ -1188,36 +1224,68 @@ class SqliteParkingSource implements LocalParkingSource {
           throw StateError('The media layout does not belong to this parking.');
         }
       }
-      final json = media.toJson();
-      _db.execute(
-        '''INSERT INTO parking_media
-          (id, company_id, parking_lot_id, layout_id, file_id, purpose,
-           file_name, mime_type, file_size, sha256, created_at, updated_at,
-           payload)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-          ON CONFLICT(id) DO UPDATE SET
-            layout_id=excluded.layout_id, file_id=excluded.file_id,
-            purpose=excluded.purpose, file_name=excluded.file_name,
-            mime_type=excluded.mime_type, file_size=excluded.file_size,
-            sha256=excluded.sha256, updated_at=excluded.updated_at,
-            payload=excluded.payload
-          WHERE parking_media.company_id=excluded.company_id''',
+      _upsertMediaRow(media);
+    });
+  }
+
+  @override
+  Future<void> attachLayoutBackground({
+    required ParkingLayout layout,
+    required ParkingMedia media,
+  }) async {
+    layout.validate();
+    media.validate();
+    if (layout.companyId != companyId || media.companyId != companyId) {
+      throw StateError('Layout and media must belong to the active company.');
+    }
+    if (media.purpose != ParkingMediaPurpose.layoutBackground ||
+        media.layoutId != layout.id ||
+        media.parkingLotId != layout.parkingLotId ||
+        media.fileId != layout.backgroundFileId ||
+        media.pixelWidth == null ||
+        media.pixelHeight == null ||
+        layout.backgroundTransform == null) {
+      throw ArgumentError(
+        'The media and calibrated layout background references are inconsistent.',
+      );
+    }
+
+    _transaction(() {
+      _assertTenantOwnership('parking_media', media.id);
+      final current = _getLayoutSync(layout.id);
+      if (current == null ||
+          current.companyId != companyId ||
+          current.parkingLotId != layout.parkingLotId) {
+        throw StateError('The target plan does not exist in this parking.');
+      }
+      if (_rowById('parking_lots', layout.parkingLotId) == null) {
+        throw StateError('The target parking does not exist in this company.');
+      }
+
+      final json = layout.toJson();
+      final changes = _db.execute(
+        '''UPDATE parking_layouts
+           SET width_m = ?, height_m = ?, background_file_id = ?,
+               background_transform_json = ?, layers_json = ?,
+               updated_at = ?, payload = ?
+           WHERE id = ? AND company_id = ? AND parking_lot_id = ?''',
         [
-          media.id,
-          companyId,
-          media.parkingLotId,
-          media.layoutId,
-          media.fileId,
-          json['purpose'],
-          media.fileName,
-          media.mimeType,
-          media.fileSize,
-          media.sha256,
-          media.createdAt.toUtc().toIso8601String(),
-          media.updatedAt.toUtc().toIso8601String(),
+          layout.widthM,
+          layout.heightM,
+          layout.backgroundFileId,
+          json['backgroundTransformJson'],
+          layout.layersJson,
+          layout.updatedAt.toUtc().toIso8601String(),
           jsonEncode(json),
+          layout.id,
+          companyId,
+          layout.parkingLotId,
         ],
       );
+      if (changes == 0) {
+        throw StateError('The target plan could not be updated.');
+      }
+      _upsertMediaRow(media);
     });
   }
 
