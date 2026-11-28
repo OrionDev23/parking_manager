@@ -1,4 +1,9 @@
+import 'dart:math' as math;
+import 'dart:ui' as ui;
+
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/painting.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/services/parking_services.dart';
@@ -639,6 +644,30 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
           ],
         ),
         const SizedBox(height: 22),
+        if (data.layouts.isNotEmpty) ...[
+          Text(
+            'Plan vectoriel — échelle métrique',
+            style: TextStyle(
+              color: theme.textColor,
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 10),
+          _ParkingPlanPreview(
+            layout: data.layouts.first,
+            zones: data.zones,
+            spaces: data.spaces,
+            states: states,
+            selectedSpaceId: selectedSpace?.id,
+            primaryColor: theme.color,
+            backgroundColor: theme.surfaceColor,
+            borderColor: theme.borderColor,
+            textColor: theme.textColor,
+            mutedColor: theme.mutedTextColor,
+          ),
+          const SizedBox(height: 22),
+        ],
         if (data.zones.isEmpty)
           _EmptyPanel(
             theme: theme,
@@ -704,6 +733,351 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
       ],
     );
   }
+}
+
+
+class _ParkingPlanPreview extends StatelessWidget {
+  final ParkingLayout layout;
+  final List<ParkingZone> zones;
+  final List<ParkingSpace> spaces;
+  final Map<String, _SpaceDisplayState> states;
+  final String? selectedSpaceId;
+  final Color primaryColor;
+  final Color backgroundColor;
+  final Color borderColor;
+  final Color textColor;
+  final Color mutedColor;
+
+  const _ParkingPlanPreview({
+    required this.layout,
+    required this.zones,
+    required this.spaces,
+    required this.states,
+    required this.selectedSpaceId,
+    required this.primaryColor,
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.textColor,
+    required this.mutedColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : 640.0;
+        final ratio = layout.widthM / layout.heightM;
+        final height = (width / ratio).clamp(220.0, 420.0).toDouble();
+        return Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            border: Border.all(color: borderColor),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: CustomPaint(
+              painter: _ParkingPlanPainter(
+                layout: layout,
+                zones: zones,
+                spaces: spaces,
+                states: states,
+                selectedSpaceId: selectedSpaceId,
+                primaryColor: primaryColor,
+                backgroundColor: backgroundColor,
+                borderColor: borderColor,
+                textColor: textColor,
+                mutedColor: mutedColor,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ParkingPlanPainter extends CustomPainter {
+  final ParkingLayout layout;
+  final List<ParkingZone> zones;
+  final List<ParkingSpace> spaces;
+  final Map<String, _SpaceDisplayState> states;
+  final String? selectedSpaceId;
+  final Color primaryColor;
+  final Color backgroundColor;
+  final Color borderColor;
+  final Color textColor;
+  final Color mutedColor;
+
+  _ParkingPlanPainter({
+    required this.layout,
+    required this.zones,
+    required this.spaces,
+    required this.states,
+    required this.selectedSpaceId,
+    required this.primaryColor,
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.textColor,
+    required this.mutedColor,
+  });
+
+  Color _spaceColor(_SpaceDisplayState state) {
+    switch (state) {
+      case _SpaceDisplayState.free:
+        return const Color(0xFF24B47E);
+      case _SpaceDisplayState.occupied:
+        return primaryColor;
+      case _SpaceDisplayState.reserved:
+        return const Color(0xFFE3A33D);
+      case _SpaceDisplayState.blocked:
+        return const Color(0xFFE05B67);
+      case _SpaceDisplayState.maintenance:
+        return const Color(0xFF8B8FA3);
+    }
+  }
+
+  List<ParkingPoint> _spacePoints(ParkingSpace space) {
+    if (space.polygon != null) return space.polygon!.points;
+
+    final geometry = space.rectangle!;
+    final angle = geometry.rotationDegrees * math.pi / 180;
+    final cosine = math.cos(angle);
+    final sine = math.sin(angle);
+    final halfWidth = geometry.width / 2;
+    final halfLength = geometry.length / 2;
+    final corners = [
+      ParkingPoint(x: -halfWidth, y: -halfLength),
+      ParkingPoint(x: halfWidth, y: -halfLength),
+      ParkingPoint(x: halfWidth, y: halfLength),
+      ParkingPoint(x: -halfWidth, y: halfLength),
+    ];
+    return [
+      for (final point in corners)
+        ParkingPoint(
+          x: geometry.centerX + point.x * cosine - point.y * sine,
+          y: geometry.centerY + point.x * sine + point.y * cosine,
+        ),
+    ];
+  }
+
+  ui.Offset _screenPoint(
+    ParkingPoint point, {
+    required double originX,
+    required double originY,
+    required double scale,
+  }) {
+    return ui.Offset(
+      originX + point.x * scale,
+      originY + (layout.heightM - point.y) * scale,
+    );
+  }
+
+  ui.Path _pathForPoints(
+    List<ParkingPoint> points, {
+    required double originX,
+    required double originY,
+    required double scale,
+  }) {
+    final path = ui.Path();
+    if (points.isEmpty) return path;
+    final first = _screenPoint(
+      points.first,
+      originX: originX,
+      originY: originY,
+      scale: scale,
+    );
+    path.moveTo(first.dx, first.dy);
+    for (final point in points.skip(1)) {
+      final screen = _screenPoint(
+        point,
+        originX: originX,
+        originY: originY,
+        scale: scale,
+      );
+      path.lineTo(screen.dx, screen.dy);
+    }
+    return path..close();
+  }
+
+  @override
+  void paint(ui.Canvas canvas, ui.Size size) {
+    const padding = 18.0;
+    final scale = math.min(
+      (size.width - padding * 2) / layout.widthM,
+      (size.height - padding * 2) / layout.heightM,
+    );
+    if (!scale.isFinite || scale <= 0) return;
+
+    final planWidth = layout.widthM * scale;
+    final planHeight = layout.heightM * scale;
+    final originX = (size.width - planWidth) / 2;
+    final originY = (size.height - planHeight) / 2;
+    final planRect = ui.Rect.fromLTWH(
+      originX,
+      originY,
+      planWidth,
+      planHeight,
+    );
+
+    canvas.drawRect(
+      planRect,
+      ui.Paint()
+        ..color = backgroundColor.withValues(alpha: .35)
+        ..style = ui.PaintingStyle.fill,
+    );
+    canvas.drawRect(
+      planRect,
+      ui.Paint()
+        ..color = borderColor
+        ..style = ui.PaintingStyle.stroke
+        ..strokeWidth = 1.2,
+    );
+
+    final gridStep = math.max(
+      5.0,
+      math.max(layout.widthM, layout.heightM) / 20,
+    );
+    final gridPaint = ui.Paint()
+      ..color = borderColor.withValues(alpha: .38)
+      ..style = ui.PaintingStyle.stroke
+      ..strokeWidth = .65;
+    for (var x = gridStep; x < layout.widthM; x += gridStep) {
+      final screenX = originX + x * scale;
+      canvas.drawLine(
+        ui.Offset(screenX, originY),
+        ui.Offset(screenX, originY + planHeight),
+        gridPaint,
+      );
+    }
+    for (var y = gridStep; y < layout.heightM; y += gridStep) {
+      final screenY = originY + (layout.heightM - y) * scale;
+      canvas.drawLine(
+        ui.Offset(originX, screenY),
+        ui.Offset(originX + planWidth, screenY),
+        gridPaint,
+      );
+    }
+
+    final zoneFill = ui.Paint()
+      ..color = primaryColor.withValues(alpha: .035)
+      ..style = ui.PaintingStyle.fill;
+    final zoneStroke = ui.Paint()
+      ..color = primaryColor.withValues(alpha: .45)
+      ..style = ui.PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+    for (final zone in zones) {
+      final boundary = zone.boundary;
+      if (boundary == null) continue;
+      final path = _pathForPoints(
+        boundary.points,
+        originX: originX,
+        originY: originY,
+        scale: scale,
+      );
+      canvas.drawPath(path, zoneFill);
+      canvas.drawPath(path, zoneStroke);
+    }
+
+    for (final space in spaces) {
+      final points = _spacePoints(space);
+      final path = _pathForPoints(
+        points,
+        originX: originX,
+        originY: originY,
+        scale: scale,
+      );
+      final color = _spaceColor(
+        states[space.id] ?? _SpaceDisplayState.blocked,
+      );
+      final selected = space.id == selectedSpaceId;
+
+      canvas.drawPath(
+        path,
+        ui.Paint()
+          ..color = color.withValues(alpha: selected ? .30 : .16)
+          ..style = ui.PaintingStyle.fill,
+      );
+      canvas.drawPath(
+        path,
+        ui.Paint()
+          ..color = selected ? primaryColor : color
+          ..style = ui.PaintingStyle.stroke
+          ..strokeWidth = selected ? 2.2 : 1.1,
+      );
+
+      var minX = double.infinity;
+      var minY = double.infinity;
+      var maxX = double.negativeInfinity;
+      var maxY = double.negativeInfinity;
+      var centerX = 0.0;
+      var centerY = 0.0;
+      for (final point in points) {
+        final screen = _screenPoint(
+          point,
+          originX: originX,
+          originY: originY,
+          scale: scale,
+        );
+        minX = math.min(minX, screen.dx);
+        minY = math.min(minY, screen.dy);
+        maxX = math.max(maxX, screen.dx);
+        maxY = math.max(maxY, screen.dy);
+        centerX += screen.dx;
+        centerY += screen.dy;
+      }
+      final boundsWidth = maxX - minX;
+      final boundsHeight = maxY - minY;
+      if (boundsWidth < 36 || boundsHeight < 19) continue;
+
+      final label = TextPainter(
+        text: TextSpan(
+          text: space.code,
+          style: TextStyle(
+            color: textColor,
+            fontSize: math.min(11.0, math.max(8.0, boundsHeight / 2.2)),
+            fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+          ),
+        ),
+        maxLines: 1,
+        ellipsis: '…',
+        textDirection: TextDirection.ltr,
+      )..layout(maxWidth: boundsWidth - 6);
+      label.paint(
+        canvas,
+        ui.Offset(
+          centerX / points.length - label.width / 2,
+          centerY / points.length - label.height / 2,
+        ),
+      );
+    }
+
+    final sizeLabel = layout.widthM.toStringAsFixed(1) +
+        ' × ' +
+        layout.heightM.toStringAsFixed(1) +
+        ' m';
+    final labelPainter = TextPainter(
+      text: TextSpan(
+        text: sizeLabel,
+        style: TextStyle(color: mutedColor, fontSize: 10),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: size.width - 8);
+    labelPainter.paint(
+      canvas,
+      ui.Offset(
+        size.width - labelPainter.width - 4,
+        size.height - labelPainter.height - 2,
+      ),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _ParkingPlanPainter oldDelegate) => true;
 }
 
 class _ParkingSetupInput {
