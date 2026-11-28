@@ -1058,9 +1058,13 @@ class _ParkingCanvasEditorPainter extends CustomPainter {
 
     final image = backgroundImage;
     final transform = layout.backgroundTransform;
-    final backgroundLayer = document.layers
-        .where((layer) => layer.type == ParkingCanvasLayerType.background)
-        .firstOrNull;
+    ParkingCanvasLayer? backgroundLayer;
+    for (final layer in document.layers) {
+      if (layer.type == ParkingCanvasLayerType.background) {
+        backgroundLayer = layer;
+        break;
+      }
+    }
     final showBackground = backgroundLayer?.visible ?? true;
     if (image != null && transform != null && showBackground) {
       final metersPerPixel =
