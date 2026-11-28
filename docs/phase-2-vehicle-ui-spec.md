@@ -11,20 +11,20 @@
 
 L'entrée principale actuelle est `VehicleManagement` dans `lib/screens/vehicle/manager/vehicle_management.dart`. Elle ouvre une `VehicleDetailsPage` lorsqu'on sélectionne une carte véhicule. La page de détail est donc déjà séparée de `VehicleForm`, ce qui constitue le bon point de départ.
 
-La page actuelle `lib/screens/vehicle/manager/vehicle_details_page.dart` présente cependant plusieurs limites :
+La page actuelle `lib/screens/vehicle/manager/vehicle_details_page.dart` a déjà reçu une première refonte structurelle :
 
-- toutes les rubriques sont empilées dans un seul long défilement ;
-- plusieurs informations sont répétées entre « Vue générale » et les sections détaillées ;
-- il n'existe pas de navigation directe vers une rubrique précise ;
-- les blocs GPS et parking sont des placeholders, et non des données connectées ;
-- les données documentaires visibles sont actuellement des métadonnées ; le modèle utilisé dans cette page ne référence pas encore de fichier joint ;
-- la page charge l'historique, les documents et la maintenance sans séparer clairement leur état de chargement et leur état vide ;
-- la synthèse affiche le nom/prénom du titulaire comme « Conducteur », alors que `VehicleMapper` mappe ces deux champs vers `ownerFirstName` et `ownerLastName`. Le conducteur est actuellement représenté séparément par `matriculeConducteur` / `driverRegistration` ;
-- le champ `etat` et le code `etatactuel` coexistent. Ils ne doivent pas être présentés comme s'ils représentaient nécessairement la même donnée ;
-- l'année `modelYear` et `anneeUtil` sont différentes dans le modèle et ne doivent pas être fusionnées par un fallback d'affichage ;
+- la fiche dispose désormais d'une navigation par rubriques et ne présente plus toutes les rubriques comme un seul long formulaire ;
+- sur mobile, la fiche utilise un scroll unique avec navigation des rubriques épinglée ;
+- le retour à la vue d'ensemble du parc est câblé depuis `VehicleManagement` ;
+- les lectures des documents, conducteurs, historique et maintenance disposent d'états de chargement/erreur/retry distincts ;
+- les documents possèdent des métadonnées de pièce jointe (`fileId`, `fileName`, `mimeType`, `fileSize`) et la fiche propose un téléchargement lorsqu'un `fileId` est présent. Le bucket actuellement ciblé par le code est `images` ; sa cohérence et ses permissions doivent être vérifiées avant généralisation ;
+- la localisation GPS reste un état vide explicite ; l'emplacement historique reste séparé du GPS et d'un vrai emplacement de parking ;
+- le titulaire et le conducteur sont résolus par des chemins séparés dans la fiche ; le formulaire legacy avait toutefois une sélection de conducteur qui recopiait ses coordonnées dans les champs du titulaire. Ce comportement est corrigé dans le formulaire ;
+- les champs `etat` et `etatactuel` coexistent et doivent rester distincts tant que leur sémantique n'est pas validée ;
+- `modelYear` et `anneeUtil` sont différents. L'en-tête a été corrigé pour n'afficher que l'année-modèle ;
 - les valeurs `emplacement` / `location` sont du texte legacy et ne prouvent pas une affectation à une place de parking.
 
-La Phase 2 doit corriger ces défauts de structure et de sémantique avant d'ajouter des effets visuels.
+La suite de la Phase 2 doit stabiliser les libellés, les sources et les unités, puis vérifier le rendu réel sur Windows, Web mobile et Android. Elle ne doit pas reconstruire les éléments de navigation déjà présents.
 
 ## 2. Objectifs de conception
 
@@ -57,7 +57,7 @@ L'image reste une illustration du véhicule, pas une preuve d'identification. Si
 
 ### 3.2 Navigation par rubriques
 
-La fiche est découpée en huit rubriques :
+La fiche est découpée dans le code actuel en neuf rubriques :
 
 | Ordre | Rubrique | Contenu principal |
 |---:|---|---|
@@ -68,7 +68,8 @@ La fiche est découpée en huit rubriques :
 | 5 | **Localisation** | Dernière position observée si disponible, source, date, précision ; emplacement/parking attendu dans un bloc distinct |
 | 6 | **Documents** | Liste des documents, échéances et état de validité |
 | 7 | **Maintenance** | Ordres de réparation, fiches de réception, relevés de kilométrage et échéances disponibles |
-| 8 | **Historique** | Changements d'état, événements disponibles, historique d'immatriculation et données d'acquisition |
+| 8 | **Historique** | Changements d'état, événements disponibles et historique d'immatriculation |
+| 9 | **Acquisition** | Type/date d'acquisition, prix, fournisseur, garantie et métadonnées de création/modification |
 
 La navigation est visible sous l'en-tête et reste facilement accessible pendant la consultation. Sur grand écran, les rubriques sont présentées sous forme d'onglets horizontaux. Sur petit écran, elles deviennent une barre d'onglets horizontalement défilante, sans réduire la largeur utile du contenu. L'onglet actif est évident et son libellé reste lisible.
 
@@ -187,7 +188,7 @@ Deux blocs visuellement et sémantiquement distincts :
 - état : expiré, expire bientôt, valide, échéance inconnue ;
 - actions d'ouverture/téléchargement uniquement lorsqu'un vrai fichier/bucket et une permission sont disponibles.
 
-Le modèle consulté expose actuellement surtout des métadonnées de document. Ne pas dessiner un bouton « Ouvrir » ou « Télécharger » inactif et ne pas présenter une métadonnée comme un fichier joint. Les dates d'expiration absentes doivent rester « Échéance inconnue », pas « Valide ».
+Le modèle expose les métadonnées de document et les références de pièce jointe (`fileId`, `fileName`, `mimeType`, `fileSize`). La fiche propose un téléchargement lorsque `fileId` est présent, via le bucket `images`. Avant de considérer cette fonctionnalité comme généralisable, vérifier que ce bucket est bien celui des documents et que les permissions sont contrôlées pour l'entreprise active. Ne jamais dessiner une action fichier lorsqu'aucun fichier réel n'est référencé. Les dates d'expiration absentes doivent rester « Échéance inconnue », pas « Valide ».
 
 ### 3.9 Maintenance
 
@@ -302,7 +303,7 @@ Après chaque sous-phase : exécuter les tests ciblés, `flutter analyze`, puis 
 - Aucune position ou place de parking inventée.
 - Aucune action de document sans fichier réel et autorisé.
 - Les champs optionnels absents n'encombrent pas l'interface.
-- Les huit rubriques sont accessibles sur toutes les tailles d'écran.
+- Les neuf rubriques sont accessibles sur toutes les tailles d'écran.
 - Les opérations et lectures restent bornées au véhicule et à l'entreprise active.
 - Le formulaire de modification continue de fonctionner et n'est pas réécrit implicitement dans le chantier de consultation.
 
