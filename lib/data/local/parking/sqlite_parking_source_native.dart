@@ -1263,7 +1263,7 @@ class SqliteParkingSource implements LocalParkingSource {
       }
 
       final json = layout.toJson();
-      final changes = _db.execute(
+      _db.execute(
         '''UPDATE parking_layouts
            SET width_m = ?, height_m = ?, background_file_id = ?,
                background_transform_json = ?, layers_json = ?,
@@ -1282,9 +1282,6 @@ class SqliteParkingSource implements LocalParkingSource {
           layout.parkingLotId,
         ],
       );
-      if (changes == 0) {
-        throw StateError('The target plan could not be updated.');
-      }
       _upsertMediaRow(media);
     });
   }
