@@ -256,7 +256,7 @@ class _VehicleFormState extends State<VehicleForm>
     GuidedFormStep(title: 'Identification', icon: FluentIcons.car),
     GuidedFormStep(title: 'Carte grise', icon: FluentIcons.document),
     GuidedFormStep(title: 'Caractéristiques', icon: FluentIcons.settings),
-    GuidedFormStep(title: 'Affectation', icon: FluentIcons.people),
+    GuidedFormStep(title: 'Affectation', icon: FluentIcons.account_management),
     GuidedFormStep(title: 'Acquisition', icon: FluentIcons.shopping_cart),
     GuidedFormStep(title: 'Documents', icon: FluentIcons.check_mark),
   ];
@@ -525,7 +525,7 @@ class _VehicleFormState extends State<VehicleForm>
           .toList(growable: false);
       final allInvalid = [...invalid, ...invalidDecimals];
       if (allInvalid.isNotEmpty) {
-        message = 'Vérifiez les valeurs numériques : ${allInvalid.join(', ')}.';
+        message = "Vérifiez les valeurs numériques : ${allInvalid.join(', ')}.";
       }
     } else if (step == 4) {
       final acquisition = acquisitionDateController.text.trim();
@@ -809,7 +809,7 @@ class _VehicleFormState extends State<VehicleForm>
                             mainAxisAlignment: MainAxisAlignment.center,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(FluentIcons.people, size: 14),
+                              Icon(FluentIcons.account_management, size: 14),
                               SizedBox(width: 8),
                               Text('Choisir dans les conducteurs'),
                             ],
@@ -1091,7 +1091,7 @@ class _VehicleFormState extends State<VehicleForm>
             children: [
               Row(
                 children: [
-                  Icon(FluentIcons.chart, color: appTheme.color, size: 17),
+                  Icon(FluentIcons.view_dashboard, color: appTheme.color, size: 17),
                   const SizedBox(width: 8),
                   const Expanded(
                     child: Text(
@@ -1227,10 +1227,10 @@ class _VehicleFormState extends State<VehicleForm>
             const SizedBox(width: 6),
             Icon(
               upcoming
-                  ? FluentIcons.clock
+                  ? FluentIcons.info
                   : ready
                       ? FluentIcons.check_mark
-                      : FluentIcons.sparkle,
+                      : FluentIcons.info,
               color: statusColor,
               size: 14,
             ),
@@ -1252,7 +1252,7 @@ class _VehicleFormState extends State<VehicleForm>
         children: [
           Row(
             children: [
-              Icon(FluentIcons.sparkle, color: appTheme.color, size: 18),
+              Icon(FluentIcons.info, color: appTheme.color, size: 18),
               const SizedBox(width: 8),
               const Text(
                 'Automatisations',
@@ -1262,7 +1262,7 @@ class _VehicleFormState extends State<VehicleForm>
           ),
           const SizedBox(height: 14),
           automationRow(
-            FluentIcons.barcode_scanner,
+            FluentIcons.search,
             'Décodage VIN',
             'Propose la marque, le modèle, l’année et des caractéristiques.',
             status: vinDecoded ? 'Décodage effectué · à vérifier' : 'Disponible',
@@ -1280,7 +1280,7 @@ class _VehicleFormState extends State<VehicleForm>
             ready: imageSelected,
           ),
           automationRow(
-            FluentIcons.map_pin,
+            FluentIcons.info,
             'Lecture de l’immatriculation',
             'Déduit les informations administratives disponibles depuis la plaque nationale.',
             status: wilayaDetected ? 'Wilaya détectée' : 'À la saisie de la plaque',
@@ -1366,7 +1366,7 @@ class _VehicleFormState extends State<VehicleForm>
       };
 
   String get _guidedDraftKey =>
-      'parcoto_vehicle_form_draft_${DatabaseGetter.activeCompanyId ?? 'company'}_${DatabaseGetter.me.value?.id ?? 'user'}_${widget.vehicle?.id ?? 'new'}';
+      "parcoto_vehicle_form_draft_${DatabaseGetter.activeCompanyId ?? 'company'}_${DatabaseGetter.me.value?.id ?? 'user'}_${widget.vehicle?.id ?? 'new'}";
 
   Future<void> _saveGuidedDraft() async {
     try {
@@ -1848,7 +1848,10 @@ class _VehicleFormState extends State<VehicleForm>
                   ],
                 ),
                 const SizedBox(height: 18),
-                Container(
+                LayoutBuilder(
+                  builder: (context, identityLayoutConstraints) {
+                    final sideBySide = identityLayoutConstraints.maxWidth >= 860;
+                    final imagePanel = Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: appTheme.color.withValues(alpha: .055),
@@ -2148,9 +2151,8 @@ class _VehicleFormState extends State<VehicleForm>
                             );
                     },
                   ),
-                ),
-                const SizedBox(height: 18),
-                Wrap(
+                );
+                    final identityFields = Wrap(
                   spacing: spacing,
                   runSpacing: 14,
                   children: [
@@ -2429,6 +2431,26 @@ class _VehicleFormState extends State<VehicleForm>
                         ),
                       ),
                   ],
+                );
+                    if (sideBySide) {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(flex: 7, child: identityFields),
+                          const SizedBox(width: 16),
+                          SizedBox(width: 300, child: imagePanel),
+                        ],
+                      );
+                    }
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        identityFields,
+                        const SizedBox(height: 14),
+                        imagePanel,
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 14),
                 Row(
@@ -2688,7 +2710,7 @@ class _VehicleFormState extends State<VehicleForm>
             Row(
               children: [
                 Icon(
-                  includeAcquisition ? FluentIcons.money : FluentIcons.car,
+                  includeAcquisition ? FluentIcons.shopping_cart : FluentIcons.car,
                   color: appTheme.color,
                   size: 20,
                 ),
@@ -5123,7 +5145,12 @@ class _VehicleFormState extends State<VehicleForm>
           await createVehicle(vehicle);
         }
 
-        await prefs.remove(_guidedDraftKey);
+        try {
+          await prefs.remove(_guidedDraftKey);
+        } catch (_) {
+          // A successfully saved vehicle must not be reported as failed because
+          // the local draft cleanup could not be completed.
+        }
         if (mounted) {
           displayInfoBar(
             context,
