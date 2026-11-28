@@ -1084,8 +1084,10 @@ class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
       final sourceHeight = widget.backgroundPixelHeight ?? descriptor.height;
       final longestSide = math.max(sourceWidth, sourceHeight);
       final decodeScale = math.min(1.0, 2400 / longestSide);
-      final targetWidth = math.max(1, (sourceWidth * decodeScale).round());
-      final targetHeight = math.max(1, (sourceHeight * decodeScale).round());
+      final targetWidth =
+          math.max(1, (sourceWidth * decodeScale).round()).toInt();
+      final targetHeight =
+          math.max(1, (sourceHeight * decodeScale).round()).toInt();
       codec = await ui.instantiateImageCodec(
         bytes,
         targetWidth: targetWidth,
