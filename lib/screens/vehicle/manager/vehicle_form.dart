@@ -1106,7 +1106,7 @@ class _VehicleFormState extends State<VehicleForm>
                 ],
               ),
               const SizedBox(height: 10),
-              _ProgressTrack(progress: complete / 6, color: appTheme.color),
+              GuidedFormProgressTrack(progress: complete / 6, color: appTheme.color),
               const SizedBox(height: 12),
               Row(
                 children: [
