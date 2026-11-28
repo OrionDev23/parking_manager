@@ -164,7 +164,7 @@ class SqliteParkingSource implements LocalParkingSource {
           t <= 1 + epsilon &&
           u >= -epsilon &&
           u <= 1 + epsilon) {
-        cuts.add(t.clamp(0.0, 1.0));
+        cuts.add(t.clamp(0.0, 1.0).toDouble());
       }
     }
 
