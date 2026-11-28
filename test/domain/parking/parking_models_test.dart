@@ -378,6 +378,187 @@ void main() {
     });
   });
 
+
+    test('allows consecutive assignments and rejects overlapping intervals', () {
+      const policy = ParkingAssignmentPolicy();
+      final space = ParkingSpace(
+        id: 'space-001',
+        companyId: 'company-001',
+        parkingZoneId: 'zone-001',
+        code: 'A-01',
+        rectangle: const ParkingSpaceGeometry(
+          centerX: 0,
+          centerY: 0,
+          width: 2.5,
+          length: 5,
+        ),
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      final current = VehicleParkingAssignment(
+        id: 'assignment-current',
+        companyId: 'company-001',
+        vehicleId: 'vehicle-001',
+        parkingSpaceId: 'space-001',
+        type: ParkingAssignmentType.assigned,
+        startAt: DateTime.utc(2026, 11, 28, 8),
+        endAt: DateTime.utc(2026, 11, 28, 12),
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      final nextReservation = VehicleParkingAssignment(
+        id: 'reservation-next',
+        companyId: 'company-001',
+        vehicleId: 'vehicle-001',
+        parkingSpaceId: 'space-001',
+        type: ParkingAssignmentType.reserved,
+        startAt: DateTime.utc(2026, 11, 28, 12),
+        endAt: DateTime.utc(2026, 11, 28, 14),
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+
+      expect(
+        () => policy.ensureAllowed(
+          candidate: nextReservation,
+          space: space,
+          existing: [current],
+        ),
+        returnsNormally,
+      );
+
+      final overlappingReservation = VehicleParkingAssignment(
+        id: 'reservation-overlap',
+        companyId: 'company-001',
+        vehicleId: 'vehicle-002',
+        parkingSpaceId: 'space-001',
+        type: ParkingAssignmentType.reserved,
+        startAt: DateTime.utc(2026, 11, 28, 11),
+        endAt: DateTime.utc(2026, 11, 28, 13),
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      expect(
+        () => policy.ensureAllowed(
+          candidate: overlappingReservation,
+          space: space,
+          existing: [current],
+        ),
+        throwsA(
+          isA<ParkingAssignmentConflict>().having(
+            (error) => error.reason,
+            'reason',
+            ParkingAssignmentConflictReason.parkingSpaceAlreadyAssigned,
+          ),
+        ),
+      );
+    });
+
+    test('prevents one vehicle from occupying two spaces in the same window', () {
+      const policy = ParkingAssignmentPolicy();
+      final space = ParkingSpace(
+        id: 'space-002',
+        companyId: 'company-001',
+        parkingZoneId: 'zone-001',
+        code: 'A-02',
+        rectangle: const ParkingSpaceGeometry(
+          centerX: 4,
+          centerY: 0,
+          width: 2.5,
+          length: 5,
+        ),
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      final existing = VehicleParkingAssignment(
+        id: 'assignment-existing',
+        companyId: 'company-001',
+        vehicleId: 'vehicle-001',
+        parkingSpaceId: 'space-001',
+        startAt: DateTime.utc(2026, 11, 28, 8),
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      final candidate = VehicleParkingAssignment(
+        id: 'assignment-candidate',
+        companyId: 'company-001',
+        vehicleId: 'vehicle-001',
+        parkingSpaceId: 'space-002',
+        startAt: DateTime.utc(2026, 11, 28, 9),
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+
+      expect(
+        () => policy.ensureAllowed(
+          candidate: candidate,
+          space: space,
+          existing: [existing],
+        ),
+        throwsA(
+          isA<ParkingAssignmentConflict>().having(
+            (error) => error.reason,
+            'reason',
+            ParkingAssignmentConflictReason.vehicleAlreadyAssigned,
+          ),
+        ),
+      );
+    });
+
+    test('rejects assignment to blocked spaces and reservations without an end', () {
+      const policy = ParkingAssignmentPolicy();
+      final blocked = ParkingSpace(
+        id: 'space-blocked',
+        companyId: 'company-001',
+        parkingZoneId: 'zone-001',
+        code: 'A-99',
+        status: ParkingSpaceStatus.blocked,
+        rectangle: const ParkingSpaceGeometry(
+          centerX: 0,
+          centerY: 0,
+          width: 2.5,
+          length: 5,
+        ),
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      final assignment = VehicleParkingAssignment(
+        id: 'assignment-blocked',
+        companyId: 'company-001',
+        vehicleId: 'vehicle-001',
+        parkingSpaceId: 'space-blocked',
+        startAt: createdAt,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      expect(
+        () => policy.ensureAllowed(
+          candidate: assignment,
+          space: blocked,
+          existing: const [],
+        ),
+        throwsA(
+          isA<ParkingAssignmentConflict>().having(
+            (error) => error.reason,
+            'reason',
+            ParkingAssignmentConflictReason.parkingSpaceUnavailable,
+          ),
+        ),
+      );
+
+      final incompleteReservation = VehicleParkingAssignment(
+        id: 'reservation-invalid',
+        companyId: 'company-001',
+        vehicleId: 'vehicle-001',
+        parkingSpaceId: 'space-blocked',
+        type: ParkingAssignmentType.reserved,
+        startAt: createdAt,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      expect(incompleteReservation.validate, throwsArgumentError);
+    });
+
   group('VehicleParkingAssignment', () {
     test('keeps reservations distinct from physical occupancy', () {
       final assignment = VehicleParkingAssignment(
