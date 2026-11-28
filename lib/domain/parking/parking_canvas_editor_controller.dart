@@ -119,6 +119,7 @@ class ParkingCanvasEditorController {
   final int historyLimit;
 
   ParkingCanvasDocument _document;
+  ParkingCanvasDocument? _transactionBase;
   final List<ParkingCanvasDocument> _undoHistory = [];
   final List<ParkingCanvasDocument> _redoHistory = [];
   Set<String> _selectedObjectIds = {};
@@ -155,6 +156,30 @@ class ParkingCanvasEditorController {
   Set<String> get selectedObjectIds =>
       Set<String>.unmodifiable(_selectedObjectIds);
   String? get activeLayerId => _activeLayerId;
+
+  void beginTransaction() {
+    if (_transactionBase != null) {
+      throw StateError('A canvas edit transaction is already open.');
+    }
+    _transactionBase = _document;
+  }
+
+  void commitTransaction() {
+    final base = _transactionBase;
+    if (base == null) return;
+    _transactionBase = null;
+    if (identical(base, _document)) return;
+    _recordUndo(base);
+    _redoHistory.clear();
+  }
+
+  void rollbackTransaction() {
+    final base = _transactionBase;
+    if (base == null) return;
+    _transactionBase = null;
+    _document = base;
+    _retainValidSelection();
+  }
   ParkingCanvasTool get activeTool => _activeTool;
   bool get canUndo => _undoHistory.isNotEmpty;
   bool get canRedo => _redoHistory.isNotEmpty;
@@ -378,6 +403,7 @@ class ParkingCanvasEditorController {
   }
 
   void undo() {
+    commitTransaction();
     if (!canUndo) return;
     _redoHistory.add(_document);
     _document = _undoHistory.removeLast();
@@ -385,6 +411,7 @@ class ParkingCanvasEditorController {
   }
 
   void redo() {
+    commitTransaction();
     if (!canRedo) return;
     _undoHistory.add(_document);
     _document = _redoHistory.removeLast();
@@ -393,12 +420,18 @@ class ParkingCanvasEditorController {
 
   void _commit(ParkingCanvasDocument next) {
     next.validate(widthM: widthM, heightM: heightM);
-    _undoHistory.add(_document);
+    if (_transactionBase == null) {
+      _recordUndo(_document);
+      _redoHistory.clear();
+    }
+    _document = next;
+  }
+
+  void _recordUndo(ParkingCanvasDocument document) {
+    _undoHistory.add(document);
     if (_undoHistory.length > historyLimit) {
       _undoHistory.removeAt(0);
     }
-    _redoHistory.clear();
-    _document = next;
   }
 
   ParkingCanvasObject? _findObject(String id) {
