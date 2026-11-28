@@ -32,6 +32,7 @@ class _ParkingSnapshot {
   final List<ParkingZone> zones;
   final List<ParkingSpace> spaces;
   final List<VehicleParkingAssignment> assignments;
+  final List<ParkingAccessEvent> accessEvents;
   final Uint8List? backgroundBytes;
   final int? backgroundPixelWidth;
   final int? backgroundPixelHeight;
@@ -44,6 +45,7 @@ class _ParkingSnapshot {
     required this.zones,
     required this.spaces,
     required this.assignments,
+    required this.accessEvents,
     this.backgroundBytes,
     this.backgroundPixelWidth,
     this.backgroundPixelHeight,
@@ -104,6 +106,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
         zones: const [],
         spaces: const [],
         assignments: const [],
+        accessEvents: const [],
       );
     }
 
@@ -126,6 +129,10 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
     }
     final assignments = await services.local.getAssignments(
       parkingLotId: selected.id,
+    );
+    final accessEvents = await services.local.getAccessEvents(
+      parkingLotId: selected.id,
+      limit: 20,
     );
     final mediaItems = await services.local.getMedia(selected.id);
     ParkingMedia? backgroundMedia;
@@ -153,6 +160,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
       zones: zones,
       spaces: spaces,
       assignments: assignments,
+      accessEvents: accessEvents,
       backgroundBytes: backgroundBytes,
       backgroundPixelWidth: backgroundMedia?.pixelWidth,
       backgroundPixelHeight: backgroundMedia?.pixelHeight,
@@ -1325,6 +1333,8 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
             ),
           ],
         ),
+        const SizedBox(height: 18),
+        _ParkingAccessHistory(events: data.accessEvents, theme: theme),
         const SizedBox(height: 22),
         if (data.layouts.isNotEmpty) ...[
           Row(
@@ -1433,6 +1443,273 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
   }
 }
 
+
+
+class _ParkingAccessHistory extends StatelessWidget {
+  final List<ParkingAccessEvent> events;
+  final AppTheme theme;
+
+  const _ParkingAccessHistory({
+    required this.events,
+    required this.theme,
+  });
+
+  String _eventLabel(ParkingAccessEvent event) {
+    switch (event.type) {
+      case ParkingAccessEventType.entry:
+        return 'Entrée';
+      case ParkingAccessEventType.exit:
+        return 'Sortie';
+      case ParkingAccessEventType.unknownPlate:
+        return 'Plaque non reconnue';
+      case ParkingAccessEventType.manualCorrection:
+        return 'Correction manuelle';
+    }
+  }
+
+  String _sourceLabel(ParkingAccessEvent event) {
+    switch (event.source) {
+      case ParkingEventSource.manual:
+        return 'Saisie manuelle';
+      case ParkingEventSource.connectScan:
+        return 'Parcoto Connect';
+    }
+  }
+
+  IconData _eventIcon(ParkingAccessEvent event) {
+    switch (event.type) {
+      case ParkingAccessEventType.entry:
+        return FluentIcons.signin;
+      case ParkingAccessEventType.exit:
+        return FluentIcons.sign_out;
+      case ParkingAccessEventType.unknownPlate:
+        return FluentIcons.warning;
+      case ParkingAccessEventType.manualCorrection:
+        return FluentIcons.edit;
+    }
+  }
+
+  Color _eventColor(ParkingAccessEvent event) {
+    switch (event.type) {
+      case ParkingAccessEventType.entry:
+        return const Color(0xFF24B47E);
+      case ParkingAccessEventType.exit:
+        return const Color(0xFF4D8DDB);
+      case ParkingAccessEventType.unknownPlate:
+        return const Color(0xFFE3A33D);
+      case ParkingAccessEventType.manualCorrection:
+        return theme.color;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.surfaceColor,
+        border: Border.all(color: theme.borderColor),
+        borderRadius: BorderRadius.circular(theme.cardRadius),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Historique des mouvements',
+                  style: TextStyle(
+                    color: theme.textColor,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Text(
+                events.isEmpty ? 'Aucun mouvement' : '\${events.length} récents',
+                style: TextStyle(
+                  color: theme.mutedTextColor,
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Entrées, sorties et corrections enregistrées dans ce parking',
+            style: TextStyle(color: theme.mutedTextColor, fontSize: 11),
+          ),
+          const SizedBox(height: 12),
+          if (events.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 18),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(
+                      FluentIcons.history,
+                      color: theme.mutedTextColor,
+                      size: 24,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Aucun mouvement enregistré pour le moment.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: theme.mutedTextColor,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            for (var index = 0; index < events.length; index++) ...[
+              if (index > 0)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Container(
+                    height: 1,
+                    color: theme.borderColor,
+                  ),
+                ),
+              _AccessHistoryRow(
+                event: events[index],
+                theme: theme,
+                label: _eventLabel(events[index]),
+                sourceLabel: _sourceLabel(events[index]),
+                icon: _eventIcon(events[index]),
+                color: _eventColor(events[index]),
+              ),
+            ],
+        ],
+      ),
+    );
+  }
+}
+
+class _AccessHistoryRow extends StatelessWidget {
+  final ParkingAccessEvent event;
+  final AppTheme theme;
+  final String label;
+  final String sourceLabel;
+  final IconData icon;
+  final Color color;
+
+  const _AccessHistoryRow({
+    required this.event,
+    required this.theme,
+    required this.label,
+    required this.sourceLabel,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final registrationValue = event.registrationCaptured;
+    final registration = registrationValue == null ||
+            registrationValue.trim().isEmpty
+        ? 'Immatriculation indisponible'
+        : registrationValue;
+    final localTime = event.occurredAt.toLocal().toString();
+    final dateLabel = localTime.length >= 16
+        ? localTime.substring(0, 16)
+        : localTime;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: .12),
+            borderRadius: BorderRadius.circular(9),
+          ),
+          child: Icon(icon, size: 15, color: color),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      registration,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: theme.textColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    dateLabel,
+                    style: TextStyle(
+                      color: theme.mutedTextColor,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 3),
+              Wrap(
+                spacing: 7,
+                runSpacing: 3,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    '• $sourceLabel',
+                    style: TextStyle(
+                      color: theme.mutedTextColor,
+                      fontSize: 10,
+                    ),
+                  ),
+                  if (event.confidence != null)
+                    Text(
+                      '• OCR \${(event.confidence! * 100).round()} %',
+                      style: TextStyle(
+                        color: theme.mutedTextColor,
+                        fontSize: 10,
+                      ),
+                    ),
+                ],
+              ),
+              if ((event.notes ?? '').trim().isNotEmpty) ...[
+                const SizedBox(height: 3),
+                Text(
+                  event.notes!,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: theme.mutedTextColor,
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 class _ParkingPlanPreview extends StatefulWidget {
   final ParkingLayout layout;
