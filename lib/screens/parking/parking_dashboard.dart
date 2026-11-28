@@ -355,6 +355,197 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
     }
   }
 
+
+  Future<Size> _readImageDimensions(Uint8List bytes) async {
+    final codec = await ui.instantiateImageCodec(bytes);
+    try {
+      final frame = await codec.getNextFrame();
+      try {
+        return Size(
+          frame.image.width.toDouble(),
+          frame.image.height.toDouble(),
+        );
+      } finally {
+        frame.image.dispose();
+      }
+    } finally {
+      codec.dispose();
+    }
+  }
+
+  Future<void> _importPlanImage() async {
+    final services = _services;
+    if (services == null) return;
+
+    try {
+      final pendingSnapshot = _snapshotFuture;
+      if (pendingSnapshot == null) {
+        throw StateError('Le plan du parking n’est pas encore chargé.');
+      }
+      final snapshot = await pendingSnapshot;
+      if (!mounted) return;
+      final parkingLot = snapshot.selectedLot;
+      if (parkingLot == null || snapshot.layouts.isEmpty) {
+        throw StateError(
+          'Crée d’abord un parking avec un plan vectoriel avant d’importer un fond.',
+        );
+      }
+      final currentLayout = snapshot.layouts.first;
+
+      final selectedFile = await FilePicker.pickFile(
+        type: FileType.custom,
+        allowedExtensions: const ['png', 'jpg', 'jpeg', 'webp'],
+      );
+      if (selectedFile == null || !mounted) return;
+      final fileName = selectedFile.name;
+      final extension = fileName.contains('.')
+          ? fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase()
+          : '';
+      final mimeType = switch (extension) {
+        'png' => 'image/png',
+        'jpg' || 'jpeg' => 'image/jpeg',
+        'webp' => 'image/webp',
+        _ => throw FormatException('Format d’image non pris en charge.'),
+      };
+
+      final bytes = await selectedFile.readAsBytes();
+      if (bytes.isEmpty || bytes.length > 20 * 1024 * 1024) {
+        throw StateError('L’image doit peser au maximum 20 Mo.');
+      }
+      final imageSize = await _readImageDimensions(bytes);
+      if (imageSize.width < 2 ||
+          imageSize.height < 2 ||
+          imageSize.width > 12000 ||
+          imageSize.height > 12000) {
+        throw StateError('Dimensions de l’image non prises en charge.');
+      }
+
+      final calibration = await showDialog<ParkingBackgroundCalibration>(
+        context: context,
+        builder: (context) => _CalibrateBackgroundDialog(
+          bytes: bytes,
+          fileName: fileName,
+          pixelWidth: imageSize.width.toInt(),
+          pixelHeight: imageSize.height.toInt(),
+        ),
+      );
+      if (calibration == null || !mounted) return;
+
+      calibration.validate();
+      final metersPerPixel = calibration.metersPerPixel;
+      final importedWidthM = imageSize.width * metersPerPixel;
+      final importedHeightM = imageSize.height * metersPerPixel;
+      if (!importedWidthM.isFinite ||
+          !importedHeightM.isFinite ||
+          importedWidthM <= 0 ||
+          importedHeightM <= 0 ||
+          importedWidthM > 10000 ||
+          importedHeightM > 10000) {
+        throw StateError('L’échelle calculée produit un plan trop grand.');
+      }
+
+      // Preserve the existing vector geometry. Expand the plan only when the
+      // calibrated raster is larger, then center the image in the new extent.
+      final layoutWidthM = math.max(
+        currentLayout.widthM,
+        importedWidthM,
+      ).toDouble();
+      final layoutHeightM = math.max(
+        currentLayout.heightM,
+        importedHeightM,
+      ).toDouble();
+
+      final now = DateTime.now().toUtc();
+      final stamp = now.microsecondsSinceEpoch.toString();
+      final fileId = 'planimg_$stamp';
+      final mediaId = 'media_$stamp';
+      final transform = ParkingBackgroundTransform(
+        originXM: (layoutWidthM - importedWidthM) / 2,
+        originYM: (layoutHeightM + importedHeightM) / 2,
+        metersPerPixel: metersPerPixel,
+        rotationDegrees: 0,
+        opacity: 0.58,
+        calibration: calibration,
+      );
+      final updatedLayout = ParkingLayout(
+        id: currentLayout.id,
+        companyId: currentLayout.companyId,
+        parkingLotId: currentLayout.parkingLotId,
+        name: currentLayout.name,
+        version: currentLayout.version,
+        status: currentLayout.status,
+        widthM: layoutWidthM,
+        heightM: layoutHeightM,
+        gridStepM: currentLayout.gridStepM,
+        backgroundFileId: fileId,
+        backgroundTransform: transform,
+        layersJson: currentLayout.layersJson,
+        createdAt: currentLayout.createdAt,
+        updatedAt: now,
+      );
+      final media = ParkingMedia(
+        id: mediaId,
+        companyId: services.companyId,
+        parkingLotId: parkingLot.id,
+        layoutId: currentLayout.id,
+        fileId: fileId,
+        purpose: ParkingMediaPurpose.layoutBackground,
+        fileName: fileName,
+        mimeType: mimeType,
+        fileSize: bytes.length,
+        pixelWidth: imageSize.width.toInt(),
+        pixelHeight: imageSize.height.toInt(),
+        createdAt: now,
+        updatedAt: now,
+      );
+
+      await services.files.saveImage(
+        fileId: fileId,
+        fileName: fileName,
+        bytes: bytes,
+      );
+      try {
+        await services.local.attachLayoutBackground(
+          layout: updatedLayout,
+          media: media,
+        );
+      } catch (_) {
+        await services.files.deleteImage(
+          fileId: fileId,
+          fileName: fileName,
+        );
+        rethrow;
+      }
+
+      if (!mounted) return;
+      _refresh(parkingLotId: parkingLot.id);
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Fond de plan importé'),
+          content: Text(
+            'Calibration : ' +
+                metersPerPixel.toStringAsFixed(4) +
+                ' m/pixel. Le fond est stocké localement sur cet appareil.',
+          ),
+          severity: InfoBarSeverity.success,
+        ),
+        duration: const Duration(seconds: 6),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Import impossible'),
+          content: Text(error.toString()),
+          severity: InfoBarSeverity.error,
+        ),
+        duration: const Duration(seconds: 7),
+      );
+    }
+  }
+
   _SpaceDisplayState _displayState(
     ParkingSpace space,
     List<VehicleParkingAssignment> assignments,
@@ -447,16 +638,35 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
                       ],
                     ),
                   ),
-                  FilledButton(
-                    onPressed: services == null ? null : _createParking,
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(FluentIcons.add, size: 14),
-                        SizedBox(width: 8),
-                        Text('Créer un parking'),
-                      ],
-                    ),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.end,
+                    children: [
+                      Button(
+                        onPressed:
+                            services == null ? null : _importPlanImage,
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(FluentIcons.upload, size: 14),
+                            SizedBox(width: 7),
+                            Text('Importer un plan'),
+                          ],
+                        ),
+                      ),
+                      FilledButton(
+                        onPressed: services == null ? null : _createParking,
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(FluentIcons.add, size: 14),
+                            SizedBox(width: 8),
+                            Text('Créer un parking'),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
