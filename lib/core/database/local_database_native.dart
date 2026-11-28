@@ -790,6 +790,76 @@ class LocalDatabase {
         rethrow;
       }
     }
+
+    if (version < 20) {
+      db.execute('BEGIN IMMEDIATE');
+      try {
+        // Enforce half-open time-window conflicts even if a caller bypasses
+        // ParkingAssignmentPolicy and writes directly to SQLite.
+        db.execute('''
+          CREATE TRIGGER IF NOT EXISTS trg_parking_assignment_no_overlap_insert
+          BEFORE INSERT ON vehicle_parking_assignments
+          WHEN NEW.status = 'active'
+          BEGIN
+            SELECT CASE WHEN EXISTS (
+              SELECT 1
+              FROM vehicle_parking_assignments existing
+              WHERE existing.company_id = NEW.company_id
+                AND existing.id <> NEW.id
+                AND existing.status = 'active'
+                AND (
+                  existing.parking_space_id = NEW.parking_space_id
+                  OR existing.vehicle_id = NEW.vehicle_id
+                )
+                AND (
+                  existing.end_at IS NULL
+                  OR NEW.start_at < existing.end_at
+                )
+                AND (
+                  NEW.end_at IS NULL
+                  OR existing.start_at < NEW.end_at
+                )
+            ) THEN RAISE(ABORT, 'Overlapping active parking assignment') END;
+          END
+        ''');
+        db.execute('''
+          CREATE TRIGGER IF NOT EXISTS trg_parking_assignment_no_overlap_update
+          BEFORE UPDATE OF company_id, vehicle_id, parking_space_id,
+                           status, start_at, end_at
+          ON vehicle_parking_assignments
+          WHEN NEW.status = 'active'
+          BEGIN
+            SELECT CASE WHEN EXISTS (
+              SELECT 1
+              FROM vehicle_parking_assignments existing
+              WHERE existing.company_id = NEW.company_id
+                AND existing.id <> NEW.id
+                AND existing.status = 'active'
+                AND (
+                  existing.parking_space_id = NEW.parking_space_id
+                  OR existing.vehicle_id = NEW.vehicle_id
+                )
+                AND (
+                  existing.end_at IS NULL
+                  OR NEW.start_at < existing.end_at
+                )
+                AND (
+                  NEW.end_at IS NULL
+                  OR existing.start_at < NEW.end_at
+                )
+            ) THEN RAISE(ABORT, 'Overlapping active parking assignment') END;
+          END
+        ''');
+        db.execute(
+          "INSERT INTO schema_migrations(version, applied_at) "
+          "VALUES (20, datetime('now'))",
+        );
+        db.execute('COMMIT');
+      } catch (_) {
+        db.execute('ROLLBACK');
+        rethrow;
+      }
+    }
   }
 
   bool isStartupMigrationComplete({
