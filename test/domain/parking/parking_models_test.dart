@@ -8,6 +8,46 @@ void main() {
   final createdAt = DateTime.utc(2026, 11, 28, 9);
   final updatedAt = DateTime.utc(2026, 11, 28, 10);
 
+
+  group('ParkingSite', () {
+    test('round trips site hierarchy and optional geographic centre', () {
+      final site = ParkingSite(
+        id: 'site-001',
+        companyId: 'company-001',
+        code: 'ANN-01',
+        name: 'Dépôt Annaba',
+        address: 'Annaba',
+        wilaya: 23,
+        commune: 'Annaba',
+        latitude: 36.9,
+        longitude: 7.77,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      final restored = ParkingSite.fromJson(
+        Map<String, dynamic>.from(site.toJson()),
+      );
+      expect(restored.companyId, 'company-001');
+      expect(restored.latitude, 36.9);
+      expect(restored.longitude, 7.77);
+    });
+
+    test('rejects coordinates outside WGS84 bounds', () {
+      expect(
+        () => ParkingSite(
+          id: 'site-invalid',
+          companyId: 'company-001',
+          code: 'BAD',
+          name: 'Invalid',
+          latitude: 91,
+          createdAt: createdAt,
+          updatedAt: updatedAt,
+        ).validate(),
+        throwsArgumentError,
+      );
+    });
+  });
+
   group('ParkingLot', () {
     test('round trips a tenant-scoped parking lot', () {
       final lot = ParkingLot(
@@ -74,9 +114,10 @@ void main() {
       final polygon = ParkingPolygon(
         points: const [
           ParkingPoint(x: 0, y: 0),
-          ParkingPoint(x: 10, y: 10),
-          ParkingPoint(x: 0, y: 10),
-          ParkingPoint(x: 10, y: 0),
+          ParkingPoint(x: 4, y: 4),
+          ParkingPoint(x: 0, y: 4),
+          ParkingPoint(x: 5, y: 0),
+          ParkingPoint(x: 6, y: 3),
         ],
       );
 
@@ -176,6 +217,24 @@ void main() {
           widthM: 20,
           heightM: 20,
           layersJson: '{}',
+          createdAt: createdAt,
+          updatedAt: updatedAt,
+        ).validate(),
+        throwsFormatException,
+      );
+      expect(
+        () => ParkingLayout(
+          id: 'layout-003',
+          companyId: 'company-001',
+          parkingLotId: 'lot-001',
+          name: 'Duplicate layer ids',
+          version: 1,
+          widthM: 20,
+          heightM: 20,
+          layersJson: jsonEncode([
+            {'id': 'layer-a', 'type': 'spaces'},
+            {'id': 'layer-a', 'type': 'annotations'},
+          ]),
           createdAt: createdAt,
           updatedAt: updatedAt,
         ).validate(),
