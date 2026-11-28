@@ -254,10 +254,13 @@ La première tranche locale du module est enregistrée sur `master` :
 - Validation de l'emprise du plan et des zones pour les géométries de places, y compris rectangles tournés.
 - Déplacements et clôtures d'affectation transactionnels ; les événements d'entrée/sortie peuvent être enregistrés dans la même transaction.
 - Vue d'exploitation alimentée par SQLite, sans jeu de données de démonstration.
+- Import local des fonds raster PNG/JPEG/WebP (20 Mo maximum), avec calibration à deux points, alignement horizontal/vertical et affichage sous les géométries vectorielles.
 
 **Limite volontaire :** le module Parking n'est pas synchronisé avec Appwrite à ce stade. Le projet Appwrite actif n'a pas été modifié ; aucune table distante ni fonction Parking n'a été déployée. Le stockage Web échoue explicitement tant que le backend distant n'est pas disponible. Les données locales natives restent sur l'appareil et ne sont pas partagées entre appareils.
 
-L'interface actuelle livre le premier assistant guidé et l'inspection des places. L'éditeur vectoriel complet, l'import calibré opérationnel, la gestion des entrées/sorties depuis Parcoto Connect, les permissions serveur et la synchronisation distante restent des lots suivants.
+L'interface actuelle livre l'assistant guidé, l'inspection des places, le rendu métrique et l'import calibré des fonds raster sur les installations natives. Les fichiers importés restent dans le dossier applicatif local du tenant. PDF n'est pas pris en charge dans ce lot ; l'import Web reste désactivé tant que le stockage distant n'est pas provisionné.
+
+L'éditeur vectoriel libre (création/déplacement de formes, calques, propriétés avancées, undo/redo), l'import PDF avec moteur de rendu, la gestion des entrées/sorties depuis Parcoto Connect, les permissions serveur et la synchronisation distante restent des lots suivants.
 
 ## 12. Plan de réalisation et critères de sortie
 
