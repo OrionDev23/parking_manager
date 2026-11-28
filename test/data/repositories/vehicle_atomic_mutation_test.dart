@@ -84,6 +84,19 @@ void main() {
           conflict_reason TEXT,
           conflicted_at TEXT
         )''');
+        legacyDatabase.execute('''CREATE TABLE vehicles (
+          id TEXT PRIMARY KEY, company_id TEXT NOT NULL, site_id TEXT,
+          registration TEXT NOT NULL, brand TEXT, model TEXT, color TEXT,
+          status TEXT NOT NULL, created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL, payload TEXT
+        )''');
+        legacyDatabase.execute('''CREATE TABLE drivers (
+          id TEXT PRIMARY KEY, company_id TEXT NOT NULL, site_id TEXT,
+          first_name TEXT NOT NULL DEFAULT '', last_name TEXT NOT NULL DEFAULT '',
+          registration TEXT NOT NULL DEFAULT '', email TEXT, phone TEXT,
+          state INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL, payload TEXT NOT NULL DEFAULT '{}'
+        )''');
         legacyDatabase.execute(
           '''INSERT INTO sync_operations
              (id, company_id, device_id, entity, entity_id, operation,
@@ -114,7 +127,7 @@ void main() {
             .select('SELECT MAX(version) AS version FROM schema_migrations')
             .single['version'];
 
-        expect(version, 12);
+        expect(version, 15);
         expect(row['id'], 'legacy-operation-001');
         expect(row['company_id'], companyId);
         expect(row['entity_id'], 'vehicle-legacy-001');
@@ -126,12 +139,29 @@ void main() {
         );
         expect(row['idempotency_key'], 'legacy-operation-001');
         expect(row['payload_version'], 1);
+        final localTables = legacyDatabase.select(
+          "SELECT name FROM sqlite_master WHERE type='table'",
+        ).map((item) => item['name'] as String).toSet();
+        expect(
+          localTables,
+          containsAll({
+            'sites',
+            'vehicle_assignments',
+            'parking_lots',
+            'parking_layouts',
+            'parking_zones',
+            'parking_spaces',
+            'vehicle_parking_assignments',
+            'parking_access_events',
+            'parking_media',
+          }),
+        );
       } finally {
         legacyDatabase.close();
       }
     });
 
-    test('opens with the version 12 outbox schema', () async {
+    test('opens with the version 15 parking schema and ordered outbox', () async {
       final migrations = database.database.select(
         'SELECT version FROM schema_migrations ORDER BY version',
       );
@@ -141,7 +171,7 @@ void main() {
           .map((row) => row['name'] as String)
           .toSet();
 
-      expect(latestVersion, 12);
+      expect(latestVersion, 15);
       expect(
         columns,
         containsAll({
@@ -151,7 +181,151 @@ void main() {
           'last_error_code',
           'last_error_message',
           'completed_at',
+          'base_revision',
+          'depends_on_operation_id',
+          'sequence_no',
         }),
+      );
+    });
+
+
+    test('releases dependent operations only after the parent is completed', () async {
+      final parent = SyncOperation(
+        id: 'site-create-op',
+        companyId: companyId,
+        deviceId: 'device-test',
+        entity: 'site',
+        entityId: 'site-001',
+        type: SyncOperationType.create,
+        payload: {'id': 'site-001', 'companyId': companyId},
+        createdAt: DateTime.utc(2026, 11, 22),
+      );
+      final child = SyncOperation(
+        id: 'parking-create-op',
+        companyId: companyId,
+        deviceId: 'device-test',
+        entity: 'parking_lot',
+        entityId: 'parking-001',
+        type: SyncOperationType.create,
+        dependsOnOperationId: parent.id,
+        payload: {'id': 'parking-001', 'companyId': companyId},
+        createdAt: DateTime.utc(2026, 11, 22),
+      );
+
+      await queue.enqueue(parent);
+      await queue.enqueue(child);
+
+      final readyBeforeAck = await queue.pending(companyId: companyId);
+      expect(readyBeforeAck.map((item) => item.id), [parent.id]);
+      final storedChild = database.database
+          .select(
+            "SELECT sequence_no, depends_on_operation_id FROM sync_operations WHERE id=?",
+            [child.id],
+          )
+          .single;
+      expect(storedChild['sequence_no'], 2);
+      expect(storedChild['depends_on_operation_id'], parent.id);
+
+      await queue.markConflict(parent.id, reason: 'Parent validation failed.');
+      await queue.pending(companyId: companyId);
+      final blockedChild = (await queue.conflicts(companyId: companyId))
+          .singleWhere((item) => item.id == child.id);
+      expect(blockedChild.conflictReason, 'dependency_blocked');
+
+      await queue.retryConflict(parent.id);
+      final readyAfterRetry = await queue.pending(companyId: companyId);
+      expect(readyAfterRetry.map((item) => item.id), [parent.id]);
+
+      await queue.markCompleted(parent.id);
+      final readyAfterAck = await queue.pending(companyId: companyId);
+      expect(readyAfterAck.map((item) => item.id), [child.id]);
+    });
+
+    test('enforces tenant parentage and single active parking occupancy', () {
+      final db = database.database;
+      const now = '2026-11-22T10:00:00.000Z';
+
+      db.execute(
+        """INSERT INTO sites
+           (id, company_id, code, name, status, created_at, updated_at)
+           VALUES ('site-a', ?, 'A', 'Site A', 'active', ?, ?)""",
+        [companyId, now, now],
+      );
+      db.execute(
+        """INSERT INTO parking_lots
+           (id, company_id, site_id, code, name, created_at, updated_at)
+           VALUES ('lot-a', ?, 'site-a', 'P1', 'Parking principal', ?, ?)""",
+        [companyId, now, now],
+      );
+      db.execute(
+        """INSERT INTO parking_zones
+           (id, company_id, parking_lot_id, code, name, created_at, updated_at)
+           VALUES ('zone-a', ?, 'lot-a', 'A', 'Zone A', ?, ?)""",
+        [companyId, now, now],
+      );
+      db.execute(
+        """INSERT INTO parking_spaces
+           (id, company_id, parking_zone_id, code, x_m, y_m, width_m,
+            length_m, created_at, updated_at)
+           VALUES ('space-a', ?, 'zone-a', 'A-01', 1, 1, 2.5, 5, ?, ?)""",
+        [companyId, now, now],
+      );
+      db.execute(
+        """INSERT INTO parking_spaces
+           (id, company_id, parking_zone_id, code, x_m, y_m, width_m,
+            length_m, created_at, updated_at)
+           VALUES ('space-b', ?, 'zone-a', 'A-02', 4, 1, 2.5, 5, ?, ?)""",
+        [companyId, now, now],
+      );
+      db.execute(
+        """INSERT INTO vehicles
+           (id, company_id, registration, status, created_at, updated_at, payload)
+           VALUES ('vehicle-a', ?, '11111-111-11', 'active', ?, ?, '{}')""",
+        [companyId, now, now],
+      );
+      db.execute(
+        """INSERT INTO vehicles
+           (id, company_id, registration, status, created_at, updated_at, payload)
+           VALUES ('vehicle-b', ?, '22222-222-22', 'active', ?, ?, '{}')""",
+        [companyId, now, now],
+      );
+
+      db.execute(
+        """INSERT INTO vehicle_parking_assignments
+           (id, company_id, vehicle_id, parking_space_id, status, start_at,
+            created_at, updated_at)
+           VALUES ('assignment-a', ?, 'vehicle-a', 'space-a', 'active', ?, ?, ?)""",
+        [companyId, now, now, now],
+      );
+
+      expect(
+        () => db.execute(
+          """INSERT INTO vehicle_parking_assignments
+             (id, company_id, vehicle_id, parking_space_id, status, start_at,
+              created_at, updated_at)
+             VALUES ('assignment-b', ?, 'vehicle-b', 'space-a', 'active', ?, ?, ?)""",
+          [companyId, now, now, now],
+        ),
+        throwsA(isA<SqliteException>()),
+      );
+      expect(
+        () => db.execute(
+          """INSERT INTO vehicle_parking_assignments
+             (id, company_id, vehicle_id, parking_space_id, status, start_at,
+              created_at, updated_at)
+             VALUES ('assignment-c', ?, 'vehicle-a', 'space-b', 'active', ?, ?, ?)""",
+          [companyId, now, now, now],
+        ),
+        throwsA(isA<SqliteException>()),
+      );
+      expect(
+        () => db.execute(
+          """INSERT INTO parking_lots
+             (id, company_id, site_id, code, name, created_at, updated_at)
+             VALUES ('lot-cross-tenant', 'company-other', 'site-a', 'P2', 'Invalid', ?, ?)""",
+          [now, now],
+        ),
+        throwsA(isA<SqliteException>()),
       );
     });
 
