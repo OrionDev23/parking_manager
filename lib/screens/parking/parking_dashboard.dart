@@ -406,6 +406,10 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
         _ => throw FormatException('Format d’image non pris en charge.'),
       };
 
+      if (selectedFile.size <= 0 ||
+          selectedFile.size > 20 * 1024 * 1024) {
+        throw StateError('L’image doit peser entre 1 octet et 20 Mo.');
+      }
       final bytes = await selectedFile.readAsBytes();
       if (bytes.isEmpty || bytes.length > 20 * 1024 * 1024) {
         throw StateError('L’image doit peser au maximum 20 Mo.');
