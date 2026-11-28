@@ -88,11 +88,22 @@ class _ParkingCanvasEditorDialogState extends State<ParkingCanvasEditorDialog> {
 
     ui.Codec? codec;
     ui.Image? decoded;
+    ui.ImmutableBuffer? buffer;
+    ui.ImageDescriptor? descriptor;
     try {
+      buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
+      descriptor = await ui.ImageDescriptor.encoded(buffer);
+      final sourceWidth =
+          widget.backgroundPixelWidth ?? descriptor.width;
+      final sourceHeight =
+          widget.backgroundPixelHeight ?? descriptor.height;
+      final scale = math.min(1.0, 2400 / math.max(sourceWidth, sourceHeight));
+      final targetWidth = math.max(1, (sourceWidth * scale).round()).toInt();
+      final targetHeight = math.max(1, (sourceHeight * scale).round()).toInt();
       codec = await ui.instantiateImageCodec(
         bytes,
-        targetWidth: 2400,
-        allowUpscaling: false,
+        targetWidth: targetWidth,
+        targetHeight: targetHeight,
       );
       decoded = (await codec.getNextFrame()).image;
     } catch (_) {
@@ -100,6 +111,8 @@ class _ParkingCanvasEditorDialogState extends State<ParkingCanvasEditorDialog> {
       return;
     } finally {
       codec?.dispose();
+      descriptor?.dispose();
+      buffer?.dispose();
     }
 
     if (!mounted || generation != _decodeGeneration) {
