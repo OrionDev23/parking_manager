@@ -1,6 +1,8 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
@@ -26,6 +28,8 @@ class _ParkingSnapshot {
   final List<ParkingZone> zones;
   final List<ParkingSpace> spaces;
   final List<VehicleParkingAssignment> assignments;
+  final ParkingMedia? backgroundMedia;
+  final Uint8List? backgroundBytes;
 
   const _ParkingSnapshot({
     required this.sites,
@@ -35,6 +39,8 @@ class _ParkingSnapshot {
     required this.zones,
     required this.spaces,
     required this.assignments,
+    this.backgroundMedia,
+    this.backgroundBytes,
   });
 }
 
@@ -115,6 +121,23 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
     final assignments = await services.local.getAssignments(
       parkingLotId: selected.id,
     );
+    final mediaItems = await services.local.getMedia(selected.id);
+    ParkingMedia? backgroundMedia;
+    Uint8List? backgroundBytes;
+    if (layouts.isNotEmpty && layouts.first.backgroundFileId != null) {
+      for (final media in mediaItems) {
+        if (media.fileId == layouts.first.backgroundFileId) {
+          backgroundMedia = media;
+          break;
+        }
+      }
+      if (backgroundMedia != null) {
+        backgroundBytes = await services.files.readImage(
+          fileId: backgroundMedia.fileId,
+          fileName: backgroundMedia.fileName,
+        );
+      }
+    }
 
     return _ParkingSnapshot(
       sites: sites,
@@ -124,6 +147,8 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
       zones: zones,
       spaces: spaces,
       assignments: assignments,
+      backgroundMedia: backgroundMedia,
+      backgroundBytes: backgroundBytes,
     );
   }
 
@@ -677,6 +702,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
             borderColor: theme.borderColor,
             textColor: theme.textColor,
             mutedColor: theme.mutedTextColor,
+            backgroundBytes: data.backgroundBytes,
           ),
           const SizedBox(height: 22),
         ],
