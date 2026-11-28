@@ -355,19 +355,19 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
 
 
   Future<ui.Size> _readImageDimensions(Uint8List bytes) async {
-    final codec = await ui.instantiateImageCodec(bytes);
+    final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
     try {
-      final frame = await codec.getNextFrame();
+      final descriptor = await ui.ImageDescriptor.encoded(buffer);
       try {
         return ui.Size(
-          frame.image.width.toDouble(),
-          frame.image.height.toDouble(),
+          descriptor.width.toDouble(),
+          descriptor.height.toDouble(),
         );
       } finally {
-        frame.image.dispose();
+        descriptor.dispose();
       }
     } finally {
-      codec.dispose();
+      buffer.dispose();
     }
   }
 
@@ -414,7 +414,8 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
       if (imageSize.width < 2 ||
           imageSize.height < 2 ||
           imageSize.width > 12000 ||
-          imageSize.height > 12000) {
+          imageSize.height > 12000 ||
+          imageSize.width * imageSize.height > 40000000) {
         throw StateError('Dimensions de l’image non prises en charge.');
       }
 
@@ -931,6 +932,8 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
             textColor: theme.textColor,
             mutedColor: theme.mutedTextColor,
             backgroundBytes: data.backgroundBytes,
+            backgroundPixelWidth: data.backgroundPixelWidth,
+            backgroundPixelHeight: data.backgroundPixelHeight,
           ),
           const SizedBox(height: 22),
         ],
@@ -1014,6 +1017,8 @@ class _ParkingPlanPreview extends StatefulWidget {
   final Color textColor;
   final Color mutedColor;
   final Uint8List? backgroundBytes;
+  final int? backgroundPixelWidth;
+  final int? backgroundPixelHeight;
 
   const _ParkingPlanPreview({
     required this.layout,
@@ -1027,6 +1032,8 @@ class _ParkingPlanPreview extends StatefulWidget {
     required this.textColor,
     required this.mutedColor,
     required this.backgroundBytes,
+    required this.backgroundPixelWidth,
+    required this.backgroundPixelHeight,
   });
 
   @override
@@ -1055,6 +1062,14 @@ class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
     }
   }
 
+  int _fallbackImageWidth(int encodedBytes) {
+    return widget.backgroundPixelWidth ?? 1;
+  }
+
+  int _fallbackImageHeight(int encodedBytes) {
+    return widget.backgroundPixelHeight ?? 1;
+  }
+
   Future<void> _decodeBackground() async {
     final bytes = widget.backgroundBytes;
     if (bytes == null || bytes.isEmpty) return;
@@ -1062,7 +1077,19 @@ class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
     ui.Image? decodedImage;
     ui.Codec? codec;
     try {
-      codec = await ui.instantiateImageCodec(bytes);
+      final sourceWidth =
+          widget.backgroundPixelWidth ?? _fallbackImageWidth(bytes.length);
+      final sourceHeight =
+          widget.backgroundPixelHeight ?? _fallbackImageHeight(bytes.length);
+      final longestSide = math.max(sourceWidth, sourceHeight);
+      final decodeScale = math.min(1.0, 2400 / longestSide);
+      final targetWidth = math.max(1, (sourceWidth * decodeScale).round());
+      final targetHeight = math.max(1, (sourceHeight * decodeScale).round());
+      codec = await ui.instantiateImageCodec(
+        bytes,
+        targetWidth: targetWidth,
+        targetHeight: targetHeight,
+      );
       final frame = await codec.getNextFrame();
       decodedImage = frame.image;
     } catch (_) {
@@ -1119,6 +1146,8 @@ class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
                 textColor: widget.textColor,
                 mutedColor: widget.mutedColor,
                 backgroundImage: _backgroundImage,
+                backgroundPixelWidth: widget.backgroundPixelWidth,
+                backgroundPixelHeight: widget.backgroundPixelHeight,
               ),
             ),
           ),
@@ -1140,6 +1169,8 @@ class _ParkingPlanPainter extends CustomPainter {
   final Color textColor;
   final Color mutedColor;
   final ui.Image? backgroundImage;
+  final int? backgroundPixelWidth;
+  final int? backgroundPixelHeight;
 
   _ParkingPlanPainter({
     required this.layout,
@@ -1153,6 +1184,8 @@ class _ParkingPlanPainter extends CustomPainter {
     required this.textColor,
     required this.mutedColor,
     required this.backgroundImage,
+    required this.backgroundPixelWidth,
+    required this.backgroundPixelHeight,
   });
 
   Color _spaceColor(_SpaceDisplayState state) {
@@ -1264,10 +1297,14 @@ class _ParkingPlanPainter extends CustomPainter {
     if (image != null && transform != null) {
       final metersPerPixel =
           transform.calibration?.metersPerPixel ?? transform.metersPerPixel;
+      final sourceWidth =
+          (backgroundPixelWidth ?? image.width).toDouble();
+      final sourceHeight =
+          (backgroundPixelHeight ?? image.height).toDouble();
       final imageCenterWorld = transform.imageToWorld(
         ParkingPoint(
-          x: image.width / 2,
-          y: image.height / 2,
+          x: sourceWidth / 2,
+          y: sourceHeight / 2,
         ),
       );
       final imageCenterScreen = _screenPoint(
@@ -1276,10 +1313,8 @@ class _ParkingPlanPainter extends CustomPainter {
         originY: originY,
         scale: scale,
       );
-      final imageWidthScreen =
-          image.width.toDouble() * metersPerPixel * scale;
-      final imageHeightScreen =
-          image.height.toDouble() * metersPerPixel * scale;
+      final imageWidthScreen = sourceWidth * metersPerPixel * scale;
+      final imageHeightScreen = sourceHeight * metersPerPixel * scale;
       canvas.save();
       canvas.clipRect(planRect);
       canvas.translate(imageCenterScreen.dx, imageCenterScreen.dy);
@@ -1633,6 +1668,12 @@ class _CalibrateBackgroundDialogState
                                 widget.bytes,
                                 fit: BoxFit.fill,
                                 gaplessPlayback: true,
+                                cacheWidth: widget.pixelWidth > 2400
+                                    ? 2400
+                                    : widget.pixelWidth,
+                                cacheHeight: widget.pixelHeight > 2400
+                                    ? 2400
+                                    : widget.pixelHeight,
                               ),
                               CustomPaint(
                                 painter: _CalibrationMarkerPainter(
