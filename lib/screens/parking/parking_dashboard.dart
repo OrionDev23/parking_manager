@@ -1241,6 +1241,8 @@ class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
             child: CustomPaint(
               painter: _ParkingPlanPainter(
                 layout: widget.layout,
+                canvasDocument:
+                    ParkingCanvasDocument.fromJsonString(widget.layout.layersJson),
                 zones: widget.zones,
                 spaces: widget.spaces,
                 states: widget.states,
@@ -1264,6 +1266,7 @@ class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
 
 class _ParkingPlanPainter extends CustomPainter {
   final ParkingLayout layout;
+  final ParkingCanvasDocument canvasDocument;
   final List<ParkingZone> zones;
   final List<ParkingSpace> spaces;
   final Map<String, _SpaceDisplayState> states;
@@ -1279,6 +1282,7 @@ class _ParkingPlanPainter extends CustomPainter {
 
   _ParkingPlanPainter({
     required this.layout,
+    required this.canvasDocument,
     required this.zones,
     required this.spaces,
     required this.states,
@@ -1292,6 +1296,29 @@ class _ParkingPlanPainter extends CustomPainter {
     required this.backgroundPixelWidth,
     required this.backgroundPixelHeight,
   });
+
+  Color _canvasTokenColor(String? token) {
+    switch (token) {
+      case 'primary':
+        return primaryColor;
+      case 'success':
+        return const Color(0xFF24B47E);
+      case 'warning':
+        return const Color(0xFFE3A33D);
+      case 'danger':
+        return const Color(0xFFE05B67);
+      case 'border':
+        return borderColor;
+      case 'muted':
+        return mutedColor;
+      case 'text':
+        return textColor;
+      case 'surface':
+        return backgroundColor;
+      default:
+        return primaryColor;
+    }
+  }
 
   Color _spaceColor(_SpaceDisplayState state) {
     switch (state) {
@@ -1574,6 +1601,71 @@ class _ParkingPlanPainter extends CustomPainter {
           centerY / points.length - label.height / 2,
         ),
       );
+    }
+
+    for (final layer in canvasDocument.layers) {
+      if (!layer.visible) continue;
+      for (final object in layer.objects) {
+        if (!object.visible || object.points.isEmpty) continue;
+        final closed = object.type == ParkingCanvasObjectType.rectangle ||
+            object.type == ParkingCanvasObjectType.polygon ||
+            object.type == ParkingCanvasObjectType.obstacle;
+        final path = _pathForPoints(
+          object.points,
+          originX: originX,
+          originY: originY,
+          scale: scale,
+        );
+        final strokeColor = _canvasTokenColor(object.strokeColorToken);
+        if (closed && object.fillColorToken != null) {
+          canvas.drawPath(
+            path,
+            ui.Paint()
+              ..color = _canvasTokenColor(object.fillColorToken)
+                  .withValues(alpha: .18)
+              ..style = ui.PaintingStyle.fill,
+          );
+        }
+        canvas.drawPath(
+          path,
+          ui.Paint()
+            ..color = strokeColor
+            ..style = ui.PaintingStyle.stroke
+            ..strokeWidth = math.max(1.0, object.strokeWidthM * scale)
+                .toDouble()
+            ..strokeCap = ui.StrokeCap.round
+            ..strokeJoin = ui.StrokeJoin.round,
+        );
+        final label = object.label ??
+            (object.type == ParkingCanvasObjectType.dimension
+                ? '${object.bounds.width.toStringAsFixed(2)} m'
+                : null);
+        if (label != null && label.isNotEmpty) {
+          final anchor = _screenPoint(
+            object.points.first,
+            originX: originX,
+            originY: originY,
+            scale: scale,
+          );
+          final textPainter = TextPainter(
+            text: TextSpan(
+              text: label,
+              style: TextStyle(
+                color: strokeColor,
+                fontSize: (object.textHeightM ?? 0.5) * scale,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            maxLines: 2,
+            ellipsis: '…',
+            textDirection: TextDirection.ltr,
+          )..layout(maxWidth: 220);
+          textPainter.paint(
+            canvas,
+            anchor.translate(-textPainter.width / 2, -textPainter.height / 2),
+          );
+        }
+      }
     }
 
     final sizeLabel = '${layout.widthM.toStringAsFixed(1)} × '
