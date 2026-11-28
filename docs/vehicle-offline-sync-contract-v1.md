@@ -368,11 +368,12 @@ Le schéma local était à la version 11 au début de l'implémentation de phase
 | 13 | **Codée sur master** — ajouter base_revision, depends_on_operation_id, sequence_no ; séquencer les opérations historiques et bloquer les enfants jusqu'à l'ACK parent |
 | 14 | **Codée sur master** — ajouter server_revision aux tables véhicules/chauffeurs et créer les tables locales typed sites/vehicle_assignments |
 | 15 | **Codée sur master** — créer les tables locales typed parking_lots, parking_layouts, parking_zones, parking_spaces, vehicle_parking_assignments, parking_access_events et parking_media |
-| 16 | À implémenter — ajouter meter readings et maintenance |
-| 17 | À implémenter après gate privacy/légal — tracking_devices/sessions/location buffer |
-| 18 | À implémenter — vehicle_events et mécanisme de receipts/cursors par domaine si requis |
+| 16 | **Codée sur master** — réserver les index uniques actifs aux affectations physiques ; les réservations sont contrôlées par intervalles temporels |
+| 17 | À implémenter — ajouter meter readings et maintenance |
+| 18 | À implémenter après gate privacy/légal — tracking_devices/sessions/location buffer |
+| 19 | À implémenter — vehicle_events et mécanisme de receipts/cursors par domaine si requis |
 
-Les migrations 13 à 15 sont additives et s'exécutent localement à l'ouverture de SQLite ; elles ne créent ni table ni colonne dans Appwrite. Les tests de migration, de dépendance parent/enfant et de contraintes locales sont ajoutés sur `master` ; leur exécution CI reste le critère de validation.
+Les migrations 13 à 16 sont additives et s'exécutent localement à l'ouverture de SQLite ; elles ne créent ni table ni colonne dans Appwrite. Les tests de migration, de dépendance parent/enfant et de contraintes locales sont ajoutés sur `master` ; leur exécution CI reste le critère de validation.
 
 Chaque migration :
 - est idempotente et testée depuis schema version 11 ;
