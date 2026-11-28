@@ -1042,6 +1042,7 @@ class _ParkingPlanPreview extends StatefulWidget {
 
 class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
   ui.Image? _backgroundImage;
+  int _decodeGeneration = 0;
 
   @override
   void initState() {
@@ -1054,6 +1055,7 @@ class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
     super.didUpdateWidget(oldWidget);
     if (!identical(oldWidget.backgroundBytes, widget.backgroundBytes)) {
       if (widget.backgroundBytes == null) {
+        _decodeGeneration++;
         _backgroundImage?.dispose();
         _backgroundImage = null;
       } else {
@@ -1062,25 +1064,20 @@ class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
     }
   }
 
-  int _fallbackImageWidth(int encodedBytes) {
-    return widget.backgroundPixelWidth ?? 1;
-  }
-
-  int _fallbackImageHeight(int encodedBytes) {
-    return widget.backgroundPixelHeight ?? 1;
-  }
-
   Future<void> _decodeBackground() async {
+    final generation = ++_decodeGeneration;
     final bytes = widget.backgroundBytes;
     if (bytes == null || bytes.isEmpty) return;
 
     ui.Image? decodedImage;
     ui.Codec? codec;
+    ui.ImmutableBuffer? buffer;
+    ui.ImageDescriptor? descriptor;
     try {
-      final sourceWidth =
-          widget.backgroundPixelWidth ?? _fallbackImageWidth(bytes.length);
-      final sourceHeight =
-          widget.backgroundPixelHeight ?? _fallbackImageHeight(bytes.length);
+      buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
+      descriptor = await ui.ImageDescriptor.encoded(buffer);
+      final sourceWidth = widget.backgroundPixelWidth ?? descriptor.width;
+      final sourceHeight = widget.backgroundPixelHeight ?? descriptor.height;
       final longestSide = math.max(sourceWidth, sourceHeight);
       final decodeScale = math.min(1.0, 2400 / longestSide);
       final targetWidth = math.max(1, (sourceWidth * decodeScale).round());
@@ -1097,9 +1094,11 @@ class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
       return;
     } finally {
       codec?.dispose();
+      descriptor?.dispose();
+      buffer?.dispose();
     }
 
-    if (!mounted) {
+    if (!mounted || generation != _decodeGeneration) {
       decodedImage?.dispose();
       return;
     }
@@ -1110,6 +1109,7 @@ class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
 
   @override
   void dispose() {
+    _decodeGeneration++;
     _backgroundImage?.dispose();
     super.dispose();
   }
