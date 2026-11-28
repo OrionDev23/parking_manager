@@ -666,7 +666,7 @@ void main() {
             assignmentId: 'another-assignment',
           ),
         ),
-        throwsA(isA<StateError>()),
+        throwsA(isA<ArgumentError>()),
       );
 
       expect(await parking.getAssignment(created.id), isNull);
@@ -911,7 +911,7 @@ void main() {
             occurredAt: DateTime.utc(2026, 11, 28, 11),
           ),
         ),
-        throwsA(isA<StateError>()),
+        throwsA(isA<ArgumentError>()),
       );
 
       expect(
