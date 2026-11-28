@@ -454,7 +454,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
                         onAction: _createParking,
                       );
                     }
-                    return _buildParking(data, theme, compact);
+                    return _buildParking(data, theme);
                   },
                 ),
             ],
@@ -467,9 +467,13 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
   Widget _buildParking(
     _ParkingSnapshot data,
     AppTheme theme,
-    bool compact,
   ) {
     final selectedLot = data.selectedLot!;
+    final selectedSiteRows =
+        data.sites.where((site) => site.id == selectedLot.siteId).toList();
+    final selectedSiteName = selectedSiteRows.isEmpty
+        ? selectedLot.siteId
+        : selectedSiteRows.first.name;
     final now = DateTime.now().toUtc();
     final states = {
       for (final space in data.spaces)
@@ -548,7 +552,8 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
           ),
         const SizedBox(height: 4),
         Text(
-          selectedLot.code + ' • ' + selectedLot.status.name,
+          'Site : ' + selectedSiteName +
+              ' • ' + selectedLot.code + ' • ' + selectedLot.status.name,
           style: TextStyle(color: theme.mutedTextColor, fontSize: 12),
         ),
         if (data.layouts.isNotEmpty) ...[
@@ -651,7 +656,6 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
                 ))
                   _SpaceTile(
                     space: space,
-                    state: states[space.id]!,
                     selected: space.id == selectedSpace?.id,
                     theme: theme,
                     color: _stateColor(states[space.id]!, theme),
@@ -1095,7 +1099,6 @@ class _MetricCard extends StatelessWidget {
 
 class _SpaceTile extends StatelessWidget {
   final ParkingSpace space;
-  final _SpaceDisplayState state;
   final bool selected;
   final AppTheme theme;
   final Color color;
@@ -1104,7 +1107,6 @@ class _SpaceTile extends StatelessWidget {
 
   const _SpaceTile({
     required this.space,
-    required this.state,
     required this.selected,
     required this.theme,
     required this.color,
