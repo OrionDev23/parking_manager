@@ -761,6 +761,34 @@ class LocalDatabase {
         db.execute('ROLLBACK');
         rethrow;
       }
+
+    if (version < 19) {
+      db.execute('BEGIN IMMEDIATE');
+      try {
+        bool hasColumn(String table, String column) => db
+            .select('PRAGMA table_info($table)')
+            .any((row) => row['name'] == column);
+
+        if (!hasColumn('parking_media', 'pixel_width')) {
+          db.execute(
+            'ALTER TABLE parking_media ADD COLUMN pixel_width INTEGER',
+          );
+        }
+        if (!hasColumn('parking_media', 'pixel_height')) {
+          db.execute(
+            'ALTER TABLE parking_media ADD COLUMN pixel_height INTEGER',
+          );
+        }
+        db.execute(
+          "INSERT INTO schema_migrations(version, applied_at) "
+          "VALUES (19, datetime('now'))",
+        );
+        db.execute('COMMIT');
+      } catch (_) {
+        db.execute('ROLLBACK');
+        rethrow;
+      }
+    }
     }
   }
 
