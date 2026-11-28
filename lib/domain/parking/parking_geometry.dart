@@ -78,8 +78,9 @@ enum ParkingRowOrientation {
 /// Input for deterministic guided generation of a row of parking spaces.
 ///
 /// The anchor is the centre of the first space. [angleDegrees] rotates the
-/// whole row clockwise in the plan coordinate system. The orientation chooses
-/// which dimension is used as the default pitch axis; angle then rotates it.
+/// whole row clockwise in the plan coordinate system. The width axis is the
+/// row pitch axis in both orientations; vertical orientation rotates that axis
+/// from X to Y together with the parking-space rectangle.
 class ParkingRowSpec {
   final String zoneCode;
   final String rowCode;
