@@ -1121,12 +1121,12 @@ class _ParkingCanvasEditorPainter extends CustomPainter {
     for (var x = 0.0; x <= layout.widthM; x += gridStep) {
       final a = _screen(ParkingPoint(x: x, y: 0));
       final b = _screen(ParkingPoint(x: x, y: layout.heightM));
-      canvas.drawLine(ui.Offset(a.x, a.y), ui.Offset(b.x, b.y), gridPaint);
+      canvas.drawLine(a, b, gridPaint);
     }
     for (var y = 0.0; y <= layout.heightM; y += gridStep) {
       final a = _screen(ParkingPoint(x: 0, y: y));
       final b = _screen(ParkingPoint(x: layout.widthM, y: y));
-      canvas.drawLine(ui.Offset(a.x, a.y), ui.Offset(b.x, b.y), gridPaint);
+      canvas.drawLine(a, b, gridPaint);
     }
 
     for (final zone in zones) {
