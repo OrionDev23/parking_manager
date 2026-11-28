@@ -422,6 +422,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
           imageSize.width * imageSize.height > 40000000) {
         throw StateError('Dimensions de l’image non prises en charge.');
       }
+      if (!mounted) return;
 
       final calibrationResult =
           await showDialog<_CalibratedBackgroundResult>(
@@ -1110,7 +1111,7 @@ class _ParkingPlanPreviewState extends State<_ParkingPlanPreview> {
     }
     final previous = _backgroundImage;
     setState(() => _backgroundImage = decodedImage);
-    previous?.dispose();
+    previous.dispose();
   }
 
   @override
