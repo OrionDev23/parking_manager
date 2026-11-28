@@ -472,9 +472,11 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final compact = constraints.maxWidth < ParcotoTokens.mobileBreakpoint;
+        // Model year and the legacy usage year have different meanings.
+        // Keep the header aligned with the Characteristics section.
         final versionParts = [
           if (v.trim?.trim().isNotEmpty == true) v.trim!.trim(),
-          (v.modelYear ?? v.anneeUtil)?.toString() ?? '',
+          v.modelYear?.toString() ?? '',
         ].where((value) => value.isNotEmpty).toList(growable: false);
         final version = versionParts.join(' • ');
         final transmission = v.transmission?.trim().isNotEmpty == true
