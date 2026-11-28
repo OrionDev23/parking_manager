@@ -733,6 +733,35 @@ class LocalDatabase {
         rethrow;
       }
     }
+
+    if (version < 18) {
+      db.execute('BEGIN IMMEDIATE');
+      try {
+        // A unique index on "active" blocked adjacent scheduled assignments.
+        // The transaction-scoped ParkingAssignmentPolicy is the authority for
+        // time-window conflicts; these indexes only accelerate its lookup.
+        db.execute('DROP INDEX IF EXISTS ux_parking_active_space');
+        db.execute('DROP INDEX IF EXISTS ux_parking_active_vehicle');
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_parking_assignment_space_window '
+          'ON vehicle_parking_assignments('
+          'company_id, parking_space_id, status, start_at, end_at)',
+        );
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_parking_assignment_vehicle_window '
+          'ON vehicle_parking_assignments('
+          'company_id, vehicle_id, status, start_at, end_at)',
+        );
+        db.execute(
+          "INSERT INTO schema_migrations(version, applied_at) "
+          "VALUES (18, datetime('now'))",
+        );
+        db.execute('COMMIT');
+      } catch (_) {
+        db.execute('ROLLBACK');
+        rethrow;
+      }
+    }
   }
 
   bool isStartupMigrationComplete({
