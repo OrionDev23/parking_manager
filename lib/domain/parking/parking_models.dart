@@ -1193,9 +1193,8 @@ class ParkingAssignmentConflict implements Exception {
 
   @override
   String toString() =>
-      'Parking assignment conflict: ' +
-      reason.name +
-      (conflictingAssignmentId == null ? '' : ' ($conflictingAssignmentId)');
+      'Parking assignment conflict: ${reason.name}'
+      '${conflictingAssignmentId == null ? '' : ' ($conflictingAssignmentId)'}';
 }
 
 /// Enforces time-window conflicts before an assignment is written.
