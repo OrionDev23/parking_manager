@@ -28,7 +28,6 @@ class _ParkingSnapshot {
   final List<ParkingZone> zones;
   final List<ParkingSpace> spaces;
   final List<VehicleParkingAssignment> assignments;
-  final ParkingMedia? backgroundMedia;
   final Uint8List? backgroundBytes;
 
   const _ParkingSnapshot({
@@ -39,7 +38,6 @@ class _ParkingSnapshot {
     required this.zones,
     required this.spaces,
     required this.assignments,
-    this.backgroundMedia,
     this.backgroundBytes,
   });
 }
@@ -147,7 +145,6 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
       zones: zones,
       spaces: spaces,
       assignments: assignments,
-      backgroundMedia: backgroundMedia,
       backgroundBytes: backgroundBytes,
     );
   }
@@ -1521,8 +1518,6 @@ class _CalibrateBackgroundDialogState
     final dialogWidth = (MediaQuery.sizeOf(context).width - 64)
         .clamp(260.0, 620.0)
         .toDouble();
-    final imageHeight =
-        dialogWidth * widget.pixelHeight / widget.pixelWidth;
 
     return ContentDialog(
       title: const Text('Calibrer le fond de plan'),
