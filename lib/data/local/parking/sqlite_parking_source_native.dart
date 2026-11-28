@@ -570,7 +570,10 @@ class SqliteParkingSource implements LocalParkingSource {
   }
 
   @override
-  Future<void> createAssignment(VehicleParkingAssignment assignment) async {
+  Future<void> createAssignment(
+    VehicleParkingAssignment assignment, {
+    ParkingAccessEvent? event,
+  }) async {
     assignment.validate();
     if (assignment.status != ParkingAssignmentStatus.active) {
       throw ArgumentError('New assignments must start in the active state.');
@@ -589,6 +592,13 @@ class SqliteParkingSource implements LocalParkingSource {
         ),
       );
       _insertAssignment(assignment);
+      if (event != null) {
+        if (event.assignmentId != assignment.id ||
+            event.vehicleId != assignment.vehicleId) {
+          throw ArgumentError('Entry event must reference the created assignment and vehicle.');
+        }
+        _appendAccessEvent(event);
+      }
     });
   }
 
@@ -597,6 +607,7 @@ class SqliteParkingSource implements LocalParkingSource {
     required VehicleParkingAssignment nextAssignment,
     required DateTime closePreviousAt,
     String? endedBy,
+    ParkingAccessEvent? event,
   }) async {
     nextAssignment.validate();
     if (nextAssignment.status != ParkingAssignmentStatus.active ||
@@ -645,6 +656,13 @@ class SqliteParkingSource implements LocalParkingSource {
         ),
       );
       _insertAssignment(nextAssignment);
+      if (event != null) {
+        if (event.assignmentId != nextAssignment.id ||
+            event.vehicleId != nextAssignment.vehicleId) {
+          throw ArgumentError('Move event must reference the new assignment and vehicle.');
+        }
+        _appendAccessEvent(event);
+      }
     });
   }
 
@@ -653,6 +671,7 @@ class SqliteParkingSource implements LocalParkingSource {
     required String assignmentId,
     required DateTime endedAt,
     String? endedBy,
+    ParkingAccessEvent? event,
   }) async {
     _transaction(() {
       final assignment = _assignmentById(assignmentId);
@@ -661,6 +680,13 @@ class SqliteParkingSource implements LocalParkingSource {
         throw StateError('Assignment is already closed.');
       }
       _endAssignment(assignment, endedAt: endedAt, endedBy: endedBy);
+      if (event != null) {
+        if (event.assignmentId != assignment.id ||
+            event.vehicleId != assignment.vehicleId) {
+          throw ArgumentError('Exit event must reference the ended assignment and vehicle.');
+        }
+        _appendAccessEvent(event);
+      }
     });
   }
 
