@@ -125,12 +125,25 @@ class ParkingCanvasEditorController {
   String? _activeLayerId;
   ParkingCanvasTool _activeTool = ParkingCanvasTool.select;
 
-  ParkingCanvasEditorController({
+  factory ParkingCanvasEditorController({
     required ParkingCanvasDocument document,
+    required double widthM,
+    required double heightM,
+    int historyLimit = 100,
+  }) =>
+      ParkingCanvasEditorController._(
+        document: document,
+        widthM: widthM,
+        heightM: heightM,
+        historyLimit: historyLimit,
+      );
+
+  ParkingCanvasEditorController._({
+    required this._document,
     required this.widthM,
     required this.heightM,
-    this.historyLimit = 100,
-  }) : _document = document {
+    required this.historyLimit,
+  }) {
     if (historyLimit < 1 || historyLimit > 1000) {
       throw RangeError.range(historyLimit, 1, 1000, 'historyLimit');
     }
