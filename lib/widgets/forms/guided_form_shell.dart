@@ -230,7 +230,7 @@ class GuidedFormShell extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      _ProgressTrack(progress: progress, color: accent),
+                      GuidedFormProgressTrack(progress: progress, color: accent),
                     ],
                   ),
                 ),
@@ -256,7 +256,7 @@ class GuidedFormShell extends StatelessWidget {
                 const SizedBox(width: 12),
                 SizedBox(
                   width: 92,
-                  child: _ProgressTrack(progress: progress, color: accent),
+                  child: GuidedFormProgressTrack(progress: progress, color: accent),
                 ),
               ],
             ),
@@ -435,11 +435,11 @@ class GuidedFormShell extends StatelessWidget {
   }
 }
 
-class _ProgressTrack extends StatelessWidget {
+class GuidedFormProgressTrack extends StatelessWidget {
   final double progress;
   final Color color;
 
-  const _ProgressTrack({
+  const GuidedFormProgressTrack({
     required this.progress,
     required this.color,
   });
