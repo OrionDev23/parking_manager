@@ -69,19 +69,23 @@ class SqliteParkingSource implements LocalParkingSource {
     DateTime? at,
   }) async => throw _unsupported();
   @override
-  Future<void> createAssignment(VehicleParkingAssignment assignment) async =>
-      throw _unsupported();
+  Future<void> createAssignment(
+    VehicleParkingAssignment assignment, {
+    ParkingAccessEvent? event,
+  }) async => throw _unsupported();
   @override
   Future<void> moveVehicleToSpace({
     required VehicleParkingAssignment nextAssignment,
     required DateTime closePreviousAt,
     String? endedBy,
+    ParkingAccessEvent? event,
   }) async => throw _unsupported();
   @override
   Future<void> endAssignment({
     required String assignmentId,
     required DateTime endedAt,
     String? endedBy,
+    ParkingAccessEvent? event,
   }) async => throw _unsupported();
 
   @override
