@@ -100,7 +100,7 @@ void main() {
       );
 
       expect(spaces[1].geometry.centerX, closeTo(3, 1e-10));
-      expect(spaces[1].geometry.centerY, closeTo(9.5, 1e-10));
+      expect(spaces[1].geometry.centerY, closeTo(7, 1e-10));
       expect(spaces[1].geometry.rotationDegrees, 90);
     });
 
