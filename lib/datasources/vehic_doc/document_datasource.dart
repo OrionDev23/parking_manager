@@ -99,7 +99,7 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
                         return f.MenuFlyout(
                           items: [
                             f.MenuFlyoutItem(
-                              text: const Text('mod').tr(),
+                              text: Text('mod').tr(),
                               onPressed: () {
                                 Navigator.of(current).pop();
                                 late f.Tab tab;
@@ -131,7 +131,7 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
                             ),
                             if (DatabaseGetter().isAdmin())
                               f.MenuFlyoutItem(
-                                text: const Text('delete').tr(),
+                                text: Text('delete').tr(),
                                 onPressed: () {
                                   showDeleteConfirmation(element.value);
                                 },
