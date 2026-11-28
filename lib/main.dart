@@ -38,6 +38,7 @@ import 'domain/repositories/access_control_repository.dart';
 import 'data/remote/access/appwrite_access_control_repository.dart';
 import 'core/services/user_profile_service.dart';
 import 'core/services/vehicle_services.dart';
+import 'core/services/parking_services.dart';
 import 'core/database/legacy_module_cache_migration.dart';
 import 'core/services/driver_services.dart';
 import 'core/services/legacy_stock_sync_service.dart';
@@ -111,6 +112,7 @@ Future<void> stopSessionRuntime() async {
   PlanningProvider.invalidateSessionCache();
   LogProvider.invalidateSessionCache();
   PartsProvider.invalidateSessionCache();
+  ParkingServices.clear();
   _backgroundInitializationRetryTimer?.cancel();
   _backgroundInitializationRetryTimer = null;
   _backgroundInitializationRetryCount = 0;
@@ -132,6 +134,7 @@ Future<void> _configureSessionRuntime(String companyId) async {
   }
 
   final configuration = () async {
+    ParkingServices.clear();
     if (_runtimeReady) await syncEngine.stop();
 
     final nextVehicles = await VehicleServices.create(
@@ -177,6 +180,10 @@ Future<void> _configureSessionRuntime(String companyId) async {
 
     vehicleServices = nextVehicles;
     driverServices = nextDrivers;
+    ParkingServices.install(
+      localDatabase: nextVehicles.localDatabase,
+      companyId: companyId,
+    );
     legacyStockSyncService = nextStock;
 
     // Runtime swaps can happen without a logout (for example, switching
