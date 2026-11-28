@@ -310,6 +310,19 @@ class _ParkingCanvasEditorDialogState extends State<ParkingCanvasEditorDialog> {
   }
 
   void _onScaleEnd(ScaleEndDetails details) {
+    if (_draggingSelection && _snapToGrid) {
+      try {
+        _editor.moveSelection(
+          0,
+          0,
+          snapToGrid: true,
+          gridStepM: widget.layout.gridStepM,
+        );
+      } catch (error) {
+        _editor.rollbackTransaction();
+        setState(() => _error = error.toString());
+      }
+    }
     _editor.commitTransaction();
     if (_draftStart != null && _draftEnd != null) {
       _commitDraft(_draftStart!, _draftEnd!);
@@ -806,7 +819,7 @@ class _ParkingCanvasEditorDialogState extends State<ParkingCanvasEditorDialog> {
                     ),
                   );
                   final inspector = Container(
-                    width: inspectorWidth,
+                    width: narrow ? constraints.maxWidth : inspectorWidth,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: widget.backgroundColor,
@@ -1045,7 +1058,11 @@ class _ParkingCanvasEditorPainter extends CustomPainter {
 
     final image = backgroundImage;
     final transform = layout.backgroundTransform;
-    if (image != null && transform != null) {
+    final backgroundLayer = document.layers
+        .where((layer) => layer.type == ParkingCanvasLayerType.background)
+        .firstOrNull;
+    final showBackground = backgroundLayer?.visible ?? true;
+    if (image != null && transform != null && showBackground) {
       final metersPerPixel =
           transform.calibration?.metersPerPixel ?? transform.metersPerPixel;
       final sourceWidth = (backgroundPixelWidth ?? image.width).toDouble();
@@ -1087,7 +1104,10 @@ class _ParkingCanvasEditorPainter extends CustomPainter {
       canvas.restore();
     }
 
-    var gridStep = layout.gridStepM;
+    var gridStep = math.max(
+      layout.gridStepM,
+      math.max(layout.widthM, layout.heightM) / 100,
+    ).toDouble();
     while (gridStep * scale < 18) {
       gridStep *= 2;
     }
