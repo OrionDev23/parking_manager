@@ -680,6 +680,35 @@ class LocalDatabase {
       }
     }
 
+
+    if (version < 16) {
+      db.execute('BEGIN IMMEDIATE');
+      try {
+        // Physical assignments occupy the space now. Reservations are
+        // time-window commitments and are checked by ParkingAssignmentPolicy.
+        db.execute('DROP INDEX IF EXISTS ux_parking_active_space');
+        db.execute('DROP INDEX IF EXISTS ux_parking_active_vehicle');
+        db.execute(
+          'CREATE UNIQUE INDEX ux_parking_active_space '
+          'ON vehicle_parking_assignments(company_id, parking_space_id) '
+          "WHERE status = 'active' AND assignment_type <> 'reserved'",
+        );
+        db.execute(
+          'CREATE UNIQUE INDEX ux_parking_active_vehicle '
+          'ON vehicle_parking_assignments(company_id, vehicle_id) '
+          "WHERE status = 'active' AND assignment_type <> 'reserved'",
+        );
+        db.execute(
+          "INSERT INTO schema_migrations(version, applied_at) "
+          "VALUES (16, datetime('now'))",
+        );
+        db.execute('COMMIT');
+      } catch (_) {
+        db.execute('ROLLBACK');
+        rethrow;
+      }
+    }
+
   bool isStartupMigrationComplete({
     required String companyId,
     required String migrationKey,
