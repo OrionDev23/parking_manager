@@ -263,6 +263,71 @@ void main() {
       expect((await parking.getSpaces(newZone.id)).single.id, newSpace.id);
     });
 
+    test('rejects a rectangular place whose edge crosses a concave zone notch', () async {
+      final newSite = site(id: 'site-concave');
+      final newLot = lot(id: 'lot-concave', parentSiteId: newSite.id);
+      final newLayout = ParkingLayout(
+        id: 'layout-concave',
+        companyId: companyId,
+        parkingLotId: newLot.id,
+        name: 'Plan concave',
+        version: 1,
+        widthM: 10,
+        heightM: 10,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      final concaveZone = ParkingZone(
+        id: 'zone-concave',
+        companyId: companyId,
+        parkingLotId: newLot.id,
+        code: 'U',
+        name: 'Zone en U',
+        boundary: ParkingPolygon(
+          points: const [
+            ParkingPoint(x: 0, y: 0),
+            ParkingPoint(x: 10, y: 0),
+            ParkingPoint(x: 10, y: 10),
+            ParkingPoint(x: 6, y: 10),
+            ParkingPoint(x: 6, y: 4),
+            ParkingPoint(x: 4, y: 4),
+            ParkingPoint(x: 4, y: 10),
+            ParkingPoint(x: 0, y: 10),
+          ],
+        ),
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      final crossingSpace = ParkingSpace(
+        id: 'space-crossing',
+        companyId: companyId,
+        parkingZoneId: concaveZone.id,
+        code: 'U-01',
+        rectangle: const ParkingSpaceGeometry(
+          centerX: 5,
+          centerY: 7,
+          width: 4,
+          length: 2,
+        ),
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+
+      await expectLater(
+        parking.createParkingSetup(
+          site: newSite,
+          parkingLot: newLot,
+          layout: newLayout,
+          zones: [concaveZone],
+          spaces: [crossingSpace],
+        ),
+        throwsA(isA<ArgumentError>()),
+      );
+
+      expect(await parking.getSites(), isEmpty);
+      expect(await parking.getParkingLots(), isEmpty);
+    });
+
     test('rolls back a new setup when generated geometry exceeds the plan',
         () async {
       final newSite = site(id: 'site-invalid');
