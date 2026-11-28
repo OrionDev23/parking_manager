@@ -134,6 +134,24 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
     });
   }
 
+  String _nextUniqueSiteCode(
+    String requested,
+    Set<String> existingCodes,
+  ) {
+    final normalized = existingCodes.map((code) => code.toLowerCase()).toSet();
+    if (!normalized.contains(requested.toLowerCase())) return requested;
+
+    for (var suffixNumber = 2; suffixNumber < 10000; suffixNumber++) {
+      final suffix = '-' + suffixNumber.toString().padLeft(2, '0');
+      final prefixLength = requested.length <= 40 - suffix.length
+          ? requested.length
+          : 40 - suffix.length;
+      final candidate = requested.substring(0, prefixLength) + suffix;
+      if (!normalized.contains(candidate.toLowerCase())) return candidate;
+    }
+    throw StateError('No unique site code could be generated.');
+  }
+
   Future<void> _createParking() async {
     final services = _services;
     if (services == null) return;
@@ -145,6 +163,11 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
     if (input == null || !mounted) return;
 
     try {
+      final existingSites = await services.local.getSites();
+      final uniqueSiteCode = _nextUniqueSiteCode(
+        input.siteCode,
+        existingSites.map((site) => site.code).toSet(),
+      );
       final now = DateTime.now().toUtc();
       final stamp = now.microsecondsSinceEpoch.toString();
       final siteId = 'site_$stamp';
@@ -163,7 +186,7 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
       final site = ParkingSite(
         id: siteId,
         companyId: services.companyId,
-        code: input.siteCode,
+        code: uniqueSiteCode,
         name: input.siteName,
         createdAt: now,
         updatedAt: now,
@@ -268,9 +291,9 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
         builder: (context, close) => const InfoBar(
           title: Text('Parking créé'),
           content: Text(
-            'Le plan et ses places sont enregistrés sur cet appareil. '
-            'La synchronisation Appwrite sera activée après le déploiement '
-            'des services distants Parking.',
+            'Code du site : ' + site.code + '. Le plan et ses places sont '
+            'enregistrés sur cet appareil. La synchronisation Appwrite sera '
+            'activée après le déploiement des services distants Parking.',
           ),
           severity: InfoBarSeverity.success,
         ),
