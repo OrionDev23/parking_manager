@@ -8,8 +8,10 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart';
 
 import '../../core/services/parking_services.dart';
+import '../../domain/parking/parking_canvas_document.dart';
 import '../../domain/parking/parking_geometry.dart';
 import '../../domain/parking/parking_models.dart';
+import 'parking_canvas_editor_dialog.dart';
 import '../../theme.dart';
 
 class ParkingDashboard extends StatefulWidget {
@@ -357,6 +359,95 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
     }
   }
 
+
+  Future<void> _editVectorPlan(
+    _ParkingSnapshot data,
+    AppTheme theme,
+  ) async {
+    final services = _services;
+    if (services == null || kIsWeb || data.layouts.isEmpty) return;
+
+    final layout = data.layouts.first;
+    ParkingCanvasDocument document;
+    try {
+      document = ParkingCanvasDocument.fromJsonString(layout.layersJson);
+      if (document.layers.isEmpty) {
+        document = ParkingCanvasDocument.withDefaultLayers();
+      }
+    } catch (error) {
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Plan illisible'),
+          content: Text(error.toString()),
+          severity: InfoBarSeverity.error,
+        ),
+      );
+      return;
+    }
+
+    final editedDocument = await showDialog<ParkingCanvasDocument>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => ParkingCanvasEditorDialog(
+        layout: layout,
+        document: document,
+        zones: data.zones,
+        spaces: data.spaces,
+        backgroundBytes: data.backgroundBytes,
+        backgroundPixelWidth: data.backgroundPixelWidth,
+        backgroundPixelHeight: data.backgroundPixelHeight,
+        primaryColor: theme.color,
+        backgroundColor: theme.surfaceColor,
+        borderColor: theme.borderColor,
+        textColor: theme.textColor,
+        mutedColor: theme.mutedTextColor,
+      ),
+    );
+    if (editedDocument == null || !mounted) return;
+
+    try {
+      final now = DateTime.now().toUtc();
+      await services.local.upsertLayout(
+        ParkingLayout(
+          id: layout.id,
+          companyId: layout.companyId,
+          parkingLotId: layout.parkingLotId,
+          name: layout.name,
+          version: layout.version,
+          status: layout.status,
+          widthM: layout.widthM,
+          heightM: layout.heightM,
+          gridStepM: layout.gridStepM,
+          backgroundFileId: layout.backgroundFileId,
+          backgroundTransform: layout.backgroundTransform,
+          layersJson: editedDocument.encode(),
+          createdAt: layout.createdAt,
+          updatedAt: now,
+        ),
+      );
+      if (!mounted) return;
+      _refresh(parkingLotId: layout.parkingLotId);
+      displayInfoBar(
+        context,
+        builder: (context, close) => const InfoBar(
+          title: Text('Plan enregistré'),
+          content: Text('Les modifications vectorielles sont enregistrées localement.'),
+          severity: InfoBarSeverity.success,
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Enregistrement impossible'),
+          content: Text(error.toString()),
+          severity: InfoBarSeverity.error,
+        ),
+      );
+    }
+  }
 
   Future<ui.Size> _readImageDimensions(Uint8List bytes) async {
     final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
@@ -910,13 +1001,30 @@ class _ParkingDashboardState extends State<ParkingDashboard> {
         ),
         const SizedBox(height: 22),
         if (data.layouts.isNotEmpty) ...[
-          Text(
-            'Plan vectoriel — échelle métrique',
-            style: TextStyle(
-              color: theme.textColor,
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Plan vectoriel — échelle métrique',
+                  style: TextStyle(
+                    color: theme.textColor,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Button(
+                onPressed: kIsWeb ? null : () => _editVectorPlan(data, theme),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(FluentIcons.edit, size: 13),
+                    SizedBox(width: 7),
+                    Text('Ouvrir le concepteur'),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 10),
           _ParkingPlanPreview(
