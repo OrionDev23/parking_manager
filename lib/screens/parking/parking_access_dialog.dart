@@ -263,7 +263,12 @@ class _ParkingAccessDialogState extends State<ParkingAccessDialog> {
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.sizeOf(context);
-    final dialogHeight = (screen.height - 48).clamp(420.0, 680.0).toDouble();
+    final dialogWidth = (screen.width - 32).clamp(240.0, 560.0).toDouble();
+    final dialogHeight = (screen.height - 32).clamp(240.0, 680.0).toDouble();
+    final contentWidth = (dialogWidth - 40).clamp(200.0, 520.0).toDouble();
+    final listHeight = widget.isEntry
+        ? (dialogHeight * 0.28).clamp(96.0, 180.0).toDouble()
+        : (dialogHeight * 0.36).clamp(110.0, 220.0).toDouble();
     final canSubmit = widget.isEntry
         ? _selectedVehicleId != null &&
             _selectedSpaceId != null &&
@@ -274,18 +279,19 @@ class _ParkingAccessDialogState extends State<ParkingAccessDialog> {
 
     return ContentDialog(
       constraints: BoxConstraints(
-        maxWidth: 600,
+        maxWidth: dialogWidth,
         maxHeight: dialogHeight,
       ),
       title: Text(
         widget.isEntry ? 'Enregistrer une entrée' : 'Enregistrer une sortie',
       ),
       content: SizedBox(
-        width: 560,
+        width: contentWidth,
         height: dialogHeight - 130,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
             Text(
               widget.isEntry
                   ? 'Sélectionne le véhicule entrant et sa place de stationnement.'
@@ -313,7 +319,7 @@ class _ParkingAccessDialogState extends State<ParkingAccessDialog> {
             ),
             const SizedBox(height: 6),
             SizedBox(
-              height: widget.isEntry ? 190 : 250,
+              height: listHeight,
               child: widget.isEntry
                   ? _vehicleOptions()
                   : _assignmentOptions(),
@@ -350,7 +356,8 @@ class _ParkingAccessDialogState extends State<ParkingAccessDialog> {
               maxLines: 2,
               placeholder: 'Note (facultative)',
             ),
-          ],
+            ],
+          ),
         ),
       ),
       actions: [
